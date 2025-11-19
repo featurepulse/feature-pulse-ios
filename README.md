@@ -1,0 +1,431 @@
+# FeaturePulse iOS SDK
+
+A modern SwiftUI-only SDK for collecting and managing feature requests from your iOS app users.
+
+## Features
+
+✅ **SwiftUI-Only** - Pure SwiftUI implementation, no UIKit dependencies  
+✅ **Modern Swift 6.0** - Uses `@Observable`, async/await, and Swift Concurrency  
+✅ **Type-Safe Localization** - String Catalogs with compile-time checking  
+✅ **Multi-Language Support** - English, Spanish, French, German included  
+✅ **Customizable** - Override any translation or appearance setting  
+✅ **Simple Integration** - Just 3 lines of code to get started
+
+## Requirements
+
+- iOS 17.0+
+- macOS 14.0+
+- Swift 6.0+
+- Xcode 15.0+
+
+## Installation
+
+### Swift Package Manager
+
+Add FeaturePulse to your project in Xcode:
+
+1. File > Add Package Dependencies
+2. Enter package URL: `https://github.com/featurepulse/feature-pulse-ios`
+3. Select version and add to your target
+
+Or add to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/featurepulse/feature-pulse-ios", from: "1.0.0")
+]
+```
+
+## Quick Start
+
+### 1. Configure API Key
+
+In your app's initialization (e.g., `@main` struct):
+
+```swift
+import SwiftUI
+import FeaturePulse
+
+@main
+struct MyApp: App {
+    init() {
+        // Required: Your API key from featurepul.se
+        FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
+        
+        // Optional: Customize primary color
+        FeaturePulseConfiguration.shared.primaryColor = .red
+        
+        // Optional: Set user payment tier
+        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+### 2. Add to Your UI
+
+Choose from multiple integration patterns:
+
+## Usage Examples
+
+### Example 1: In a Tab Bar
+
+```swift
+import SwiftUI
+import FeaturePulse
+
+struct ContentView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+
+            FeaturePulseView()
+                .tabItem {
+                    Label("Feedback", systemImage: "lightbulb")
+                }
+        }
+    }
+}
+```
+
+### Example 2: As a Modal Sheet
+
+Present with NavigationStack and close button:
+
+```swift
+import SwiftUI
+import FeaturePulse
+
+struct ContentView: View {
+    @State private var show = false
+
+    var body: some View {
+        Button("Feature Requests") {
+            show = true
+        }
+        .sheet(isPresented: $show) {
+            NavigationStack {
+                FeaturePulseView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            if #available(iOS 26, *) {
+                                Button(role: .close) {
+                                    show = false
+                                }
+                            } else {
+                                Button {
+                                    show = false
+                                } label: {
+                                    Label("Close", systemImage: "xmark")
+                                }
+                            }
+                        }
+                    }
+            }
+        }
+    }
+}
+```
+
+### Example 3: As a Navigation Link
+
+```swift
+import SwiftUI
+import FeaturePulse
+
+struct SettingsView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                NavigationLink {
+                    FeaturePulseView()
+                } label: {
+                    Label(FeaturePulse.L10n.featureRequests, systemImage: "lightbulb")
+                }
+            }
+            .navigationTitle("Settings")
+        }
+    }
+}
+```
+
+### Example 4: As a Root View
+
+```swift
+import SwiftUI
+import FeaturePulse
+
+struct FeedbackView: View {
+    var body: some View {
+        NavigationStack {
+            FeaturePulseView()
+        }
+    }
+}
+```
+
+That's it! Your users can now submit and vote on feature requests.
+
+## Configuration
+
+### Complete Configuration Example
+
+```swift
+import FeaturePulse
+
+// API Configuration
+FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
+
+// Appearance
+FeaturePulseConfiguration.shared.primaryColor = .red
+
+// User Information
+FeaturePulseConfiguration.shared.updateUser(
+    customID: "user_123",
+    email: "user@example.com",
+    name: "John Doe"
+)
+
+// Payment Tier (affects vote weighting)
+FeaturePulseConfiguration.shared.updateUser(payment: .free)
+FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99))
+```
+
+### Customize Primary Color
+
+Change the primary color to match your app's brand:
+
+```swift
+// Use system colors
+FeaturePulseConfiguration.shared.primaryColor = .blue
+FeaturePulseConfiguration.shared.primaryColor = .red
+FeaturePulseConfiguration.shared.primaryColor = .green
+
+// Use custom colors
+FeaturePulseConfiguration.shared.primaryColor = Color(red: 87/255, green: 13/255, blue: 248/255)
+```
+
+### User Information
+
+Track user information for better feedback and analytics:
+
+```swift
+// Update user details
+FeaturePulseConfiguration.shared.updateUser(
+    customID: "user_123",      // Your internal user ID
+    email: "user@example.com", // User's email
+    name: "John Doe"          // User's display name
+)
+
+// Update payment tier separately
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+```
+
+### Payment Tracking & Vote Weighting
+
+FeaturePulse uses Monthly Recurring Revenue (MRR) to weight votes, giving higher priority to paying customers:
+
+```swift
+// Free users
+FeaturePulseConfiguration.shared.updateUser(payment: .free)
+
+// Weekly subscription ($2.99/week = ~$12 MRR)
+FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99))
+
+// Monthly subscription ($9.99/month = $9.99 MRR)
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+
+// Yearly subscription ($79.99/year = ~$6.67 MRR)
+FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99))
+
+// Lifetime purchase ($199.99 amortized over 24 months = ~$8.33 MRR)
+FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99))
+
+// Custom lifetime amortization period
+FeaturePulseConfiguration.shared.updateUser(
+    payment: .lifetime(199.99, expectedLifetimeMonths: 36)
+)
+```
+
+**How Vote Weighting Works:**
+- Free users: Weight = 0 (vote is counted but not weighted)
+- Paying users: Weight = MRR in cents (e.g., $9.99/month = 999 points)
+- This ensures feature requests from paying customers are prioritized
+
+### RevenueCat Integration Example
+
+If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, here's how to automatically sync payment info:
+
+```swift
+import FeaturePulse
+import RevenueCat
+
+// Call this when you receive customer info updates
+func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
+    guard
+        let customerInfo = userPurchases.customerInfo,
+        userPurchases.subscriptionActive,
+        let entitlement = customerInfo.entitlements[Constants.revenueCatEntitlementIdentifier],
+        let currentOffering = userPurchases.offerings?.current
+    else {
+        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+        return
+    }
+    
+    let productId = entitlement.productIdentifier
+    guard let matchedPackage = currentOffering.availablePackages.first(where: {
+        $0.storeProduct.productIdentifier == productId
+    }) else {
+        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+        return
+    }
+    
+    let price = matchedPackage.storeProduct.price
+    let payment: FeaturePulse.Payment = {
+        switch matchedPackage.packageType {
+        case .weekly:
+            return .weekly(price)
+        case .monthly:
+            return .monthly(price)
+        case .annual:
+            return .yearly(price)
+        case .lifetime:
+            return .lifetime(price, expectedLifetimeMonths: 24)
+        default:
+            return .free
+        }
+    }()
+    
+    FeaturePulseConfiguration.shared.updateUser(payment: payment)
+}
+```
+
+**Integration Tips:**
+- Call this function whenever RevenueCat customer info updates
+- Use `Purchases.shared.getCustomerInfo()` to get current state
+- Set up a listener: `Purchases.shared.delegate = self`
+- Votes will be weighted based on actual subscription price
+
+## Localization
+
+FeaturePulse includes translations for:
+
+- 🇬🇧 English
+- 🇪🇸 Spanish (Español)
+- 🇫🇷 French (Français)
+- 🇩🇪 German (Deutsch)
+
+The SDK automatically uses the user's device language. No additional configuration needed!
+
+### Adding More Languages
+
+To add more languages:
+
+1. Open `Localizable.xcstrings` in Xcode
+2. Click "+" to add a new language
+3. Translate all strings
+4. Rebuild the package
+
+## API Reference
+
+### FeaturePulseConfiguration
+
+Main configuration singleton:
+
+```swift
+// Required
+FeaturePulseConfiguration.shared.apiKey: String
+
+// Optional
+FeaturePulseConfiguration.shared.primaryColor: Color
+
+// Methods
+FeaturePulseConfiguration.shared.updateUser(
+    customID: String? = nil,
+    email: String? = nil,
+    name: String? = nil
+)
+
+FeaturePulseConfiguration.shared.updateUser(payment: Payment)
+```
+
+### Views
+
+- `FeaturePulseView()` - Main view with feature requests list
+
+### Payment Types
+
+```swift
+enum Payment {
+    case free
+    case weekly(Decimal)
+    case monthly(Decimal)
+    case yearly(Decimal)
+    case lifetime(Decimal, expectedLifetimeMonths: Int = 24)
+}
+```
+
+## Getting Your API Key
+
+1. Sign up at [featurepul.se](https://featurepul.se)
+2. Create a new project
+3. Copy your API key from the project settings
+4. Add it to your app configuration
+
+## Troubleshooting
+
+### "Invalid API Key" error
+
+Make sure you've set your API key before presenting any FeaturePulse views:
+
+```swift
+FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
+```
+
+### Color not applying
+
+Make sure to set the color before presenting the view:
+
+```swift
+@main
+struct MyApp: App {
+    init() {
+        FeaturePulseConfiguration.shared.primaryColor = .red
+    }
+    // ...
+}
+```
+
+## Example Projects
+
+Check out example implementations:
+- **Tab Bar Integration**: See Example 1 above
+- **Modal Presentation**: See Example 2 above
+- **Navigation Link**: See Example 3 above
+
+## Support
+
+- 🐛 Issues: [GitHub Issues](https://github.com/featurepulse/feature-pulse-ios/issues)
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Credits
+
+Built with ❤️ using SwiftUI and modern Swift concurrency.
+
+---
+
+**Made by [FeaturePulse](https://featurepul.se)** - The simplest way to collect feature requests from your iOS app.
