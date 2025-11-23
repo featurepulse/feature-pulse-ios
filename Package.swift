@@ -10,23 +10,21 @@ let package = Package(
   products: [
     .library(
       name: "FeaturePulse",
-      targets: ["FeaturePulseWrapper"]
+      targets: ["FeaturePulse"]
     )
   ],
   dependencies: [
     .package(url: "https://github.com/codykerns/StableID", from: "0.4.1")
   ],
   targets: [
-    .binaryTarget(
-      name: "FeaturePulseBinary",
-      path: "Sources/FeaturePulse.xcframework"
-    ),
     .target(
-      name: "FeaturePulseWrapper",
+      name: "FeaturePulse",
       dependencies: [
-        "FeaturePulseBinary",
-        .product(name: "StableID", package: "StableID"),
+        .product(name: "StableID", package: "StableID")
+      ],
+      resources: [
+        .process("Resources")
       ]
-    ),
+    )
   ]
 )
