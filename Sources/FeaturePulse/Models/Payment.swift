@@ -1,0 +1,138 @@
+import Foundation
+
+/// Represents a user's payment information for MRR tracking and feature prioritization
+public struct Payment: Codable, Equatable, Sendable {
+
+    /// Monthly recurring revenue in cents
+    let monthlyValueInCents: Int
+
+    /// Original payment type for analytics
+    let paymentType: PaymentType
+
+    /// Original amount in the payment's currency
+    let originalAmount: Decimal
+
+    // MARK: - Payment Types
+
+    public enum PaymentType: String, Codable, Sendable {
+        case free
+        case weekly
+        case monthly
+        case yearly
+        case lifetime
+    }
+
+    // MARK: - Free
+
+    /// Free tier user
+    public static var free: Payment {
+        return Payment(
+            monthlyValueInCents: 0,
+            paymentType: .free,
+            originalAmount: 0
+        )
+    }
+
+    // MARK: - Weekly
+
+    /// Accepts a price expressed in `Decimal` e.g: 2.99 or 11.49
+    /// Calculates MRR by multiplying by 4 (4 weeks per month)
+    public static func weekly(_ amount: Decimal) -> Payment {
+        let amountInCents = NSDecimalNumber(decimal: amount * 100).intValue
+        let monthlyValue = NSDecimalNumber(decimal: Decimal(amountInCents) * 4)
+            .rounding(accordingToBehavior: RoundUp())
+            .intValue
+
+        return Payment(
+            monthlyValueInCents: monthlyValue,
+            paymentType: .weekly,
+            originalAmount: amount
+        )
+    }
+
+    // MARK: - Monthly
+
+    /// Accepts a price expressed in `Decimal` e.g: 6.99 or 19.49
+    public static func monthly(_ amount: Decimal) -> Payment {
+        let amountInCents = NSDecimalNumber(decimal: amount * 100).intValue
+
+        return Payment(
+            monthlyValueInCents: amountInCents,
+            paymentType: .monthly,
+            originalAmount: amount
+        )
+    }
+
+    // MARK: - Yearly
+
+    /// Accepts a price expressed in `Decimal` e.g: 69.99 or 199.49
+    public static func yearly(_ amount: Decimal) -> Payment {
+        let monthlyValue = NSDecimalNumber(decimal: (amount * 100) / 12)
+            .rounding(accordingToBehavior: RoundUp())
+            .intValue
+
+        return Payment(
+            monthlyValueInCents: monthlyValue,
+            paymentType: .yearly,
+            originalAmount: amount
+        )
+    }
+
+    // MARK: - Lifetime
+
+    /// Accepts a price expressed in `Decimal` e.g: 99.99 or 299.99
+    /// Amortizes over expected lifetime (default 24 months)
+    /// - Parameters:
+    ///   - amount: The one-time payment amount
+    ///   - expectedLifetimeMonths: Number of months to amortize over (default: 24)
+    public static func lifetime(_ amount: Decimal, expectedLifetimeMonths: Int = 24) -> Payment {
+        let monthlyValue = NSDecimalNumber(decimal: (amount * 100) / Decimal(expectedLifetimeMonths))
+            .rounding(accordingToBehavior: RoundUp())
+            .intValue
+
+        return Payment(
+            monthlyValueInCents: monthlyValue,
+            paymentType: .lifetime,
+            originalAmount: amount
+        )
+    }
+
+    // MARK: - Computed Properties
+
+    /// MRR in dollars (for display)
+    public var monthlyValue: Decimal {
+        return Decimal(monthlyValueInCents) / 100
+    }
+
+    /// Annual recurring revenue in cents
+    public var annualValueInCents: Int {
+        return monthlyValueInCents * 12
+    }
+
+    /// Annual recurring revenue in dollars
+    public var annualValue: Decimal {
+        return Decimal(annualValueInCents) / 100
+    }
+
+    /// Returns true if this is a paying customer
+    public var isPaying: Bool {
+        return monthlyValueInCents > 0
+    }
+}
+
+// MARK: - RoundUp Helper
+
+private class RoundUp: NSObject, NSDecimalNumberBehaviors {
+    func roundingMode() -> NSDecimalNumber.RoundingMode {
+        return .up
+    }
+
+    func scale() -> Int16 {
+        return 0
+    }
+
+    func exceptionDuringOperation(_ operation: Selector, error: NSDecimalNumber.CalculationError, leftOperand: NSDecimalNumber, rightOperand: NSDecimalNumber?) -> NSDecimalNumber? {
+        // We don't provide custom exception handling; return nil to let the system handle it.
+        return nil
+    }
+}
