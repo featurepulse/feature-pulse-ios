@@ -1,0 +1,6 @@
+# SwiftLint Configuration for FeaturePulse SDK
+
+excluded:
+  - .build
+  - .swiftpm
+  - Tests
