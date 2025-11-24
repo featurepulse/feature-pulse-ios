@@ -131,7 +131,12 @@ private class RoundUp: NSObject, NSDecimalNumberBehaviors {
         return 0
     }
 
-    func exceptionDuringOperation(_ operation: Selector, error: NSDecimalNumber.CalculationError, leftOperand: NSDecimalNumber, rightOperand: NSDecimalNumber?) -> NSDecimalNumber? {
+    func exceptionDuringOperation(
+        _ operation: Selector,
+        error: NSDecimalNumber.CalculationError,
+        leftOperand: NSDecimalNumber,
+        rightOperand: NSDecimalNumber?
+    ) -> NSDecimalNumber? {
         // We don't provide custom exception handling; return nil to let the system handle it.
         return nil
     }

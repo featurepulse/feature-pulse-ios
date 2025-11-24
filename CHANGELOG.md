@@ -5,6 +5,42 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-11-24
+
+### 🎨 UI Improvements
+- **Full-width text in feature rows** - Title and description now expand to use all available horizontal space
+- Better text layout and readability in `FeatureRequestRow`
+
+### 🧹 Code Quality
+- **SwiftLint compliance** - Fixed all SwiftLint warnings in source code
+- Renamed short variable names (`i`, `j` → `index`, `randomIndex`)
+- Split long lines for better readability
+- Added SwiftLint identifier exclusions for `ok` and `id`
+
+### 📚 Developer Experience
+- **VSCode settings** - Added `.vscode/settings.json` with consistent formatting rules
+- **4-space indentation** - Compatible with SwiftLint defaults
+- **Development guide** - Created `DEVELOPMENT.md` with comprehensive guidelines
+- **Cursor rules** - Added `.cursorrules` for AI assistant guidance
+- Format on save enabled by default
+- 120 character line length ruler
+
+### 🔧 Platform Support
+- Focused on **iOS 17.0+ only** (includes iPadOS)
+- Removed macOS and visionOS for now (can be re-added later)
+- Platform-specific code preserved for future expansion
+
+### 📱 Requirements
+- iOS 17.0+ (iPadOS included)
+- Xcode 15.0+
+- Swift 5.9+
+
+### 🔗 Links
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.2](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.2)
+
+---
+
 ## [1.0.1] - 2025-11-23
 
 ### 🎯 Major Changes

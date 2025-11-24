@@ -5,9 +5,7 @@ let package = Package(
   name: "FeaturePulse",
   defaultLocalization: "en",
   platforms: [
-    .iOS(.v17),
-    .macOS(.v14),
-    .visionOS(.v1)
+    .iOS(.v17)
   ],
   products: [
     .library(

@@ -84,37 +84,53 @@ public enum L10n {
     public static var invalidEmail: String {
         String(localized: "invalid.email", defaultValue: "Please enter a valid email address", bundle: .module)
     }
-    
+
     // MARK: - Validation
     public static var titleTooShort: String {
-        String(localized: "validation.title.too_short", defaultValue: "Title must be at least 3 characters", bundle: .module)
+        String(
+            localized: "validation.title.too_short",
+            defaultValue: "Title must be at least 3 characters",
+            bundle: .module
+        )
     }
-    
+
     public static var titleTooLong: String {
-        String(localized: "validation.title.too_long", defaultValue: "Title must not exceed 50 characters", bundle: .module)
+        String(
+            localized: "validation.title.too_long",
+            defaultValue: "Title must not exceed 50 characters",
+            bundle: .module
+        )
     }
-    
+
     public static var descriptionTooShort: String {
-        String(localized: "validation.description.too_short", defaultValue: "Description must be at least 10 characters", bundle: .module)
+        String(
+            localized: "validation.description.too_short",
+            defaultValue: "Description must be at least 10 characters",
+            bundle: .module
+        )
     }
-    
+
     public static var descriptionTooLong: String {
-        String(localized: "validation.description.too_long", defaultValue: "Description must not exceed 500 characters", bundle: .module)
+        String(
+            localized: "validation.description.too_long",
+            defaultValue: "Description must not exceed 500 characters",
+            bundle: .module
+        )
     }
-    
+
     // MARK: - Section Headers
     public static var titleHeader: String {
         String(localized: "section.title", defaultValue: "Title", bundle: .module)
     }
-    
+
     public static var descriptionHeader: String {
         String(localized: "section.description", defaultValue: "Description", bundle: .module)
     }
-    
+
     public static var contactHeader: String {
         String(localized: "section.contact", defaultValue: "Contact", bundle: .module)
     }
-    
+
     public static var optional: String {
         String(localized: "optional", defaultValue: "Optional", bundle: .module)
     }

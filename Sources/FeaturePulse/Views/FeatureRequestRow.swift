@@ -65,11 +65,13 @@ struct FeatureRequestRow: View {
         Text(request.title)
           .font(.headline)
           .lineLimit(2)
+          .frame(maxWidth: .infinity, alignment: .leading)
 
         Text(request.description)
           .font(.subheadline)
           .foregroundStyle(.secondary)
           .lineLimit(2)
+          .frame(maxWidth: .infinity, alignment: .leading)
 
         // Show status badge only if enabled from dashboard
         if FeaturePulseConfiguration.shared.showStatus {

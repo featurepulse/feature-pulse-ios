@@ -4,3 +4,8 @@ excluded:
   - .build
   - .swiftpm
   - Tests
+
+identifier_name:
+  excluded:
+    - ok
+    - id

@@ -75,24 +75,25 @@ public struct FeaturePulseView: View {
     }
 
     private var featureRequestsList: some View {
-        List {
-            ForEach(displayedRequests) { request in
-                Button {
-                    selectedRequest = request
-                } label: {
-                    FeatureRequestRow(
-                        request: request,
-                        hasVoted: viewModel.hasVoted(for: request.id)
-                    ) {
-                        await viewModel.toggleVote(for: request.id)
+        ScrollView(showsIndicators: false) {
+            VStack {
+                ForEach(displayedRequests) { request in
+                    Button {
+                        selectedRequest = request
+                    } label: {
+                        FeatureRequestRow(
+                            request: request,
+                            hasVoted: viewModel.hasVoted(for: request.id)
+                        ) {
+                            await viewModel.toggleVote(for: request.id)
+                        }
                     }
+                    .buttonStyle(.plain)
+                    .transition(.opacity.combined(with: .scale))
+                    .padding(.horizontal, 16)
                 }
-                .buttonStyle(.plain)
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             }
         }
-        .listStyle(.plain)
         .refreshable {
             Task {
                 await viewModel.loadFeatureRequests(isRefresh: true)

@@ -4,19 +4,19 @@ import SwiftUI
 @Observable
 public final class FeaturePulseConfiguration: @unchecked Sendable {
     public static let shared = FeaturePulseConfiguration()
-    
+
     /// Your FeaturePulse API key (required)
     public var apiKey: String = ""
-    
+
     /// Base URL for FeaturePulse API
     public var baseURL: String = "https://featurepul.se"
-    
+
     /// Current user information
     public let user = User()
-    
+
     /// Primary brand color used for vote and submit buttons (defaults to DaisyUI primary blue: #570df8)
     public var primaryColor: Color = Color(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
-    
+
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var showStatus: Bool = false
@@ -25,9 +25,9 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// This value is set automatically by the API and cannot be changed by the client
     /// Default is false (email field hidden) for better privacy
     public internal(set) var showSdkEmailField: Bool = false
-    
+
     private init() {}
-    
+
     /// Update user with multiple properties
     public func updateUser(customID: String? = nil, email: String? = nil, name: String? = nil) {
         if let customID = customID {
@@ -39,18 +39,15 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
         if let name = name {
             user.name = name
         }
-        print(
-            "[FeaturePulse] Updating user - customID: \(customID ?? "nil"), email: \(email ?? "nil"), name: \(name ?? "nil")"
-        )
         Task {
             do {
                 try await FeaturePulseAPI.shared.syncUser()
             } catch {
-                print("[FeaturePulse] Error syncing user: \(error)")
+                // Silently handle sync errors
             }
         }
     }
-    
+
     /// Update user with payment information for MRR tracking
     /// - Parameters:
     ///   - payment: The user's payment tier (free, weekly, monthly, yearly, or lifetime)

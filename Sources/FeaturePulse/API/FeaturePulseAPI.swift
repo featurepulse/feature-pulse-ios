@@ -109,13 +109,13 @@ public final class FeaturePulseAPI: Sendable {
     // Use user information from configuration
     let deviceInfo: [String: Any] = [
       "device_id": config.user.deviceID,
-      "bundle_id": Bundle.main.bundleIdentifier ?? "unknown",
+      "bundle_id": Bundle.main.bundleIdentifier ?? "unknown"
     ]
 
     var body: [String: Any] = [
       "title": title,
       "description": description,
-      "device_info": deviceInfo,
+      "device_info": deviceInfo
     ]
 
     // Only include email and name if they exist
@@ -203,13 +203,11 @@ public final class FeaturePulseAPI: Sendable {
     let config = FeaturePulseConfiguration.shared
 
     guard !config.apiKey.isEmpty else {
-      print("[FeaturePulse] Error: API key is missing")
       throw FeaturePulseError.missingAPIKey
     }
 
     let urlString = "\(config.baseURL)/api/sdk/user"
     guard let url = URL(string: urlString) else {
-      print("[FeaturePulse] Error: Invalid URL - \(urlString)")
       throw FeaturePulseError.invalidURL
     }
 
@@ -239,11 +237,6 @@ public final class FeaturePulseAPI: Sendable {
       body["monthly_value_cents"] = payment.monthlyValueInCents
       body["original_amount_cents"] =
         NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
-      print(
-        "[FeaturePulse] Syncing user with payment: \(payment.paymentType.rawValue) - $\(payment.monthlyValue)/mo"
-      )
-    } else {
-      print("[FeaturePulse] Syncing user without payment info")
     }
 
     request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -251,18 +244,12 @@ public final class FeaturePulseAPI: Sendable {
     let (data, response) = try await session.data(for: request)
 
     guard let httpResponse = response as? HTTPURLResponse else {
-      print("[FeaturePulse] Error: Invalid response")
       throw FeaturePulseError.invalidResponse
     }
 
     if !(200...299).contains(httpResponse.statusCode) {
-      if let errorString = String(data: data, encoding: .utf8) {
-        print("[FeaturePulse] Error: Server returned \(httpResponse.statusCode) - \(errorString)")
-      }
       throw FeaturePulseError.serverError(httpResponse.statusCode)
     }
-
-    print("[FeaturePulse] User synced successfully")
   }
 
   /// Removes vote from a feature request
