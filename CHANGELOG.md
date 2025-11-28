@@ -5,6 +5,34 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-01-28
+
+### 🐛 Bug Fixes
+
+- **Deterministic Shuffle** - Fixed feature request order changing after voting
+  - Replaced Swift's `Hasher` with djb2 hash algorithm for true determinism
+  - Feature requests now maintain consistent order across app launches
+  - Each user sees their own stable, seeded order based on device ID
+
+### 🧹 Code Quality
+
+- Fixed SwiftLint `identifier_name` violations in shuffle algorithm
+- Improved variable naming: `i`, `j` → `index`, `randomIndex`
+- All SwiftLint checks passing
+
+### 📱 Requirements
+
+- iOS 17.0+ (iPadOS included)
+- Xcode 15.0+
+- Swift 5.9+
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.3](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.3)
+
+---
+
 ## [1.0.2] - 2025-11-24
 
 ### 🎨 UI Improvements

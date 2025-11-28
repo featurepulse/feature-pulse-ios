@@ -2,132 +2,166 @@ import SwiftUI
 
 /// Main view displaying list of feature requests
 public struct FeaturePulseView: View {
-    @State private var viewModel = FeaturePulseViewModel()
-    @State private var showingNewRequest = false
-    @State private var selectedRequest: FeatureRequest?
+  @State private var viewModel = FeaturePulseViewModel()
+  @State private var showingNewRequest = false
+  @State private var selectedRequest: FeatureRequest?
 
-    public init() {}
+  public init() {}
 
-    public var body: some View {
-        Group {
-            if let error = viewModel.error {
-                ContentUnavailableView {
-                    Label(L10n.loadingError, systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(error.localizedDescription)
-                } actions: {
-                    Button("Retry") {
-                        Task {
-                            await viewModel.loadFeatureRequests()
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            } else {
-                featureRequestsList
-                    .redacted(reason: viewModel.isLoading ? .placeholder : [])
-                    .modifier(ShimmerModifier(isLoading: viewModel.isLoading))
-            }
-        }
-        .navigationTitle(L10n.featureRequests)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingNewRequest = true
-                } label: {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(
-            isPresented: $showingNewRequest,
-            onDismiss: {
-                Task {
-                    await viewModel.loadFeatureRequests()
-                }
-            },
-            content: {
-                NewFeatureRequestView()
-            }
-        )
-        .alert("Vote Error", isPresented: $viewModel.showVoteError) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            if let errorMessage = viewModel.voteErrorMessage {
-                Text(errorMessage)
-            }
-        }
-        .task {
-            await viewModel.loadFeatureRequests()
-        }
-    }
-
-    /// Create a binding to a specific feature request by ID
-    private func requestBinding(for id: String) -> Binding<FeatureRequest>? {
-        guard let index = viewModel.featureRequests.firstIndex(where: { $0.id == id }) else {
-            return nil
-        }
-
-        return Binding(
-            get: { viewModel.featureRequests[index] },
-            set: { viewModel.featureRequests[index] = $0 }
-        )
-    }
-
-    private var featureRequestsList: some View {
-        ScrollView(showsIndicators: false) {
-            VStack {
-                ForEach(displayedRequests) { request in
-                    Button {
-                        selectedRequest = request
-                    } label: {
-                        FeatureRequestRow(
-                            request: request,
-                            hasVoted: viewModel.hasVoted(for: request.id)
-                        ) {
-                            await viewModel.toggleVote(for: request.id)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .transition(.opacity.combined(with: .scale))
-                    .padding(.horizontal, 16)
-                }
-            }
-        }
-        .refreshable {
+  public var body: some View {
+    Group {
+      if let error = viewModel.error {
+        ContentUnavailableView {
+          Label(L10n.loadingError, systemImage: "exclamationmark.triangle")
+        } description: {
+          Text(error.localizedDescription)
+        } actions: {
+          Button("Retry") {
             Task {
-                await viewModel.loadFeatureRequests(isRefresh: true)
+              await viewModel.loadFeatureRequests()
             }
+          }
+          .buttonStyle(.borderedProminent)
         }
-        .sheet(item: $selectedRequest) { request in
-            if let binding = requestBinding(for: request.id) {
-                FeatureRequestDetailView(
-                    request: binding,
-                    hasVoted: viewModel.hasVoted(for: request.id)
-                ) {
-                    await viewModel.toggleVote(for: request.id)
-                }
-            }
+      } else {
+        featureRequestsList
+          .redacted(reason: viewModel.isLoading ? .placeholder : [])
+          .modifier(ShimmerModifier(isLoading: viewModel.isLoading))
+      }
+    }
+    .navigationTitle(L10n.featureRequests)
+    .toolbar {
+      ToolbarItem(placement: .confirmationAction) {
+          Button(L10n.requestFeature, systemImage: "plus") {
+              showingNewRequest = true
+
+          }
+          .foregroundStyle(Color(uiColor: .systemBackground))
+          .tint(Color(uiColor: .label))
+      }
+    }
+    .sheet(
+        isPresented: $showingNewRequest,
+        onDismiss: {
+        Task {
+          await viewModel.loadFeatureRequests()
         }
+      },
+      content: {
+        NewFeatureRequestView()
+      }
+    )
+    .alert("Vote Error", isPresented: $viewModel.showVoteError) {
+      Button("OK", role: .cancel) {}
+    } message: {
+      if let errorMessage = viewModel.voteErrorMessage {
+        Text(errorMessage)
+      }
+    }
+    .task {
+      await viewModel.loadFeatureRequests()
+    }
+  }
+
+  /// Create a binding to a specific feature request by ID
+  private func requestBinding(for id: String) -> Binding<FeatureRequest>? {
+    guard let index = viewModel.featureRequests.firstIndex(where: { $0.id == id }) else {
+      return nil
     }
 
-    /// Returns feature requests or placeholder data when loading
-    private var displayedRequests: [FeatureRequest] {
-        if viewModel.isLoading && viewModel.featureRequests.isEmpty {
-            // Show placeholder items while loading
-            // Use previous count if available, otherwise default to 5
-            let placeholderCount = max(viewModel.previousRequestCount, 5)
-            return (0..<placeholderCount).map { index in
-                FeatureRequest(
-                    id: "placeholder-\(index)",
-                    title: "Loading feature request...",
-                    description: "Please wait while we load the feature requests from the server.",
-                    status: .pending,
-                    voteCount: 0,
-                    hasVoted: false
-                )
+    return Binding(
+      get: { viewModel.featureRequests[index] },
+      set: { viewModel.featureRequests[index] = $0 }
+    )
+  }
+
+  private var featureRequestsList: some View {
+    ScrollView(showsIndicators: false) {
+      VStack(spacing: 0) {
+        // Feature requests list
+        VStack {
+          ForEach(displayedRequests) { request in
+            Button {
+              selectedRequest = request
+            } label: {
+              FeatureRequestRow(
+                request: request,
+                hasVoted: viewModel.hasVoted(for: request.id)
+              ) {
+                await viewModel.toggleVote(for: request.id)
+              }
             }
+            .buttonStyle(.plain)
+            .transition(.opacity.combined(with: .scale))
+            .padding(.horizontal, 16)
+          }
         }
-        return viewModel.featureRequests
+        .padding(.top, 24)
+
+        // CTA Section at bottom
+        if !viewModel.isLoading || !viewModel.featureRequests.isEmpty {
+          VStack(alignment: .leading, spacing: 12) {
+            Text(L10n.ctaMessage)
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+              .multilineTextAlignment(.leading)
+
+            Button {
+              showingNewRequest = true
+            } label: {
+              HStack(spacing: 8) {
+                Image(systemName: "plus")
+                  .font(.body.weight(.semibold))
+                Text(L10n.requestFeature)
+                  .font(.body.weight(.semibold))
+              }
+              .frame(maxWidth: .infinity)
+              .padding(.vertical, 14)
+              .background(Color(uiColor: .label))
+              .foregroundStyle(Color(uiColor: .systemBackground))
+              .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+          }
+          .padding(.horizontal, 16)
+          .padding(.vertical, 32)
+        }
+      }
     }
+    .refreshable {
+      Task {
+        await viewModel.loadFeatureRequests(isRefresh: true)
+      }
+    }
+    .sheet(item: $selectedRequest) { request in
+      if let binding = requestBinding(for: request.id) {
+        FeatureRequestDetailView(
+          request: binding,
+          hasVoted: viewModel.hasVoted(for: request.id)
+        ) {
+          await viewModel.toggleVote(for: request.id)
+        }
+      }
+    }
+  }
+
+  /// Returns feature requests or placeholder data when loading
+  private var displayedRequests: [FeatureRequest] {
+    if viewModel.isLoading && viewModel.featureRequests.isEmpty {
+      // Show placeholder items while loading
+      // Use previous count if available, otherwise default to 5
+      let placeholderCount = max(viewModel.previousRequestCount, 5)
+      return (0..<placeholderCount).map { index in
+        FeatureRequest(
+          id: "placeholder-\(index)",
+          title: "Loading feature request...",
+          description: "Please wait while we load the feature requests from the server.",
+          status: .pending,
+          voteCount: 0,
+          hasVoted: false
+        )
+      }
+    }
+    return viewModel.featureRequests
+  }
 }
