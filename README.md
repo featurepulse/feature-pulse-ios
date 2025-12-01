@@ -275,8 +275,8 @@ struct YourApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .featurePulseSessionTracking()  // Add this modifier to your root view
         }
-        .featurePulseSessionTracking()  // Add this modifier
     }
 }
 ```

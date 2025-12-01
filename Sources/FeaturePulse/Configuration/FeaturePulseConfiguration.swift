@@ -18,17 +18,22 @@ extension View {
     /// Automatically track app sessions when the view becomes active
     /// Tracks app opens with a 30-minute timeout (Firebase-style)
     ///
-    /// Simply add this modifier to enable session tracking. No configuration needed!
+    /// Simply add this modifier to your root view inside `WindowGroup` to enable session tracking. No configuration needed!
     ///
     /// # Example Usage:
     /// ```swift
     /// @main
     /// struct YourApp: App {
+    ///     init() {
+    ///         // Required: Your API key from featurepul.se
+    ///         FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
+    ///     }
+    ///
     ///     var body: some Scene {
     ///         WindowGroup {
     ///             ContentView()
+    ///                 .featurePulseSessionTracking() // Add this modifier to your root view
     ///         }
-    ///         .featurePulseSessionTracking()
     ///     }
     /// }
     /// ```
@@ -89,10 +94,15 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
 
         // 30 minutes timeout (1800 seconds)
         if lastSessionTime == 0 || (now - lastSessionTime) > 1800 {
-            UserDefaults.standard.set(now, forKey: lastSessionKey)
-
             Task {
-                try? await FeaturePulseAPI.shared.trackActivity(type: "app_open")
+                do {
+                    try await FeaturePulseAPI.shared.trackActivity(type: "app_open")
+                    // Only update UserDefaults if API call succeeds
+                    UserDefaults.standard.set(now, forKey: lastSessionKey)
+                } catch {
+                    // Silently fail - don't block app, but don't mark as tracked if it failed
+                    // Will retry on next app open (after 30 min)
+                }
             }
         }
     }

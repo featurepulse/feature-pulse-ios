@@ -5,6 +5,27 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-12-01
+
+### 🐛 Bug Fixes
+
+- **Session Tracking Modifier Fix** - Fixed `.featurePulseSessionTracking()` modifier to work correctly
+  - Changed from non-existent `SceneModifier` to proper `ViewModifier`
+  - Modifier must now be applied to the root view inside `WindowGroup`, not to `WindowGroup` itself
+  - Updated documentation with correct usage pattern
+
+### 📚 Documentation
+
+- Updated README with correct usage example for session tracking modifier
+- Clarified that modifier should be applied to root view, not `WindowGroup`
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.5](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.5)
+
+---
+
 ## [1.0.4] - 2025-01-28
 
 ### ✨ New Features
