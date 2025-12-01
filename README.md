@@ -261,7 +261,54 @@ FeaturePulseConfiguration.shared.updateUser(
 **How Vote Weighting Works:**
 - Free users: Weight = 0 (vote is counted but not weighted)
 - Paying users: Weight = MRR in cents (e.g., $9.99/month = 999 points)
-- This ensures feature requests from paying customers are prioritized
+- **Engagement multiplier**: Votes are also weighted by user engagement (see Session Tracking below)
+- Final formula: `Vote Weight = MRR × Engagement Weight`
+- This ensures feature requests from engaged, paying customers are prioritized
+
+### Session Tracking & Engagement Metrics
+
+Track user app opens to measure engagement and weight votes accordingly:
+
+```swift
+@main
+struct YourApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .featurePulseSessionTracking()  // Add this modifier
+    }
+}
+```
+
+**That's it!** No configuration needed. The modifier automatically:
+- Tracks app opens when your app becomes active (foreground)
+- Uses 30-minute timeout (Firebase-style) to avoid counting quick app switches
+- Stores session data in UserDefaults
+- Sends session data to FeaturePulse backend
+
+**Engagement Tiers:**
+- 🔥 **Power User** (20+ sessions/month): 2.0x engagement multiplier
+- ⚡ **Active User** (10-19 sessions/month): 1.5x engagement multiplier
+- 👍 **Regular User** (5-9 sessions/month): 1.0x engagement multiplier
+- 💤 **Casual User** (2-4 sessions/month): 0.7x engagement multiplier
+- 👻 **Ghost User** (0-1 sessions/month): 0.3x engagement multiplier
+
+**Vote Weighting with Engagement:**
+```swift
+// Example: User with $10/month subscription
+// - Power User (20+ sessions): $10 × 2.0 = 20 points per vote
+// - Active User (10-19 sessions): $10 × 1.5 = 15 points per vote
+// - Regular User (5-9 sessions): $10 × 1.0 = 10 points per vote
+// - Casual User (2-4 sessions): $10 × 0.7 = 7 points per vote
+// - Ghost User (0-1 sessions): $10 × 0.3 = 3 points per vote
+```
+
+**Benefits:**
+- Rewards users who actually use your app
+- Prevents one-time users from skewing priorities
+- Shows engagement badges in dashboard
+- Helps identify your most valuable users
 
 ### RevenueCat Integration Example
 
