@@ -19,6 +19,11 @@ private struct FeatureRequestsResponse: Codable {
     }
 }
 
+private struct ActivityResponse: Codable {
+    let success: Bool
+    let message: String?
+}
+
 /// API client for communicating with FeaturePulse backend
 public final class FeaturePulseAPI: Sendable {
     public static let shared = FeaturePulseAPI()
@@ -26,6 +31,47 @@ public final class FeaturePulseAPI: Sendable {
     private let session = URLSession.shared
 
     private init() {}
+
+    // MARK: - Track Activity
+
+    /// Tracks user activity (app opens) for engagement metrics
+    public func trackActivity(type: String = "app_open") async throws {
+        let config = FeaturePulseConfiguration.shared
+
+        guard !config.apiKey.isEmpty else {
+            throw FeaturePulseError.missingAPIKey
+        }
+
+        let urlString = "\(config.baseURL)/api/sdk/activity"
+        guard let url = URL(string: urlString) else {
+            throw FeaturePulseError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(config.apiKey, forHTTPHeaderField: "x-api-key")
+
+        let body: [String: Any] = [
+            "user_identifier": config.user.deviceID,
+            "activity_type": type,
+        ]
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw FeaturePulseError.invalidResponse
+        }
+
+        if !(200...299).contains(httpResponse.statusCode) {
+            throw FeaturePulseError.serverError(httpResponse.statusCode)
+        }
+
+        // Decode response (optional, just for validation)
+        _ = try JSONDecoder().decode(ActivityResponse.self, from: data)
+    }
 
     // MARK: - Fetch Feature Requests
 
@@ -109,13 +155,13 @@ public final class FeaturePulseAPI: Sendable {
         // Use user information from configuration
         let deviceInfo: [String: Any] = [
             "device_id": config.user.deviceID,
-            "bundle_id": Bundle.main.bundleIdentifier ?? "unknown"
+            "bundle_id": Bundle.main.bundleIdentifier ?? "unknown",
         ]
 
         var body: [String: Any] = [
             "title": title,
             "description": description,
-            "device_info": deviceInfo
+            "device_info": deviceInfo,
         ]
 
         // Only include email and name if they exist

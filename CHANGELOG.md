@@ -5,6 +5,48 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-01-28
+
+### ✨ New Features
+
+- **Session Tracking for Engagement Metrics** - Track user app opens to measure engagement
+  - Simple `.featurePulseSessionTracking()` modifier - just add it to your `WindowGroup`
+  - Automatic 30-minute timeout (Firebase-style) using UserDefaults
+  - No configuration needed - modifier itself enables tracking
+  - Tracks app opens when app becomes active (foreground)
+  - Automatically calculates engagement weight for vote weighting
+  - Shows engagement badges in dashboard (🔥 Power, ⚡ Active, 👍 Regular, 💤 Casual, 👻 Ghost)
+
+### 🎯 Vote Weighting Enhancement
+
+- **Engagement-Based Vote Weighting** - Votes now weighted by both MRR and engagement
+  - Power users (20+ sessions/month): 2.0x engagement multiplier
+  - Active users (10-19 sessions/month): 1.5x engagement multiplier
+  - Regular users (5-9 sessions/month): 1.0x engagement multiplier
+  - Casual users (2-4 sessions/month): 0.7x engagement multiplier
+  - Ghost users (0-1 sessions/month): 0.3x engagement multiplier
+  - Formula: `Vote Weight = MRR × Engagement Weight`
+
+### 📚 Developer Experience
+
+- **Simplified API** - One modifier, zero configuration
+  - Just add `.featurePulseSessionTracking()` to your `WindowGroup`
+  - No boolean flags or manual setup required
+  - Comprehensive documentation with examples
+
+### 📱 Requirements
+
+- iOS 17.0+ (iPadOS included)
+- Xcode 15.0+
+- Swift 5.9+
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.4](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.4)
+
+---
+
 ## [1.0.3] - 2025-01-28
 
 ### 🐛 Bug Fixes
