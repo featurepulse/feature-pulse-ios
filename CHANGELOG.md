@@ -9,13 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ✨ New Features
 
-- **Privacy Manifest** - Added `PrivacyInfo.xcprivacy` for App Store compliance
-  - Declares all data collection types (User ID, Email, Name, Purchase History, Product Interaction)
-  - Declares API usage (UserDefaults for session tracking)
-  - No tracking declared (NSPrivacyTracking = false)
-  - Automatically merged with your app's privacy manifest during App Store submission
-  - Ensures compliance with Apple's privacy requirements
-
 - **Configurable Foreground Colors** - Enhanced color customization
   - `foregroundColor` - Configurable foreground color for vote buttons, submit button, and CTA button
   - Defaults to white for optimal contrast with primary color backgrounds
@@ -29,8 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 📚 Documentation
 
-- Updated README with privacy manifest information
-- Added comprehensive privacy and data collection documentation
 - Updated color customization examples with new property names
 
 ### 🔗 Links
