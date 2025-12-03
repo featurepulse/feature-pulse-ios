@@ -5,6 +5,21 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2025-01-30
+
+### 🌍 Localization
+
+- **Italian (IT) Support** - Added complete Italian translations for all SDK strings
+- **Portuguese (PT-PT) Support** - Added complete Portuguese (Portugal) translations for all SDK strings
+- SDK now supports 6 languages: English, Spanish, French, German, Italian, and Portuguese (PT-PT)
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.7](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.7)
+
+---
+
 ## [1.0.6] - 2025-01-30
 
 ### ✨ New Features
