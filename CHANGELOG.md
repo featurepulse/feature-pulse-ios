@@ -5,6 +5,41 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-01-30
+
+### ✨ New Features
+
+- **Privacy Manifest** - Added `PrivacyInfo.xcprivacy` for App Store compliance
+  - Declares all data collection types (User ID, Email, Name, Purchase History, Product Interaction)
+  - Declares API usage (UserDefaults for session tracking)
+  - No tracking declared (NSPrivacyTracking = false)
+  - Automatically merged with your app's privacy manifest during App Store submission
+  - Ensures compliance with Apple's privacy requirements
+
+- **Configurable Foreground Colors** - Enhanced color customization
+  - `foregroundColor` - Configurable foreground color for vote buttons, submit button, and CTA button
+  - Defaults to white for optimal contrast with primary color backgrounds
+  - Allows full customization of button text and icon colors
+
+### 🔧 Improvements
+
+- **Color Configuration** - Improved color property naming
+  - Renamed `textColor` to `foregroundColor` for better SwiftUI terminology alignment
+  - More accurate naming reflects that colors apply to all foreground elements, not just text
+
+### 📚 Documentation
+
+- Updated README with privacy manifest information
+- Added comprehensive privacy and data collection documentation
+- Updated color customization examples with new property names
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.6](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.6)
+
+---
+
 ## [1.0.5] - 2025-12-01
 
 ### 🐛 Bug Fixes

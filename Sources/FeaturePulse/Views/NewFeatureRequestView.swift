@@ -142,7 +142,7 @@ public struct NewFeatureRequestView: View {
               || isSubmitting)
               ? Color.gray.opacity(0.3) : FeaturePulseConfiguration.shared.primaryColor
           )
-          .foregroundStyle(.white)
+          .foregroundStyle(FeaturePulseConfiguration.shared.foregroundColor)
         }
       }
       .navigationTitle(L10n.newFeatureRequest)

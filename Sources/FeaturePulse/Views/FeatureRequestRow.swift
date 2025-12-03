@@ -17,7 +17,7 @@ struct FeatureRequestRow: View {
         if isVoting {
           ProgressView()
             .controlSize(.small)
-            .tint(hasVoted ? .white : voteColor)
+            .tint(hasVoted ? FeaturePulseConfiguration.shared.primaryColor : voteColor)
         } else {
           Image(systemName: "triangle.fill")
             .font(.caption2.weight(.semibold))
@@ -30,7 +30,9 @@ struct FeatureRequestRow: View {
       }
       .frame(width: 56, height: 60)
       .background(hasVoted ? voteColor : voteColor.opacity(0.1))
-      .foregroundStyle(hasVoted ? .white : voteColor)
+      .foregroundStyle(
+        hasVoted ? FeaturePulseConfiguration.shared.foregroundColor : voteColor
+      )
       .clipShape(RoundedRectangle(cornerRadius: 12))
       .overlay(
         RoundedRectangle(cornerRadius: 12)

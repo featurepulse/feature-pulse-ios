@@ -202,19 +202,32 @@ FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99))
 FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99))
 ```
 
-### Customize Primary Color
+### Customize Colors
 
-Change the primary color to match your app's brand:
+Change the primary color and foreground colors to match your app's brand:
 
 ```swift
-// Use system colors
+// Primary color (used for vote buttons, submit button, and CTA button background)
 FeaturePulseConfiguration.shared.primaryColor = .blue
 FeaturePulseConfiguration.shared.primaryColor = .red
-FeaturePulseConfiguration.shared.primaryColor = .green
-
-// Use custom colors
 FeaturePulseConfiguration.shared.primaryColor = Color(red: 87/255, green: 13/255, blue: 248/255)
+
+// Foreground color (used for titles and main content)
+FeaturePulseConfiguration.shared.foregroundColor = .primary  // System primary (adapts to light/dark mode)
+FeaturePulseConfiguration.shared.foregroundColor = .black    // Always black
+FeaturePulseConfiguration.shared.foregroundColor = Color(uiColor: .label)  // System label (default)
+FeaturePulseConfiguration.shared.foregroundColor = Color(red: 0.2, green: 0.2, blue: 0.2)  // Custom color
+
+// Accent foreground color (used for buttons with colored backgrounds)
+FeaturePulseConfiguration.shared.accentForegroundColor = .white  // Default: white
+FeaturePulseConfiguration.shared.accentForegroundColor = .black   // For light backgrounds
+FeaturePulseConfiguration.shared.accentForegroundColor = Color(red: 1.0, green: 1.0, blue: 1.0)  // Custom color
 ```
+
+**Note:** 
+- The default `foregroundColor` uses `Color(uiColor: .label)` which automatically adapts to light/dark mode
+- The default `accentForegroundColor` is white, which works well with most primary colors
+- Make sure accent foreground color has good contrast with your primary color for accessibility
 
 ### User Information
 
@@ -460,6 +473,31 @@ Check out example implementations:
 - **Tab Bar Integration**: See Example 1 above
 - **Modal Presentation**: See Example 2 above
 - **Navigation Link**: See Example 3 above
+
+## Privacy & Data Collection
+
+FeaturePulse SDK includes a **Privacy Manifest** (`PrivacyInfo.xcprivacy`) that declares all data collection and API usage according to [Apple's Privacy Manifest requirements](https://developer.apple.com/documentation/bundleresources/privacy-manifest-files).
+
+### Data Collected
+
+The SDK collects the following data (all optional except device identifier):
+
+- **Device Identifier**: Persistent device ID for analytics and feature request attribution
+- **Email Address**: Optional, user-provided for contact purposes
+- **Display Name**: Optional, user-provided for personalization
+- **Payment Information**: Optional, for MRR tracking (payment tier only, not payment details)
+- **App Usage**: App opens and feature request submissions for engagement metrics
+
+### Privacy Features
+
+- ✅ **No Tracking**: The SDK does not track users across apps or websites
+- ✅ **User Control**: Email and name are optional and user-provided
+- ✅ **Privacy-First**: All data collection is transparent and declared in the privacy manifest
+- ✅ **App Store Compliant**: Privacy manifest ensures App Store submission compliance
+
+### For App Developers
+
+When submitting your app to the App Store, Xcode will automatically merge the SDK's privacy manifest with your app's privacy manifest. No additional configuration needed!
 
 ## Support
 

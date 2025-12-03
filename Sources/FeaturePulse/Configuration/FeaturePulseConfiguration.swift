@@ -73,6 +73,9 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// Primary brand color used for vote and submit buttons (defaults to DaisyUI primary blue: #570df8)
     public var primaryColor: Color = Color(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
 
+    /// Foreground color for vote title and icons and new feature request button CTA
+    public var foregroundColor: Color = Color(uiColor: .white)
+
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var showStatus: Bool = false

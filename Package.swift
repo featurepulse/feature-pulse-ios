@@ -23,7 +23,8 @@ let package = Package(
         .product(name: "StableID", package: "StableID")
       ],
       resources: [
-        .process("Resources")
+        .process("Resources"),
+        .copy("PrivacyInfo.xcprivacy"),
       ]
     )
   ]
