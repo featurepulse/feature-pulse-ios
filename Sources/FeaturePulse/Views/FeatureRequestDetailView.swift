@@ -118,7 +118,7 @@ struct FeatureRequestDetailView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(localHasVoted ? voteColor : voteColor.opacity(0.1))
-                .foregroundStyle(localHasVoted ? .white : voteColor)
+                .foregroundStyle(localHasVoted ? FeaturePulseConfiguration.shared.foregroundColor : voteColor)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .disabled(isVoting)
