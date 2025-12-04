@@ -186,13 +186,7 @@ FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
 
 // Appearance
 FeaturePulseConfiguration.shared.primaryColor = .red
-
-// User Information
-FeaturePulseConfiguration.shared.updateUser(
-    customID: "user_123",
-    email: "user@example.com",
-    name: "John Doe"
-)
+FeaturePulseConfiguration.shared.foregroundColor = .white
 
 // Payment Tier (affects vote weighting)
 FeaturePulseConfiguration.shared.updateUser(payment: .free)
@@ -212,38 +206,32 @@ FeaturePulseConfiguration.shared.primaryColor = .blue
 FeaturePulseConfiguration.shared.primaryColor = .red
 FeaturePulseConfiguration.shared.primaryColor = Color(red: 87/255, green: 13/255, blue: 248/255)
 
-// Foreground color (used for titles and main content)
-FeaturePulseConfiguration.shared.foregroundColor = .primary  // System primary (adapts to light/dark mode)
-FeaturePulseConfiguration.shared.foregroundColor = .black    // Always black
-FeaturePulseConfiguration.shared.foregroundColor = Color(uiColor: .label)  // System label (default)
-FeaturePulseConfiguration.shared.foregroundColor = Color(red: 0.2, green: 0.2, blue: 0.2)  // Custom color
-
-// Accent foreground color (used for buttons with colored backgrounds)
-FeaturePulseConfiguration.shared.accentForegroundColor = .white  // Default: white
-FeaturePulseConfiguration.shared.accentForegroundColor = .black   // For light backgrounds
-FeaturePulseConfiguration.shared.accentForegroundColor = Color(red: 1.0, green: 1.0, blue: 1.0)  // Custom color
+// Foreground color (used for button text and icons with colored backgrounds)
+FeaturePulseConfiguration.shared.foregroundColor = .white  // Default: white
+FeaturePulseConfiguration.shared.foregroundColor = .black  // For light backgrounds
+FeaturePulseConfiguration.shared.foregroundColor = Color(red: 1.0, green: 1.0, blue: 1.0)  // Custom color
 ```
 
-**Note:** 
-- The default `foregroundColor` uses `Color(uiColor: .label)` which automatically adapts to light/dark mode
-- The default `accentForegroundColor` is white, which works well with most primary colors
-- Make sure accent foreground color has good contrast with your primary color for accessibility
+**Note:**
+- The default `foregroundColor` is white, which works well with most primary colors
+- Make sure foreground color has good contrast with your primary color for accessibility
 
-### User Information
+### Custom User ID
 
-Track user information for better feedback and analytics:
+You can optionally set a custom user ID to link the device ID with your own internal user identification system:
 
 ```swift
-// Update user details
-FeaturePulseConfiguration.shared.updateUser(
-    customID: "user_123",      // Your internal user ID
-    email: "user@example.com", // User's email
-    name: "John Doe"          // User's display name
-)
+// Set custom user ID (e.g., from your authentication system)
+FeaturePulseConfiguration.shared.updateUser(customID: "user_123")
 
-// Update payment tier separately
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+// Clear custom ID
+FeaturePulseConfiguration.shared.updateUser(customID: nil)
 ```
+
+This is useful for:
+- Linking feature requests to your internal user database
+- Tracking the same user across multiple devices
+- Associating feedback with specific user accounts
 
 ### Payment Tracking & Vote Weighting
 
@@ -409,14 +397,10 @@ FeaturePulseConfiguration.shared.apiKey: String
 
 // Optional
 FeaturePulseConfiguration.shared.primaryColor: Color
+FeaturePulseConfiguration.shared.foregroundColor: Color
 
 // Methods
-FeaturePulseConfiguration.shared.updateUser(
-    customID: String? = nil,
-    email: String? = nil,
-    name: String? = nil
-)
-
+FeaturePulseConfiguration.shared.updateUser(customID: String?)
 FeaturePulseConfiguration.shared.updateUser(payment: Payment)
 ```
 
@@ -483,15 +467,13 @@ FeaturePulse SDK includes a **Privacy Manifest** (`PrivacyInfo.xcprivacy`) that 
 The SDK collects the following data (all optional except device identifier):
 
 - **Device Identifier**: Persistent device ID for analytics and feature request attribution
-- **Email Address**: Optional, user-provided for contact purposes
-- **Display Name**: Optional, user-provided for personalization
 - **Payment Information**: Optional, for MRR tracking (payment tier only, not payment details)
 - **App Usage**: App opens and feature request submissions for engagement metrics
 
 ### Privacy Features
 
 - ✅ **No Tracking**: The SDK does not track users across apps or websites
-- ✅ **User Control**: Email and name are optional and user-provided
+- ✅ **Minimal Data**: Only collects device ID, payment tier, and app usage
 - ✅ **Privacy-First**: All data collection is transparent and declared in the privacy manifest
 - ✅ **App Store Compliant**: Privacy manifest ensures App Store submission compliance
 

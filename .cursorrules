@@ -8,8 +8,10 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for complete development guidelines.
 ### Before Every Commit
 ```bash
 cd ios-sdk
-swiftlint --fix
+swiftlint --fix  # Auto-fix style issues
+swiftlint        # Verify no violations in FeaturePulse code
 ```
+**Note**: Ignore violations in external dependencies (StableID) or generated files.
 
 ### Platform Support
 - iOS 17.0+ | macOS 14.0+ | visionOS 1.0+

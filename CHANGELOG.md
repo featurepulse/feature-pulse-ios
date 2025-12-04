@@ -5,6 +5,41 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2025-01-30
+
+### 🔒 Privacy & Simplification
+
+- **Removed Email Collection** - Email field completely removed from SDK for better privacy
+  - No more email input field in new feature request form
+  - Users are now tracked by device ID only
+  - Simplified user model (removed email and name properties)
+  - Updated privacy manifest to reflect minimal data collection
+
+- **Added Custom User ID Support** - New method to link device ID with your internal user system
+  - `updateUser(customID:)` method for tracking users across your systems
+  - Useful for linking feature requests to your authentication system
+  - Does not change privacy manifest (covered under existing User ID declaration)
+
+- **Privacy Manifest Improvements**
+  - Removed email and name from collected data types
+  - Now only collects: Device ID, Payment tier, and App usage
+  - Fully compliant with Apple's privacy requirements
+  - Added `PrivacyInfo.xcprivacy` to package resources
+
+### 📚 Documentation
+
+- Updated README to reflect privacy-first approach
+- Removed email-related configuration examples
+- Added Custom User ID documentation
+- Clarified privacy manifest and data collection policies
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.0.9](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.9)
+
+---
+
 ## [1.0.8] - 2025-01-30
 
 ### 🔧 Maintenance

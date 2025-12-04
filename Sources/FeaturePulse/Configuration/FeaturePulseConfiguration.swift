@@ -70,7 +70,7 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// Current user information
     public let user = User()
 
-    /// Primary brand color used for vote and submit buttons (defaults to DaisyUI primary blue: #570df8)
+    /// Primary brand color used for vote and submit buttons (defaults to primary blue: #570df8)
     public var primaryColor: Color = Color(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
 
     /// Foreground color for vote title and icons and new feature request button CTA
@@ -79,11 +79,6 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var showStatus: Bool = false
-
-    /// Whether to show the email field in the new feature request form (controlled from dashboard, default: false)
-    /// This value is set automatically by the API and cannot be changed by the client
-    /// Default is false (email field hidden) for better privacy
-    public internal(set) var showSdkEmailField: Bool = false
 
     private let lastSessionKey = "FeaturePulse_LastSessionTime"
 
@@ -110,23 +105,18 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
         }
     }
 
-    /// Update user with multiple properties
-    public func updateUser(customID: String? = nil, email: String? = nil, name: String? = nil) {
-        if let customID = customID {
-            user.customID = customID
-        }
-        if let email = email {
-            user.email = email
-        }
-        if let name = name {
-            user.name = name
-        }
+    /// Update user with custom ID for tracking
+    /// - Parameters:
+    ///   - customID: Your internal user ID (e.g., from your authentication system)
+    ///
+    /// # Example Usage:
+    /// ```swift
+    /// FeaturePulseConfiguration.shared.updateUser(customID: "user_123")
+    /// ```
+    public func updateUser(customID: String?) {
+        user.customID = customID
         Task {
-            do {
-                try await FeaturePulseAPI.shared.syncUser()
-            } catch {
-                // Silently handle sync errors
-            }
+            try? await FeaturePulseAPI.shared.syncUser()
         }
     }
 

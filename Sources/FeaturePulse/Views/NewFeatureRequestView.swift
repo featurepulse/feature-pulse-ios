@@ -5,7 +5,6 @@ public struct NewFeatureRequestView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var title = ""
   @State private var description = ""
-  @State private var email = ""
   @State private var isSubmitting = false
   @State private var showError = false
   @State private var errorMessage = ""
@@ -14,7 +13,6 @@ public struct NewFeatureRequestView: View {
   private enum Field: Hashable {
     case title
     case description
-    case email
   }
 
   public init() {}
@@ -58,14 +56,10 @@ public struct NewFeatureRequestView: View {
               axis: .vertical
             )
             .focused($focusedField, equals: .description)
-            .submitLabel(FeaturePulseConfiguration.shared.showSdkEmailField ? .next : .send)
+            .submitLabel(.send)
             .onSubmit {
-              if FeaturePulseConfiguration.shared.showSdkEmailField {
-                focusedField = .email
-              } else {
-                focusedField = nil
-                submitFeatureRequest()
-              }
+              focusedField = nil
+              submitFeatureRequest()
             }
             .tint(FeaturePulseConfiguration.shared.primaryColor)
             .lineLimit(5...10)
@@ -86,30 +80,6 @@ public struct NewFeatureRequestView: View {
           }
         } header: {
           Text(L10n.descriptionHeader)
-        }
-
-        // Only show email field if enabled by dashboard setting
-        if FeaturePulseConfiguration.shared.showSdkEmailField {
-          Section {
-            TextField(
-              L10n.emailOptional,
-              text: $email,
-              prompt: Text(L10n.emailOptional)
-            )
-            .focused($focusedField, equals: .email)
-            .submitLabel(.send)
-            .onSubmit {
-              focusedField = nil
-              submitFeatureRequest()
-            }
-            .tint(FeaturePulseConfiguration.shared.primaryColor)
-            #if os(iOS)
-              .textContentType(.emailAddress)
-              .keyboardType(.emailAddress)
-              .autocapitalization(.none)
-            #endif
-            .autocorrectionDisabled()
-          }
         }
 
         Section {
@@ -192,21 +162,13 @@ public struct NewFeatureRequestView: View {
       return
     }
 
-    // Validate email if provided
-    if !email.isEmpty && !isValidEmail(email) {
-      errorMessage = L10n.invalidEmail
-      showError = true
-      return
-    }
-
     isSubmitting = true
 
     Task {
       do {
         try await FeaturePulseAPI.shared.submitFeatureRequest(
           title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-          description: description.trimmingCharacters(in: .whitespacesAndNewlines),
-          email: email.isEmpty ? nil : email.trimmingCharacters(in: .whitespacesAndNewlines)
+          description: description.trimmingCharacters(in: .whitespacesAndNewlines)
         )
         await MainActor.run {
           dismiss()
@@ -219,11 +181,5 @@ public struct NewFeatureRequestView: View {
         }
       }
     }
-  }
-
-  private func isValidEmail(_ email: String) -> Bool {
-    let emailRegex = "^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}$"
-    let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
-    return emailPredicate.evaluate(with: email)
   }
 }

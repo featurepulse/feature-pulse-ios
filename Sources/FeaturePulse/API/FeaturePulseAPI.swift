@@ -10,12 +10,10 @@ private struct FeatureRequestsResponse: Codable {
     let success: Bool
     let data: [FeatureRequest]
     let showStatus: Bool?
-    let showSdkEmailField: Bool?
 
     enum CodingKeys: String, CodingKey {
         case success, data
         case showStatus = "show_status"
-        case showSdkEmailField = "show_sdk_email_field"
     }
 }
 
@@ -116,9 +114,6 @@ public final class FeaturePulseAPI: Sendable {
         if let showStatus = apiResponse.showStatus {
             config.showStatus = showStatus
         }
-        if let showSdkEmailField = apiResponse.showSdkEmailField {
-            config.showSdkEmailField = showSdkEmailField
-        }
 
         return apiResponse.data
     }
@@ -128,18 +123,12 @@ public final class FeaturePulseAPI: Sendable {
     /// Submits a new feature request
     public func submitFeatureRequest(
         title: String,
-        description: String,
-        email: String? = nil
+        description: String
     ) async throws {
         let config = FeaturePulseConfiguration.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
-        }
-
-        // If email is provided and different from current, update user configuration
-        if let email = email, !email.isEmpty, email != config.user.email {
-            config.user.email = email
         }
 
         let urlString = "\(config.baseURL)/api/sdk/feature-requests"
@@ -163,14 +152,6 @@ public final class FeaturePulseAPI: Sendable {
             "description": description,
             "device_info": deviceInfo,
         ]
-
-        // Only include email and name if they exist
-        if let email = config.user.email, !email.isEmpty {
-            body["user_email"] = email
-        }
-        if let name = config.user.name, !name.isEmpty {
-            body["user_name"] = name
-        }
 
         // Include payment information if available
         if let payment = config.user.payment {
@@ -269,12 +250,6 @@ public final class FeaturePulseAPI: Sendable {
 
         if let customID = config.user.customID {
             body["custom_id"] = customID
-        }
-        if let email = config.user.email {
-            body["user_email"] = email
-        }
-        if let name = config.user.name {
-            body["user_name"] = name
         }
 
         // Include payment information if available

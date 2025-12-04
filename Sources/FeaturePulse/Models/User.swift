@@ -6,12 +6,6 @@ public final class User: @unchecked Sendable {
     /// Custom user identifier (e.g., your app's user ID)
     public var customID: String?
 
-    /// User's email address
-    public var email: String?
-
-    /// User's display name
-    public var name: String?
-
     /// User's payment information for MRR tracking
     public var payment: Payment?
 
