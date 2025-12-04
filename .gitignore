@@ -95,14 +95,7 @@ iOSInjectionProject/
 ## macOS
 .DS_Store
 
-# Private/Development files
+# Personal dev files (keep in monorepo, don't sync to public)
 .cursorrules
 .vscode/
-DEVELOPMENT.md
-PUBLISHING_GUIDE.md
 RELEASE.md
-archives/
-.build-xcode/
-ios-sdk/
-xcframework/
-xcframework-with-resources/

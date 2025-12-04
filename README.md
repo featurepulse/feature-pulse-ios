@@ -188,7 +188,7 @@ FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
 FeaturePulseConfiguration.shared.primaryColor = .red
 FeaturePulseConfiguration.shared.foregroundColor = .white
 
-// Payment Tier (affects vote weighting)
+// Payment Tier
 FeaturePulseConfiguration.shared.updateUser(payment: .free)
 FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99))
 FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
@@ -233,9 +233,9 @@ This is useful for:
 - Tracking the same user across multiple devices
 - Associating feedback with specific user accounts
 
-### Payment Tracking & Vote Weighting
+### Payment Tracking
 
-FeaturePulse uses Monthly Recurring Revenue (MRR) to weight votes, giving higher priority to paying customers:
+Track user payment tiers to understand your customer base:
 
 ```swift
 // Free users
@@ -259,16 +259,15 @@ FeaturePulseConfiguration.shared.updateUser(
 )
 ```
 
-**How Vote Weighting Works:**
-- Free users: Weight = 0 (vote is counted but not weighted)
-- Paying users: Weight = MRR in cents (e.g., $9.99/month = 999 points)
-- **Engagement multiplier**: Votes are also weighted by user engagement (see Session Tracking below)
-- Final formula: `Vote Weight = MRR × Engagement Weight`
-- This ensures feature requests from engaged, paying customers are prioritized
+**Payment Tier Benefits:**
+- Track MRR (Monthly Recurring Revenue) from your app
+- Understand which features paying customers want
+- Segment feedback by customer value
+- Make data-driven prioritization decisions
 
 ### Session Tracking & Engagement Metrics
 
-Track user app opens to measure engagement and weight votes accordingly:
+Track user app opens to measure engagement:
 
 ```swift
 @main
@@ -289,27 +288,17 @@ struct YourApp: App {
 - Sends session data to FeaturePulse backend
 
 **Engagement Tiers:**
-- 🔥 **Power User** (20+ sessions/month): 2.0x engagement multiplier
-- ⚡ **Active User** (10-19 sessions/month): 1.5x engagement multiplier
-- 👍 **Regular User** (5-9 sessions/month): 1.0x engagement multiplier
-- 💤 **Casual User** (2-4 sessions/month): 0.7x engagement multiplier
-- 👻 **Ghost User** (0-1 sessions/month): 0.3x engagement multiplier
-
-**Vote Weighting with Engagement:**
-```swift
-// Example: User with $10/month subscription
-// - Power User (20+ sessions): $10 × 2.0 = 20 points per vote
-// - Active User (10-19 sessions): $10 × 1.5 = 15 points per vote
-// - Regular User (5-9 sessions): $10 × 1.0 = 10 points per vote
-// - Casual User (2-4 sessions): $10 × 0.7 = 7 points per vote
-// - Ghost User (0-1 sessions): $10 × 0.3 = 3 points per vote
-```
+- 🔥 **Power User** (20+ sessions/month)
+- ⚡ **Active User** (10-19 sessions/month)
+- 👍 **Regular User** (5-9 sessions/month)
+- 💤 **Casual User** (2-4 sessions/month)
+- 👻 **Ghost User** (0-1 sessions/month)
 
 **Benefits:**
-- Rewards users who actually use your app
-- Prevents one-time users from skewing priorities
-- Shows engagement badges in dashboard
-- Helps identify your most valuable users
+- Understand user engagement patterns
+- See engagement badges in dashboard
+- Identify your most active users
+- Track app usage alongside feature requests
 
 ### RevenueCat Integration Example
 
@@ -363,7 +352,7 @@ func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
 - Call this function whenever RevenueCat customer info updates
 - Use `Purchases.shared.getCustomerInfo()` to get current state
 - Set up a listener: `Purchases.shared.delegate = self`
-- Votes will be weighted based on actual subscription price
+- Payment tiers will be automatically synced to FeaturePulse
 
 ## Localization
 
@@ -426,37 +415,6 @@ enum Payment {
 2. Create a new project
 3. Copy your API key from the project settings
 4. Add it to your app configuration
-
-## Troubleshooting
-
-### "Invalid API Key" error
-
-Make sure you've set your API key before presenting any FeaturePulse views:
-
-```swift
-FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
-```
-
-### Color not applying
-
-Make sure to set the color before presenting the view:
-
-```swift
-@main
-struct MyApp: App {
-    init() {
-        FeaturePulseConfiguration.shared.primaryColor = .red
-    }
-    // ...
-}
-```
-
-## Example Projects
-
-Check out example implementations:
-- **Tab Bar Integration**: See Example 1 above
-- **Modal Presentation**: See Example 2 above
-- **Navigation Link**: See Example 3 above
 
 ## Privacy & Data Collection
 
