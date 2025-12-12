@@ -188,12 +188,12 @@ FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
 FeaturePulseConfiguration.shared.primaryColor = .red
 FeaturePulseConfiguration.shared.foregroundColor = .white
 
-// Payment Tier
+// Payment Tier (with currency)
 FeaturePulseConfiguration.shared.updateUser(payment: .free)
-FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99))
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
-FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99))
-FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
+FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
+FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
 ```
 
 ### Customize Colors
@@ -235,27 +235,27 @@ This is useful for:
 
 ### Payment Tracking
 
-Track user payment tiers to understand your customer base:
+Track user payment tiers to understand your customer base. **Currency is required** for all payment tiers (except `.free`).
 
 ```swift
 // Free users
 FeaturePulseConfiguration.shared.updateUser(payment: .free)
 
 // Weekly subscription ($2.99/week = ~$12 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
 
 // Monthly subscription ($9.99/month = $9.99 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
 
 // Yearly subscription ($79.99/year = ~$6.67 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
 
 // Lifetime purchase ($199.99 amortized over 24 months = ~$8.33 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99))
+FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
 
 // Custom lifetime amortization period
 FeaturePulseConfiguration.shared.updateUser(
-    payment: .lifetime(199.99, expectedLifetimeMonths: 36)
+    payment: .lifetime(199.99, currency: "USD", expectedLifetimeMonths: 36)
 )
 ```
 
@@ -264,6 +264,24 @@ FeaturePulseConfiguration.shared.updateUser(
 - Understand which features paying customers want
 - Segment feedback by customer value
 - Make data-driven prioritization decisions
+
+#### Multi-Currency Support
+
+FeaturePulse supports 20+ major currencies. Specify the currency code using ISO 4217 standard:
+
+```swift
+// Examples with different currencies
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))  // US Dollar
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(8.99, currency: "EUR"))  // Euro
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(7.99, currency: "GBP"))  // British Pound
+FeaturePulseConfiguration.shared.updateUser(payment: .yearly(99.99, currency: "CAD")) // Canadian Dollar
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(699, currency: "JPY"))   // Japanese Yen
+```
+
+**Supported Currencies:**
+USD, EUR, GBP, CAD, AUD, JPY, CHF, CNY, INR, BRL, MXN, SEK, NOK, DKK, PLN, SGD, HKD, KRW, TRY, ZAR
+
+All amounts are automatically converted to USD for MRR calculations in the dashboard, while preserving your original currency for accurate tracking.
 
 ### Session Tracking & Engagement Metrics
 
@@ -329,16 +347,17 @@ func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
     }
     
     let price = matchedPackage.storeProduct.price
+    let currency = matchedPackage.storeProduct.currencyCode ?? "USD"
     let payment: FeaturePulse.Payment = {
         switch matchedPackage.packageType {
         case .weekly:
-            return .weekly(price)
+            return .weekly(price, currency: currency)
         case .monthly:
-            return .monthly(price)
+            return .monthly(price, currency: currency)
         case .annual:
-            return .yearly(price)
+            return .yearly(price, currency: currency)
         case .lifetime:
-            return .lifetime(price, expectedLifetimeMonths: 24)
+            return .lifetime(price, currency: currency, expectedLifetimeMonths: 24)
         default:
             return .free
         }

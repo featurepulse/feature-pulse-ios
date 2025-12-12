@@ -12,6 +12,9 @@ public struct Payment: Codable, Equatable, Sendable {
     /// Original amount in the payment's currency
     let originalAmount: Decimal
 
+    /// Currency code (ISO 4217) - e.g., "USD", "EUR", "GBP"
+    let currency: String
+
     // MARK: - Payment Types
 
     public enum PaymentType: String, Codable, Sendable {
@@ -29,7 +32,8 @@ public struct Payment: Codable, Equatable, Sendable {
         return Payment(
             monthlyValueInCents: 0,
             paymentType: .free,
-            originalAmount: 0
+            originalAmount: 0,
+            currency: "USD"
         )
     }
 
@@ -37,7 +41,10 @@ public struct Payment: Codable, Equatable, Sendable {
 
     /// Accepts a price expressed in `Decimal` e.g: 2.99 or 11.49
     /// Calculates MRR by multiplying by 4 (4 weeks per month)
-    public static func weekly(_ amount: Decimal) -> Payment {
+    /// - Parameters:
+    ///   - amount: The payment amount
+    ///   - currency: ISO 4217 currency code (e.g., "USD", "EUR", "GBP")
+    public static func weekly(_ amount: Decimal, currency: String) -> Payment {
         let amountInCents = NSDecimalNumber(decimal: amount * 100).intValue
         let monthlyValue = NSDecimalNumber(decimal: Decimal(amountInCents) * 4)
             .rounding(accordingToBehavior: RoundUp())
@@ -46,27 +53,35 @@ public struct Payment: Codable, Equatable, Sendable {
         return Payment(
             monthlyValueInCents: monthlyValue,
             paymentType: .weekly,
-            originalAmount: amount
+            originalAmount: amount,
+            currency: currency
         )
     }
 
     // MARK: - Monthly
 
     /// Accepts a price expressed in `Decimal` e.g: 6.99 or 19.49
-    public static func monthly(_ amount: Decimal) -> Payment {
+    /// - Parameters:
+    ///   - amount: The payment amount
+    ///   - currency: ISO 4217 currency code (e.g., "USD", "EUR", "GBP")
+    public static func monthly(_ amount: Decimal, currency: String) -> Payment {
         let amountInCents = NSDecimalNumber(decimal: amount * 100).intValue
 
         return Payment(
             monthlyValueInCents: amountInCents,
             paymentType: .monthly,
-            originalAmount: amount
+            originalAmount: amount,
+            currency: currency
         )
     }
 
     // MARK: - Yearly
 
     /// Accepts a price expressed in `Decimal` e.g: 69.99 or 199.49
-    public static func yearly(_ amount: Decimal) -> Payment {
+    /// - Parameters:
+    ///   - amount: The payment amount
+    ///   - currency: ISO 4217 currency code (e.g., "USD", "EUR", "GBP")
+    public static func yearly(_ amount: Decimal, currency: String) -> Payment {
         let monthlyValue = NSDecimalNumber(decimal: (amount * 100) / 12)
             .rounding(accordingToBehavior: RoundUp())
             .intValue
@@ -74,7 +89,8 @@ public struct Payment: Codable, Equatable, Sendable {
         return Payment(
             monthlyValueInCents: monthlyValue,
             paymentType: .yearly,
-            originalAmount: amount
+            originalAmount: amount,
+            currency: currency
         )
     }
 
@@ -84,8 +100,9 @@ public struct Payment: Codable, Equatable, Sendable {
     /// Amortizes over expected lifetime (default 24 months)
     /// - Parameters:
     ///   - amount: The one-time payment amount
+    ///   - currency: ISO 4217 currency code (e.g., "USD", "EUR", "GBP")
     ///   - expectedLifetimeMonths: Number of months to amortize over (default: 24)
-    public static func lifetime(_ amount: Decimal, expectedLifetimeMonths: Int = 24) -> Payment {
+    public static func lifetime(_ amount: Decimal, currency: String, expectedLifetimeMonths: Int = 24) -> Payment {
         let monthlyValue = NSDecimalNumber(decimal: (amount * 100) / Decimal(expectedLifetimeMonths))
             .rounding(accordingToBehavior: RoundUp())
             .intValue
@@ -93,7 +110,8 @@ public struct Payment: Codable, Equatable, Sendable {
         return Payment(
             monthlyValueInCents: monthlyValue,
             paymentType: .lifetime,
-            originalAmount: amount
+            originalAmount: amount,
+            currency: currency
         )
     }
 

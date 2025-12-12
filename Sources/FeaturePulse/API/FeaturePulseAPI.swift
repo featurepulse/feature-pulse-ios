@@ -159,6 +159,7 @@ public final class FeaturePulseAPI: Sendable {
             body["monthly_value_cents"] = payment.monthlyValueInCents
             body["original_amount_cents"] =
             NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
+            body["currency"] = payment.currency
         }
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -258,6 +259,7 @@ public final class FeaturePulseAPI: Sendable {
             body["monthly_value_cents"] = payment.monthlyValueInCents
             body["original_amount_cents"] =
             NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
+            body["currency"] = payment.currency
         }
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)

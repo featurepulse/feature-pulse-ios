@@ -5,6 +5,51 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-02-05
+
+### 🌍 Multi-Currency Support
+
+- **BREAKING**: Currency parameter is now **required** for all payment tiers (except `.free`)
+  - `Payment.weekly(_:currency:)` - Currency parameter added
+  - `Payment.monthly(_:currency:)` - Currency parameter added
+  - `Payment.yearly(_:currency:)` - Currency parameter added
+  - `Payment.lifetime(_:currency:expectedLifetimeMonths:)` - Currency parameter added
+- **20+ Currencies Supported** - USD, EUR, GBP, CAD, AUD, JPY, CHF, CNY, INR, BRL, MXN, SEK, NOK, DKK, PLN, SGD, HKD, KRW, TRY, ZAR
+- **Automatic Conversion** - All amounts converted to USD for MRR calculations while preserving original currency
+- **ISO 4217 Standard** - Use standard currency codes (e.g., "USD", "EUR", "GBP")
+
+### 📝 Migration Guide
+
+Update your payment configuration to include currency:
+
+```swift
+// Before (1.0.x)
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99))
+
+// After (1.1.0)
+FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
+```
+
+RevenueCat integration also updated:
+
+```swift
+let currency = matchedPackage.storeProduct.currencyCode ?? "USD"
+let payment: FeaturePulse.Payment = {
+    switch matchedPackage.packageType {
+    case .monthly:
+        return .monthly(price, currency: currency)
+    // ... other cases
+    }
+}()
+```
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.1.0](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.1.0)
+
+---
+
 ## [1.0.10] - 2025-01-30
 
 ### 📚 Documentation
