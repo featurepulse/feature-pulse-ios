@@ -7,9 +7,17 @@ A modern SwiftUI-only SDK for collecting and managing feature requests from your
 ✅ **SwiftUI-Only** - Pure SwiftUI implementation, no UIKit dependencies  
 ✅ **Modern Swift 6.0** - Uses `@Observable`, async/await, and Swift Concurrency  
 ✅ **Type-Safe Localization** - String Catalogs with compile-time checking  
-✅ **Multi-Language Support** - English, Spanish, French, German included  
-✅ **Customizable** - Override any translation or appearance setting  
+✅ **Multi-Language Support** - English, Spanish, French, German, Italian, Portuguese included  
+✅ **Customizable** - Override any translation or appearance setting
 ✅ **Simple Integration** - Just 3 lines of code to get started
+
+## Screenshots
+
+<p align="center">
+  <img src="Screenshots/feature-pulse-screenshot-list-blue.png" width="250" alt="Feature Requests List">
+  <img src="Screenshots/feature-pulse-screenshot-detail-blue.png" width="250" alt="Feature Request Detail">
+  <img src="Screenshots/feature-pulse-screenshot-new-blue.png" width="250" alt="Submit New Feature">
+</p>
 
 ## Requirements
 
@@ -381,6 +389,8 @@ FeaturePulse includes translations for:
 - 🇪🇸 Spanish (Español)
 - 🇫🇷 French (Français)
 - 🇩🇪 German (Deutsch)
+- 🇮🇹 Italian (Italiano)
+- 🇵🇹 Portuguese (Português)
 
 The SDK automatically uses the user's device language. No additional configuration needed!
 

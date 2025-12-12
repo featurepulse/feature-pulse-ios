@@ -40,7 +40,7 @@ public struct Payment: Codable, Equatable, Sendable {
     // MARK: - Weekly
 
     /// Accepts a price expressed in `Decimal` e.g: 2.99 or 11.49
-    /// Calculates MRR by multiplying by 4 (4 weeks per month)
+    /// Calculates MRR using accurate weekly-to-monthly conversion (52 weeks / 12 months = 4.333...)
     /// - Parameters:
     ///   - amount: The payment amount
     ///   - currency: ISO 4217 currency code (e.g., "USD", "EUR", "GBP")
