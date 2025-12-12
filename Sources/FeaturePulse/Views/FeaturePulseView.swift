@@ -30,6 +30,7 @@ public struct FeaturePulseView: View {
             }
         }
         .navigationTitle(L10n.featureRequests)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(L10n.requestFeature, systemImage: "plus") {
@@ -75,61 +76,65 @@ public struct FeaturePulseView: View {
     }
 
     private var featureRequestsList: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                // Feature requests list
-                VStack {
-                    ForEach(displayedRequests) { request in
-                        Button {
-                            selectedRequest = request
-                        } label: {
-                            FeatureRequestRow(
-                                request: request,
-                                hasVoted: viewModel.hasVoted(for: request.id)
-                            ) {
-                                await viewModel.toggleVote(for: request.id)
+        Group {
+            // Show empty state if no feature requests and not loading
+            if viewModel.featureRequests.isEmpty && !viewModel.isLoading {
+                emptyStateView
+            } else {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Feature requests list
+                        VStack {
+                            ForEach(displayedRequests) { request in
+                                Button {
+                                    selectedRequest = request
+                                } label: {
+                                    FeatureRequestRow(
+                                        request: request,
+                                        hasVoted: viewModel.hasVoted(for: request.id)
+                                    ) {
+                                        await viewModel.toggleVote(for: request.id)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, 16)
                             }
                         }
-                        .buttonStyle(.plain)
-                        .transition(.opacity.combined(with: .scale))
+                        .padding(.top, 24)
+
+                        // CTA Section at bottom
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(L10n.ctaMessage)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+
+                            Button {
+                                showingNewRequest = true
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "plus")
+                                        .font(.body.weight(.semibold))
+                                    Text(L10n.requestFeature)
+                                        .font(.body.weight(.semibold))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color(uiColor: .label))
+                                .foregroundStyle(Color(uiColor: .systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
                         .padding(.horizontal, 16)
+                        .padding(.vertical, 32)
                     }
                 }
-                .padding(.top, 24)
-
-                // CTA Section at bottom
-                if !viewModel.isLoading || !viewModel.featureRequests.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(L10n.ctaMessage)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
-
-                        Button {
-                            showingNewRequest = true
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "plus")
-                                    .font(.body.weight(.semibold))
-                                Text(L10n.requestFeature)
-                                    .font(.body.weight(.semibold))
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color(uiColor: .label))
-                            .foregroundStyle(Color(uiColor: .systemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
+                .refreshable {
+                    Task {
+                        await viewModel.loadFeatureRequests(isRefresh: true)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 32)
                 }
-            }
-        }
-        .refreshable {
-            Task {
-                await viewModel.loadFeatureRequests(isRefresh: true)
             }
         }
         .sheet(item: $selectedRequest) { request in
@@ -162,5 +167,45 @@ public struct FeaturePulseView: View {
             }
         }
         return viewModel.featureRequests
+    }
+
+    /// Empty state view when there are no feature requests
+    private var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "lightbulb.fill")
+                .font(.system(size: 64))
+                .foregroundStyle(FeaturePulseConfiguration.shared.primaryColor)
+                .symbolEffect(.pulse)
+
+            VStack(spacing: 8) {
+                Text(L10n.emptyStateTitle)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.primary)
+
+                Text(L10n.emptyStateMessage)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            Button {
+                showingNewRequest = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "plus")
+                        .font(.body.weight(.semibold))
+                    Text(L10n.requestFeature)
+                        .font(.body.weight(.semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Color(uiColor: .label))
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 12)
+        }
+        .padding(.horizontal, 40)
     }
 }

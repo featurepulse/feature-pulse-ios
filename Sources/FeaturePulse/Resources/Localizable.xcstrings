@@ -462,6 +462,88 @@
         }
       }
     },
+    "empty.state.message" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sei der Erste, der seine Ideen teilt!\nLass uns wissen, welche Funktionen du gerne sehen würdest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Be the first to share your ideas!\nLet us know what features you'd like to see."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sé el primero en compartir tus ideas. ¡Cuéntanos qué características te gustaría ver!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soyez le premier à partager vos idées !\nFaites-nous savoir quelles fonctionnalités vous aimeriez voir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sii il primo a condividere le tue idee!\nFacci sapere quali funzionalità ti piacerebbe vedere."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seja o primeiro a partilhar as suas ideias!\nDiga-nos que funcionalidades gostaria de ver."
+          }
+        }
+      }
+    },
+    "empty.state.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Funktionsanfragen bisher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Feature Requests Yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no hay solicitudes de funciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune demande de fonctionnalité pour le moment"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta di funzionalità finora"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ainda não foram feitos pedidos de funcionalidades."
+          }
+        }
+      }
+    },
     "error" : {
       "extractionState" : "manual",
       "localizations" : {

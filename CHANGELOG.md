@@ -5,6 +5,29 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-12-12
+
+### ✨ New Features
+
+- **Empty State View** - Added beautiful empty state when no feature requests exist
+  - Localized empty state messages in all supported languages
+  - Encourages users to submit their first feature request
+  - Clean, minimalist design with clear call-to-action
+
+### 🎨 UI Improvements
+
+- **Enhanced Animations** - Improved animation smoothness in feature request rows
+  - Better visual feedback when interacting with feature requests
+  - Smoother transitions and state changes
+  - More polished overall user experience
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.1.1](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.1.1)
+
+---
+
 ## [1.1.0] - 2025-02-05
 
 ### 🌍 Multi-Currency Support

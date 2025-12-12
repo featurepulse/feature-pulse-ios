@@ -152,4 +152,17 @@ public enum L10n {
   public static var optional: String {
     String(localized: "optional", defaultValue: "Optional", bundle: .module)
   }
+
+  // MARK: - Empty State
+  public static var emptyStateTitle: String {
+    String(localized: "empty.state.title", defaultValue: "No Feature Requests Yet", bundle: .module)
+  }
+
+  public static var emptyStateMessage: String {
+    String(
+      localized: "empty.state.message",
+      defaultValue: "Be the first to share your ideas!\nLet us know what features you'd like to see.",
+      bundle: .module
+    )
+  }
 }

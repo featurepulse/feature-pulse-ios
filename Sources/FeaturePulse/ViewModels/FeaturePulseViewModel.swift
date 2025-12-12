@@ -30,7 +30,9 @@ final class FeaturePulseViewModel: @unchecked Sendable {
                 previousRequestCount = featureRequests.count
             }
 
-            featureRequests = requests
+            withAnimation {
+                featureRequests = requests
+            }
 
             // Sync voted state from API
             votedRequestIds = Set(featureRequests.filter { $0.hasVoted }.map { $0.id })
