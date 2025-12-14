@@ -7,15 +7,15 @@ public protocol DefaultValueProvider {
 }
 
 /// Provides the first case of a CaseIterable enum as default
-public struct FirstCase<T: Codable & CaseIterable>: DefaultValueProvider where T: RawRepresentable, T.RawValue == String {
+public struct FirstCase<T: Codable & CaseIterable>: DefaultValueProvider, Sendable where T: RawRepresentable, T.RawValue == String, T: Sendable {
     public static var defaultValue: T {
-        return T.allCases.first!
+        T.allCases.first!
     }
 }
 
 /// Property wrapper that provides a default value when decoding fails
 @propertyWrapper
-public struct Default<Provider: DefaultValueProvider>: Codable, Equatable, Hashable where Provider.Value: Equatable & Hashable {
+public struct Default<Provider: DefaultValueProvider>: Codable, Equatable, Hashable, Sendable where Provider.Value: Equatable & Hashable & Sendable, Provider: Sendable {
     public var wrappedValue: Provider.Value
 
     public init(wrappedValue: Provider.Value) {
@@ -27,9 +27,9 @@ public struct Default<Provider: DefaultValueProvider>: Codable, Equatable, Hasha
 
         // Try to decode the value, fall back to default if it fails
         if let value = try? container.decode(Provider.Value.self) {
-            self.wrappedValue = value
+            wrappedValue = value
         } else {
-            self.wrappedValue = Provider.defaultValue
+            wrappedValue = Provider.defaultValue
         }
     }
 

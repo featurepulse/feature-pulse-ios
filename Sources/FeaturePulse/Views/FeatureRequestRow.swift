@@ -4,11 +4,21 @@ import SwiftUI
 struct FeatureRequestRow: View {
     let request: FeatureRequest
     let hasVoted: Bool
+    let translatedTitle: String?
+    let translatedDescription: String?
     let onVote: () async -> Bool
 
     @State private var isVoting = false
     @State private var justVoted = false
     @State private var scale: CGFloat = 1.0
+
+    private var displayTitle: String {
+        translatedTitle ?? request.title
+    }
+
+    private var displayDescription: String {
+        translatedDescription ?? request.description
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -64,12 +74,12 @@ struct FeatureRequestRow: View {
 
             // Content
             VStack(alignment: .leading, spacing: 6) {
-                Text(request.title)
+                Text(displayTitle)
                     .font(.headline)
                     .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text(request.description)
+                Text(displayDescription)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
@@ -96,7 +106,6 @@ struct FeatureRequestRow: View {
             }
         }
         .padding(.vertical, 8)
-        .padding(.horizontal, 12)
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)

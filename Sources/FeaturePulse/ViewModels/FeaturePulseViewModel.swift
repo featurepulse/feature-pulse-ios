@@ -35,7 +35,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
             }
 
             // Sync voted state from API
-            votedRequestIds = Set(featureRequests.filter { $0.hasVoted }.map { $0.id })
+            votedRequestIds = Set(featureRequests.filter(\.hasVoted).map(\.id))
 
             isLoading = false
         } catch {
@@ -140,7 +140,7 @@ private struct SeededRandomGenerator {
     private var state: UInt64
 
     init(seed: UInt64) {
-        self.state = seed
+        state = seed
     }
 
     mutating func next() -> UInt64 {

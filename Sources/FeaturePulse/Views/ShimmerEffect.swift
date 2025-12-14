@@ -26,7 +26,7 @@ struct ShimmerEffect: ViewModifier {
             .onAppear {
                 withAnimation(
                     .linear(duration: 1.5)
-                    .repeatForever(autoreverses: false)
+                        .repeatForever(autoreverses: false)
                 ) {
                     phase = 1
                 }

@@ -2,7 +2,6 @@ import Foundation
 
 /// Represents a user's payment information for MRR tracking and feature prioritization
 public struct Payment: Codable, Equatable, Sendable {
-
     /// Monthly recurring revenue in cents
     let monthlyValueInCents: Int
 
@@ -29,7 +28,7 @@ public struct Payment: Codable, Equatable, Sendable {
 
     /// Free tier user
     public static var free: Payment {
-        return Payment(
+        Payment(
             monthlyValueInCents: 0,
             paymentType: .free,
             originalAmount: 0,
@@ -119,22 +118,22 @@ public struct Payment: Codable, Equatable, Sendable {
 
     /// MRR in dollars (for display)
     public var monthlyValue: Decimal {
-        return Decimal(monthlyValueInCents) / 100
+        Decimal(monthlyValueInCents) / 100
     }
 
     /// Annual recurring revenue in cents
     public var annualValueInCents: Int {
-        return monthlyValueInCents * 12
+        monthlyValueInCents * 12
     }
 
     /// Annual recurring revenue in dollars
     public var annualValue: Decimal {
-        return Decimal(annualValueInCents) / 100
+        Decimal(annualValueInCents) / 100
     }
 
     /// Returns true if this is a paying customer
     public var isPaying: Bool {
-        return monthlyValueInCents > 0
+        monthlyValueInCents > 0
     }
 }
 
@@ -142,20 +141,20 @@ public struct Payment: Codable, Equatable, Sendable {
 
 private class RoundUp: NSObject, NSDecimalNumberBehaviors {
     func roundingMode() -> NSDecimalNumber.RoundingMode {
-        return .up
+        .up
     }
 
     func scale() -> Int16 {
-        return 0
+        0
     }
 
     func exceptionDuringOperation(
-        _ operation: Selector,
-        error: NSDecimalNumber.CalculationError,
-        leftOperand: NSDecimalNumber,
-        rightOperand: NSDecimalNumber?
+        _: Selector,
+        error _: NSDecimalNumber.CalculationError,
+        leftOperand _: NSDecimalNumber,
+        rightOperand _: NSDecimalNumber?
     ) -> NSDecimalNumber? {
         // We don't provide custom exception handling; return nil to let the system handle it.
-        return nil
+        nil
     }
 }

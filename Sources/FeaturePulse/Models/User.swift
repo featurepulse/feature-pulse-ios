@@ -17,21 +17,21 @@ public final class User: @unchecked Sendable {
         // Stored in Keychain and iCloud (when available), survives app reinstalls
 
         #if targetEnvironment(simulator)
-        // For simulator, generate a stable UUID stored in UserDefaults
-        // (iCloud Key-Value Store requires entitlements that may not be configured)
-        let key = "com.featurepulse.deviceID"
-        if let stored = UserDefaults.standard.string(forKey: key) {
-            self.deviceID = stored
-        } else {
-            self.deviceID = UUID().uuidString
-            UserDefaults.standard.set(self.deviceID, forKey: key)
-        }
+            // For simulator, generate a stable UUID stored in UserDefaults
+            // (iCloud Key-Value Store requires entitlements that may not be configured)
+            let key = "com.featurepulse.deviceID"
+            if let stored = UserDefaults.standard.string(forKey: key) {
+                deviceID = stored
+            } else {
+                deviceID = UUID().uuidString
+                UserDefaults.standard.set(deviceID, forKey: key)
+            }
         #else
-        // For real devices, use StableID which syncs across devices via iCloud
-        if !StableID.isConfigured {
-            StableID.configure()
-        }
-        self.deviceID = StableID.id
+            // For real devices, use StableID which syncs across devices via iCloud
+            if !StableID.isConfigured {
+                StableID.configure()
+            }
+            deviceID = StableID.id
         #endif
     }
 
@@ -39,6 +39,6 @@ public final class User: @unchecked Sendable {
     /// Always uses deviceID as the stable unique identifier
     /// customID and email are sent as additional metadata to complement the device identity
     var userIdentifier: String {
-        return deviceID
+        deviceID
     }
 }

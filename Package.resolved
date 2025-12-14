@@ -1,5 +1,4 @@
 {
-  "originHash" : "9e5eccef9420c85105c8b0bc97b3dec46d6efbb06ebc61d41e2ccdc0e6753f47",
   "pins" : [
     {
       "identity" : "stableid",
@@ -11,5 +10,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }

@@ -4,17 +4,29 @@ import SwiftUI
 struct FeatureRequestDetailView: View {
     @Binding var request: FeatureRequest
     let hasVoted: Bool
+    let translatedTitle: String?
+    let translatedDescription: String?
     let onVote: () async -> Bool
     @Environment(\.dismiss) private var dismiss
 
     @State private var isVoting = false
     @State private var localHasVoted: Bool
 
-    init(request: Binding<FeatureRequest>, hasVoted: Bool, onVote: @escaping () async -> Bool) {
-        self._request = request
+    private var displayTitle: String {
+        translatedTitle ?? request.title
+    }
+
+    private var displayDescription: String {
+        translatedDescription ?? request.description
+    }
+
+    init(request: Binding<FeatureRequest>, hasVoted: Bool, translatedTitle: String? = nil, translatedDescription: String? = nil, onVote: @escaping () async -> Bool) {
+        _request = request
         self.hasVoted = hasVoted
+        self.translatedTitle = translatedTitle
+        self.translatedDescription = translatedDescription
         self.onVote = onVote
-        self._localHasVoted = State(initialValue: hasVoted)
+        _localHasVoted = State(initialValue: hasVoted)
     }
 
     var body: some View {
@@ -40,12 +52,12 @@ struct FeatureRequestDetailView: View {
                     }
 
                     // Title
-                    Text(request.title)
+                    Text(displayTitle)
                         .font(.title2.bold())
                         .foregroundStyle(.primary)
 
                     // Description
-                    Text(request.description)
+                    Text(displayDescription)
                         .font(.body)
                         .foregroundStyle(.secondary)
 
@@ -55,38 +67,38 @@ struct FeatureRequestDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .navigationTitle(L10n.featureRequests)
-#if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-#endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-#if os(iOS)
-                    if #available(iOS 26.0, *) {
-                        Button(role: .close) {
-                            dismiss()
-                        }
-                    } else {
-                        Button(L10n.cancel) {
-                            dismiss()
-                        }
+            #if os(iOS)
+                .navigationBarTitleDisplayMode(.inline)
+            #endif
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        #if os(iOS)
+                            if #available(iOS 26.0, *) {
+                                Button(role: .close) {
+                                    dismiss()
+                                }
+                            } else {
+                                Button(L10n.cancel) {
+                                    dismiss()
+                                }
+                            }
+                        #else
+                            Button(L10n.cancel) {
+                                dismiss()
+                            }
+                        #endif
                     }
-#else
-                    Button(L10n.cancel) {
-                        dismiss()
-                    }
-#endif
-                }
 
-#if os(iOS)
-                if #available(iOS 26.0, *) {
-                    vote.sharedBackgroundVisibility(.hidden)
-                } else {
-                    vote
+                    #if os(iOS)
+                        if #available(iOS 26.0, *) {
+                            vote.sharedBackgroundVisibility(.hidden)
+                        } else {
+                            vote
+                        }
+                    #else
+                        vote
+                    #endif
                 }
-#else
-                vote
-#endif
-            }
         }
     }
 

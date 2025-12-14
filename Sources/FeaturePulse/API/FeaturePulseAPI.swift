@@ -10,11 +10,13 @@ private struct FeatureRequestsResponse: Codable {
     let success: Bool
     let data: [FeatureRequest]
     let showStatus: Bool?
+    let showTranslation: Bool?
     let permissions: Permissions?
 
     enum CodingKeys: String, CodingKey {
         case success, data, permissions
         case showStatus = "show_status"
+        case showTranslation = "show_translation"
     }
 }
 
@@ -53,7 +55,7 @@ public final class FeaturePulseAPI: Sendable {
 
         let body: [String: Any] = [
             "user_identifier": config.user.deviceID,
-            "activity_type": type,
+            "activity_type": type
         ]
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -64,7 +66,7 @@ public final class FeaturePulseAPI: Sendable {
             throw FeaturePulseError.invalidResponse
         }
 
-        if !(200...299).contains(httpResponse.statusCode) {
+        if !(200 ... 299).contains(httpResponse.statusCode) {
             throw FeaturePulseError.serverError(httpResponse.statusCode)
         }
 
@@ -116,6 +118,10 @@ public final class FeaturePulseAPI: Sendable {
             config.showStatus = showStatus
         }
 
+        if let showTranslation = apiResponse.showTranslation {
+            config.showTranslation = showTranslation
+        }
+
         // Update permissions from server
         if let permissions = apiResponse.permissions {
             config.permissions = permissions
@@ -150,13 +156,13 @@ public final class FeaturePulseAPI: Sendable {
         // Use user information from configuration
         let deviceInfo: [String: Any] = [
             "device_id": config.user.deviceID,
-            "bundle_id": Bundle.main.bundleIdentifier ?? "unknown",
+            "bundle_id": Bundle.main.bundleIdentifier ?? "unknown"
         ]
 
         var body: [String: Any] = [
             "title": title,
             "description": description,
-            "device_info": deviceInfo,
+            "device_info": deviceInfo
         ]
 
         // Include payment information if available
@@ -164,7 +170,7 @@ public final class FeaturePulseAPI: Sendable {
             body["payment_type"] = payment.paymentType.rawValue
             body["monthly_value_cents"] = payment.monthlyValueInCents
             body["original_amount_cents"] =
-            NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
+                NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
             body["currency"] = payment.currency
         }
 
@@ -181,7 +187,7 @@ public final class FeaturePulseAPI: Sendable {
             throw FeaturePulseError.paymentRequired
         }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
             throw FeaturePulseError.serverError(httpResponse.statusCode)
         }
     }
@@ -230,7 +236,7 @@ public final class FeaturePulseAPI: Sendable {
             throw FeaturePulseError.alreadyVoted
         }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
             throw FeaturePulseError.serverError(httpResponse.statusCode)
         }
     }
@@ -269,19 +275,19 @@ public final class FeaturePulseAPI: Sendable {
             body["payment_type"] = payment.paymentType.rawValue
             body["monthly_value_cents"] = payment.monthlyValueInCents
             body["original_amount_cents"] =
-            NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
+                NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
             body["currency"] = payment.currency
         }
 
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, response) = try await session.data(for: request)
+        let (_, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw FeaturePulseError.invalidResponse
         }
 
-        if !(200...299).contains(httpResponse.statusCode) {
+        if !(200 ... 299).contains(httpResponse.statusCode) {
             throw FeaturePulseError.serverError(httpResponse.statusCode)
         }
     }
@@ -316,7 +322,7 @@ public final class FeaturePulseAPI: Sendable {
             throw FeaturePulseError.invalidResponse
         }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
+        guard (200 ... 299).contains(httpResponse.statusCode) else {
             throw FeaturePulseError.serverError(httpResponse.statusCode)
         }
     }
@@ -337,19 +343,19 @@ public enum FeaturePulseError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "API key is required. Set it in FeaturePulseConfiguration.shared.apiKey"
+            "API key is required. Set it in FeaturePulseConfiguration.shared.apiKey"
         case .invalidURL:
-            return "Invalid URL"
+            "Invalid URL"
         case .invalidResponse:
-            return "Invalid response from server"
-        case .serverError(let code):
-            return "Server error: \(code)"
+            "Invalid response from server"
+        case let .serverError(code):
+            "Server error: \(code)"
         case .decodingError:
-            return "Failed to decode response"
+            "Failed to decode response"
         case .alreadyVoted:
-            return "You have already voted for this feature request"
+            "You have already voted for this feature request"
         case .paymentRequired:
-            return "Subscription required to create feature requests"
+            "Subscription required to create feature requests"
         }
     }
 }

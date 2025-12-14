@@ -17,7 +17,7 @@ public struct FeaturePulseSessionTracker: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     /// Automatically track app sessions when the view becomes active
     /// Tracks app opens with a 30-minute timeout (Firebase-style)
     ///
@@ -54,7 +54,7 @@ extension View {
     /// - 👍 Regular User: 5-9 sessions/month
     /// - 💤 Casual User: 2-4 sessions/month
     /// - 👻 Ghost User: 0-1 sessions/month
-    public func featurePulseSessionTracking() -> some View {
+    func featurePulseSessionTracking() -> some View {
         modifier(FeaturePulseSessionTracker())
     }
 }
@@ -74,18 +74,23 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     public let user = User()
 
     /// Primary brand color used for vote and submit buttons (defaults to primary blue: #570df8)
-    public var primaryColor: Color = Color(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
+    public var primaryColor: Color = .init(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
 
     /// Foreground color for vote title and icons and new feature request button CTA
-    public var foregroundColor: Color = Color(uiColor: .white)
+    public var foregroundColor: Color = .init(uiColor: .white)
 
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var showStatus: Bool = false
 
+    /// Whether to show translation button for non-English users (controlled from dashboard, default: true)
+    /// This value is set automatically by the API and cannot be changed by the client
+    /// Requires iOS 18.0+ to work
+    public internal(set) var showTranslation: Bool = true
+
     /// User permissions (fetched from API)
     /// This value is set automatically by the API and cannot be changed by the client
-    public internal(set) var permissions: Permissions = Permissions(canCreateFeatureRequest: true)
+    public internal(set) var permissions: Permissions = .init(canCreateFeatureRequest: true)
 
     /// How to handle feature request restrictions (nil = default alert with "Pro")
     public var restrictionMode: FeatureRequestRestrictionMode?
@@ -96,7 +101,7 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
 
     /// Track app open for engagement metrics (with 30-minute timeout)
     /// Called automatically by the featurePulseSessionTracking() modifier
-    internal func trackAppOpenIfNewSession() {
+    func trackAppOpenIfNewSession() {
         let lastSessionTime = UserDefaults.standard.double(forKey: lastSessionKey)
         let now = Date().timeIntervalSince1970
 
@@ -168,7 +173,7 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// // In a NavigationStack or TabView
     /// FeaturePulse.shared.view()
     /// ```
-    public func view() -> FeaturePulseView {
-        return FeaturePulseView()
+    @MainActor public func view() -> FeaturePulseView {
+        FeaturePulseView()
     }
 }

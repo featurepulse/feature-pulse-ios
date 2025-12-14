@@ -29,22 +29,24 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         self.id = id
         self.title = title
         self.description = description
-        self._status = Default(wrappedValue: status)
+        _status = Default(wrappedValue: status)
         self.voteCount = voteCount
         self.hasVoted = hasVoted
     }
 
     // MARK: - Equatable
+
     public static func == (lhs: FeatureRequest, rhs: FeatureRequest) -> Bool {
         lhs.id == rhs.id &&
-        lhs.title == rhs.title &&
-        lhs.description == rhs.description &&
-        lhs.status == rhs.status &&
-        lhs.voteCount == rhs.voteCount &&
-        lhs.hasVoted == rhs.hasVoted
+            lhs.title == rhs.title &&
+            lhs.description == rhs.description &&
+            lhs.status == rhs.status &&
+            lhs.voteCount == rhs.voteCount &&
+            lhs.hasVoted == rhs.hasVoted
     }
 
     // MARK: - Hashable
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(title)
