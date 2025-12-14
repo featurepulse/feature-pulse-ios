@@ -10,9 +10,10 @@ private struct FeatureRequestsResponse: Codable {
     let success: Bool
     let data: [FeatureRequest]
     let showStatus: Bool?
+    let permissions: Permissions?
 
     enum CodingKeys: String, CodingKey {
-        case success, data
+        case success, data, permissions
         case showStatus = "show_status"
     }
 }
@@ -115,6 +116,11 @@ public final class FeaturePulseAPI: Sendable {
             config.showStatus = showStatus
         }
 
+        // Update permissions from server
+        if let permissions = apiResponse.permissions {
+            config.permissions = permissions
+        }
+
         return apiResponse.data
     }
 
@@ -168,6 +174,11 @@ public final class FeaturePulseAPI: Sendable {
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw FeaturePulseError.invalidResponse
+        }
+
+        // Handle payment required (403 Forbidden)
+        if httpResponse.statusCode == 403 {
+            throw FeaturePulseError.paymentRequired
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
@@ -321,6 +332,7 @@ public enum FeaturePulseError: LocalizedError, Equatable {
     case serverError(Int)
     case decodingError
     case alreadyVoted
+    case paymentRequired
 
     public var errorDescription: String? {
         switch self {
@@ -336,6 +348,8 @@ public enum FeaturePulseError: LocalizedError, Equatable {
             return "Failed to decode response"
         case .alreadyVoted:
             return "You have already voted for this feature request"
+        case .paymentRequired:
+            return "Subscription required to create feature requests"
         }
     }
 }

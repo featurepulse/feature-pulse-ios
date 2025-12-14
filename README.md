@@ -58,13 +58,13 @@ import FeaturePulse
 struct MyApp: App {
     init() {
         // Required: Your API key from featurepul.se
-        FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
-        
+        FeaturePulse.shared.apiKey = "your-api-key-here"
+
         // Optional: Customize primary color
-        FeaturePulseConfiguration.shared.primaryColor = .red
-        
+        FeaturePulse.shared.primaryColor = .red
+
         // Optional: Set user payment tier
-        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+        FeaturePulse.shared.updateUser(payment: .free)
     }
 
     var body: some Scene {
@@ -95,7 +95,7 @@ struct ContentView: View {
                     Label("Home", systemImage: "house")
                 }
 
-            FeaturePulseView()
+            FeaturePulse.shared.view()
                 .tabItem {
                     Label("Feedback", systemImage: "lightbulb")
                 }
@@ -121,7 +121,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $show) {
             NavigationStack {
-                FeaturePulseView()
+                FeaturePulse.shared.view()
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
                             if #available(iOS 26, *) {
@@ -154,7 +154,7 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 NavigationLink {
-                    FeaturePulseView()
+                    FeaturePulse.shared.view()
                 } label: {
                     Label(FeaturePulse.L10n.featureRequests, systemImage: "lightbulb")
                 }
@@ -174,7 +174,7 @@ import FeaturePulse
 struct FeedbackView: View {
     var body: some View {
         NavigationStack {
-            FeaturePulseView()
+            FeaturePulse.shared.view()
         }
     }
 }
@@ -190,18 +190,18 @@ That's it! Your users can now submit and vote on feature requests.
 import FeaturePulse
 
 // API Configuration
-FeaturePulseConfiguration.shared.apiKey = "your-api-key-here"
+FeaturePulse.shared.apiKey = "your-api-key-here"
 
 // Appearance
-FeaturePulseConfiguration.shared.primaryColor = .red
-FeaturePulseConfiguration.shared.foregroundColor = .white
+FeaturePulse.shared.primaryColor = .red
+FeaturePulse.shared.foregroundColor = .white
 
 // Payment Tier (with currency)
-FeaturePulseConfiguration.shared.updateUser(payment: .free)
-FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
-FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
-FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .free)
+FeaturePulse.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
 ```
 
 ### Customize Colors
@@ -210,14 +210,14 @@ Change the primary color and foreground colors to match your app's brand:
 
 ```swift
 // Primary color (used for vote buttons, submit button, and CTA button background)
-FeaturePulseConfiguration.shared.primaryColor = .blue
-FeaturePulseConfiguration.shared.primaryColor = .red
-FeaturePulseConfiguration.shared.primaryColor = Color(red: 87/255, green: 13/255, blue: 248/255)
+FeaturePulse.shared.primaryColor = .blue
+FeaturePulse.shared.primaryColor = .red
+FeaturePulse.shared.primaryColor = Color(red: 87/255, green: 13/255, blue: 248/255)
 
 // Foreground color (used for button text and icons with colored backgrounds)
-FeaturePulseConfiguration.shared.foregroundColor = .white  // Default: white
-FeaturePulseConfiguration.shared.foregroundColor = .black  // For light backgrounds
-FeaturePulseConfiguration.shared.foregroundColor = Color(red: 1.0, green: 1.0, blue: 1.0)  // Custom color
+FeaturePulse.shared.foregroundColor = .white  // Default: white
+FeaturePulse.shared.foregroundColor = .black  // For light backgrounds
+FeaturePulse.shared.foregroundColor = Color(red: 1.0, green: 1.0, blue: 1.0)  // Custom color
 ```
 
 **Note:**
@@ -230,10 +230,10 @@ You can optionally set a custom user ID to link the device ID with your own inte
 
 ```swift
 // Set custom user ID (e.g., from your authentication system)
-FeaturePulseConfiguration.shared.updateUser(customID: "user_123")
+FeaturePulse.shared.updateUser(customID: "user_123")
 
 // Clear custom ID
-FeaturePulseConfiguration.shared.updateUser(customID: nil)
+FeaturePulse.shared.updateUser(customID: nil)
 ```
 
 This is useful for:
@@ -247,22 +247,22 @@ Track user payment tiers to understand your customer base. **Currency is require
 
 ```swift
 // Free users
-FeaturePulseConfiguration.shared.updateUser(payment: .free)
+FeaturePulse.shared.updateUser(payment: .free)
 
 // Weekly subscription ($2.99/week = ~$12 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .weekly(2.99, currency: "USD"))
 
 // Monthly subscription ($9.99/month = $9.99 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
 
 // Yearly subscription ($79.99/year = ~$6.67 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .yearly(79.99, currency: "USD"))
 
 // Lifetime purchase ($199.99 amortized over 24 months = ~$8.33 MRR)
-FeaturePulseConfiguration.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
+FeaturePulse.shared.updateUser(payment: .lifetime(199.99, currency: "USD"))
 
 // Custom lifetime amortization period
-FeaturePulseConfiguration.shared.updateUser(
+FeaturePulse.shared.updateUser(
     payment: .lifetime(199.99, currency: "USD", expectedLifetimeMonths: 36)
 )
 ```
@@ -279,17 +279,61 @@ FeaturePulse supports 20+ major currencies. Specify the currency code using ISO 
 
 ```swift
 // Examples with different currencies
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(9.99, currency: "USD"))  // US Dollar
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(8.99, currency: "EUR"))  // Euro
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(7.99, currency: "GBP"))  // British Pound
-FeaturePulseConfiguration.shared.updateUser(payment: .yearly(99.99, currency: "CAD")) // Canadian Dollar
-FeaturePulseConfiguration.shared.updateUser(payment: .monthly(699, currency: "JPY"))   // Japanese Yen
+FeaturePulse.shared.updateUser(payment: .monthly(9.99, currency: "USD"))  // US Dollar
+FeaturePulse.shared.updateUser(payment: .monthly(8.99, currency: "EUR"))  // Euro
+FeaturePulse.shared.updateUser(payment: .monthly(7.99, currency: "GBP"))  // British Pound
+FeaturePulse.shared.updateUser(payment: .yearly(99.99, currency: "CAD")) // Canadian Dollar
+FeaturePulse.shared.updateUser(payment: .monthly(699, currency: "JPY"))   // Japanese Yen
 ```
 
 **Supported Currencies:**
 USD, EUR, GBP, CAD, AUD, JPY, CHF, CNY, INR, BRL, MXN, SEK, NOK, DKK, PLN, SGD, HKD, KRW, TRY, ZAR
 
 All amounts are automatically converted to USD for MRR calculations in the dashboard, while preserving your original currency for accurate tracking.
+
+### Feature Request Restrictions
+
+Restrict feature request creation to paying users while allowing everyone to vote. This is perfect for:
+- Preventing spam from free users
+- Encouraging upgrades to paid tiers
+- Maintaining high-quality feedback
+
+**How it works:**
+1. Enable "Require Subscription to Create Feature Requests" in your dashboard (Project Settings)
+2. The SDK automatically checks permissions from the API
+3. Free users see a restriction message, paying users can create requests
+4. Everyone can still vote on existing requests
+
+**Default behavior (no code needed):**
+
+```swift
+// By default, shows alert: "Only Pro users can add new feature requests..."
+// The SDK handles this automatically based on API permissions
+```
+
+**Customize the subscription name:**
+
+```swift
+// In your app initialization
+FeaturePulse.shared.restrictionMode = .alert(subscriptionName: "Premium")
+// Alert: "Only Premium users can add new feature requests..."
+```
+
+**Custom paywall handling:**
+
+```swift
+// In your app initialization
+FeaturePulse.shared.restrictionMode = .callback {
+    // Your custom logic - show paywall, navigate to subscription screen, etc.
+    showPaywallSheet()
+}
+```
+
+**Important:** The restriction checks `payment_type`, not MRR. This means:
+- ✅ **Paid users** (weekly, monthly, yearly, lifetime) → Can create feature requests
+- ✅ **Gifted subscriptions** → Can create (even with $0 MRR)
+- ❌ **Free users** → Cannot create feature requests
+- ✅ **Everyone** → Can vote on existing requests
 
 ### Session Tracking & Engagement Metrics
 
@@ -342,18 +386,18 @@ func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
         let entitlement = customerInfo.entitlements[Constants.revenueCatEntitlementIdentifier],
         let currentOffering = userPurchases.offerings?.current
     else {
-        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+        FeaturePulse.shared.updateUser(payment: .free)
         return
     }
-    
+
     let productId = entitlement.productIdentifier
     guard let matchedPackage = currentOffering.availablePackages.first(where: {
         $0.storeProduct.productIdentifier == productId
     }) else {
-        FeaturePulseConfiguration.shared.updateUser(payment: .free)
+        FeaturePulse.shared.updateUser(payment: .free)
         return
     }
-    
+
     let price = matchedPackage.storeProduct.price
     let currency = matchedPackage.storeProduct.currencyCode ?? "USD"
     let payment: FeaturePulse.Payment = {
@@ -370,8 +414,8 @@ func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
             return .free
         }
     }()
-    
-    FeaturePulseConfiguration.shared.updateUser(payment: payment)
+
+    FeaturePulse.shared.updateUser(payment: payment)
 }
 ```
 
@@ -405,36 +449,50 @@ To add more languages:
 
 ## API Reference
 
-### FeaturePulseConfiguration
+### FeaturePulse (FeaturePulseConfiguration)
 
-Main configuration singleton:
+Main configuration singleton. `FeaturePulse` is a typealias for `FeaturePulseConfiguration`.
 
 ```swift
 // Required
-FeaturePulseConfiguration.shared.apiKey: String
+FeaturePulse.shared.apiKey: String
 
-// Optional
-FeaturePulseConfiguration.shared.primaryColor: Color
-FeaturePulseConfiguration.shared.foregroundColor: Color
+// Optional Appearance
+FeaturePulse.shared.primaryColor: Color
+FeaturePulse.shared.foregroundColor: Color
+
+// Optional Restriction Mode
+FeaturePulse.shared.restrictionMode: FeatureRequestRestrictionMode?
 
 // Methods
-FeaturePulseConfiguration.shared.updateUser(customID: String?)
-FeaturePulseConfiguration.shared.updateUser(payment: Payment)
+FeaturePulse.shared.updateUser(customID: String?)
+FeaturePulse.shared.updateUser(payment: Payment)
+FeaturePulse.shared.view() -> FeaturePulseView
 ```
 
 ### Views
 
 - `FeaturePulseView()` - Main view with feature requests list
+- `FeaturePulse.shared.view()` - Convenience method that returns `FeaturePulseView()` instance
 
 ### Payment Types
 
 ```swift
 enum Payment {
     case free
-    case weekly(Decimal)
-    case monthly(Decimal)
-    case yearly(Decimal)
-    case lifetime(Decimal, expectedLifetimeMonths: Int = 24)
+    case weekly(Decimal, currency: String)
+    case monthly(Decimal, currency: String)
+    case yearly(Decimal, currency: String)
+    case lifetime(Decimal, currency: String, expectedLifetimeMonths: Int = 24)
+}
+```
+
+### Restriction Modes
+
+```swift
+enum FeatureRequestRestrictionMode {
+    case alert(subscriptionName: String = "Pro")
+    case callback(() -> Void)
 }
 ```
 

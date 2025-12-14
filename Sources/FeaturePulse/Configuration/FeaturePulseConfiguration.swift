@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Shorter alias for FeaturePulseConfiguration
+public typealias FeaturePulse = FeaturePulseConfiguration
+
 /// View modifier for automatic session tracking
 public struct FeaturePulseSessionTracker: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
@@ -80,6 +83,13 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var showStatus: Bool = false
 
+    /// User permissions (fetched from API)
+    /// This value is set automatically by the API and cannot be changed by the client
+    public internal(set) var permissions: Permissions = Permissions(canCreateFeatureRequest: true)
+
+    /// How to handle feature request restrictions (nil = default alert with "Pro")
+    public var restrictionMode: FeatureRequestRestrictionMode?
+
     private let lastSessionKey = "FeaturePulse_LastSessionTime"
 
     private init() {}
@@ -149,5 +159,16 @@ public final class FeaturePulseConfiguration: @unchecked Sendable {
         Task {
             try? await FeaturePulseAPI.shared.syncUser()
         }
+    }
+
+    /// Returns a FeaturePulseView instance
+    ///
+    /// # Example Usage:
+    /// ```swift
+    /// // In a NavigationStack or TabView
+    /// FeaturePulse.shared.view()
+    /// ```
+    public func view() -> FeaturePulseView {
+        return FeaturePulseView()
     }
 }

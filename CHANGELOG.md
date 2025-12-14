@@ -5,6 +5,85 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-12-14
+
+### ✨ New Features
+
+- **Feature Request Restrictions** - Restrict feature creation to paying users
+  - Dashboard toggle to require subscription for creating feature requests
+  - Free users can still vote on existing requests
+  - Two restriction modes:
+    - `.alert(subscriptionName:)` - Show alert with customizable subscription name (default: "Pro")
+    - `.callback` - Custom handler for showing paywalls or navigation
+  - Checks `payment_type` instead of MRR (supports gifted subscriptions with $0 MRR)
+  - All three "Request Feature" buttons respect permissions (toolbar, CTA, empty state)
+
+- **Clean API with Typealias** - Shorter, more elegant SDK usage
+  - `FeaturePulse` typealias for `FeaturePulseConfiguration`
+  - Use `FeaturePulse.shared` instead of `FeaturePulseConfiguration.shared`
+  - New `view()` convenience method: `FeaturePulse.shared.view()` returns `FeaturePulseView` instance
+
+- **Safe Enum Decoding** - Resilient to unknown enum values from API
+  - `@Default<FirstCase>` property wrapper for enum properties
+  - Prevents crashes when API returns unknown status values
+  - Automatically falls back to first case if value is unrecognized
+
+### 🎨 API Improvements
+
+- Simplified restriction configuration:
+  ```swift
+  // Default - shows alert with "Pro"
+  // No configuration needed
+
+  // Custom subscription name
+  FeaturePulse.shared.restrictionMode = .alert(subscriptionName: "Premium")
+
+  // Custom callback
+  FeaturePulse.shared.restrictionMode = .callback {
+      showPaywallSheet()
+  }
+  ```
+
+- Cleaner SDK initialization:
+  ```swift
+  // Old
+  FeaturePulseConfiguration.shared.apiKey = "key"
+
+  // New
+  FeaturePulse.shared.apiKey = "key"
+  ```
+
+- Convenient view instantiation:
+  ```swift
+  // Direct instantiation (still works)
+  FeaturePulseView()
+
+  // New convenience method
+  FeaturePulse.shared.view()
+  ```
+
+### 🔒 Restriction Behavior
+
+- **Paid users** (weekly, monthly, yearly, lifetime) → Can create feature requests
+- **Gifted subscriptions** → Can create (even with $0 MRR)
+- **Free users** → Cannot create, see restriction message
+- **Everyone** → Can vote on existing requests
+
+### 📚 Documentation
+
+- Updated README with new API examples
+- Added Feature Request Restrictions section
+- Documented restriction modes and usage patterns
+- Updated all code examples to use `FeaturePulse.shared`
+- Added API reference for `FeatureRequestRestrictionMode`
+
+### 🔗 Links
+
+- [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
+- [Release v1.2.0](https://github.com/featurepulse/feature-pulse-ios/releases/tag/ios-sdk-v1.2.0)
+
+---
+
 ## [1.1.1] - 2025-12-12
 
 ### ✨ New Features

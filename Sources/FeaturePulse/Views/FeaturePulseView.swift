@@ -5,8 +5,17 @@ public struct FeaturePulseView: View {
     @State private var viewModel = FeaturePulseViewModel()
     @State private var showingNewRequest = false
     @State private var selectedRequest: FeatureRequest?
+    @State private var restrictionAlert: RestrictionAlert?
+    @State private var configFetched = false
+    private let config = FeaturePulseConfiguration.shared
 
     public init() {}
+
+    /// Alert data for restriction message
+    private struct RestrictionAlert: Identifiable {
+        let id = UUID()
+        let subscriptionName: String
+    }
 
     public var body: some View {
         Group {
@@ -34,10 +43,11 @@ public struct FeaturePulseView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(L10n.requestFeature, systemImage: "plus") {
-                    showingNewRequest = true
+                    handleFeatureRequestTap()
                 }
                 .foregroundStyle(Color(uiColor: .systemBackground))
                 .tint(Color(uiColor: .label))
+                .disabled(!configFetched)
             }
         }
         .sheet(
@@ -58,8 +68,40 @@ public struct FeaturePulseView: View {
                 Text(errorMessage)
             }
         }
+        .alert(item: $restrictionAlert) { alert in
+            Alert(
+                title: Text(L10n.restrictionAlertTitle),
+                message: Text(L10n.restrictionMessage(subscriptionName: alert.subscriptionName)),
+                dismissButton: .default(Text(L10n.ok))
+            )
+        }
         .task {
             await viewModel.loadFeatureRequests()
+            configFetched = true
+        }
+    }
+
+    private func handleFeatureRequestTap() {
+        if !config.permissions.canCreateFeatureRequest {
+            handleRestriction()
+        } else {
+            showingNewRequest = true
+        }
+    }
+
+    private func handleRestriction() {
+        if let mode = config.restrictionMode {
+            switch mode {
+            case .alert(let subscriptionName):
+                restrictionAlert = RestrictionAlert(subscriptionName: subscriptionName)
+            case .callback(let handler):
+                DispatchQueue.main.async {
+                    handler()
+                }
+            }
+        } else {
+            // Default: show alert with "Pro"
+            restrictionAlert = RestrictionAlert(subscriptionName: "Pro")
         }
     }
 
@@ -110,7 +152,7 @@ public struct FeaturePulseView: View {
                                 .multilineTextAlignment(.leading)
 
                             Button {
-                                showingNewRequest = true
+                                handleFeatureRequestTap()
                             } label: {
                                 HStack(spacing: 8) {
                                     Image(systemName: "plus")
@@ -189,7 +231,7 @@ public struct FeaturePulseView: View {
             }
 
             Button {
-                showingNewRequest = true
+                handleFeatureRequestTap()
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "plus")

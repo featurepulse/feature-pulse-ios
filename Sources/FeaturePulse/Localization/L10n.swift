@@ -165,4 +165,13 @@ public enum L10n {
       bundle: .module
     )
   }
+
+  // MARK: - Restrictions
+  public static var restrictionAlertTitle: String {
+    String(localized: "restriction.alert.title", defaultValue: "Subscription Required", bundle: .module)
+  }
+
+  public static func restrictionMessage(subscriptionName: String = "Pro") -> String {
+    String(localized: "restriction.message", defaultValue: "Only \(subscriptionName) users can add new feature requests, but you can vote for already added requests.", bundle: .module)
+  }
 }
