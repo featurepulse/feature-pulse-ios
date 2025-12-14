@@ -179,7 +179,6 @@ public struct FeaturePulseView: View {
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 10)
                                     .background(Color.secondary.opacity(0.2))
-                                    .foregroundStyle(FeaturePulse.shared.foregroundColor)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                 }
                                 .buttonStyle(.plain)
