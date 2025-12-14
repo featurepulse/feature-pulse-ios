@@ -33,7 +33,7 @@ struct FeatureRequestDetailView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if FeaturePulseConfiguration.shared.showStatus {
+                    if FeaturePulse.shared.showStatus {
                         HStack(spacing: 4) {
                             Image(systemName: request.status.systemImage)
                                 .font(.system(size: 11, weight: .semibold))
@@ -130,7 +130,7 @@ struct FeatureRequestDetailView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(localHasVoted ? voteColor : voteColor.opacity(0.1))
-                .foregroundStyle(localHasVoted ? FeaturePulseConfiguration.shared.foregroundColor : voteColor)
+                .foregroundStyle(localHasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .disabled(isVoting)
@@ -138,6 +138,6 @@ struct FeatureRequestDetailView: View {
     }
 
     private var voteColor: Color {
-        FeaturePulseConfiguration.shared.primaryColor
+        FeaturePulse.shared.primaryColor
     }
 }

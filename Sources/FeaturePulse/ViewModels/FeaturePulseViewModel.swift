@@ -23,7 +23,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
 
             // Shuffle with seeded random to prevent voting bias
             // Each user sees a different consistent order based on their deviceID
-            requests = shuffleWithSeed(requests, seed: FeaturePulseConfiguration.shared.user.deviceID)
+            requests = shuffleWithSeed(requests, seed: FeaturePulse.shared.user.deviceID)
 
             // Store previous count for placeholder sizing
             if !featureRequests.isEmpty {

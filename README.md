@@ -156,7 +156,7 @@ struct SettingsView: View {
                 NavigationLink {
                     FeaturePulse.shared.view()
                 } label: {
-                    Label(FeaturePulseL10n.featureRequests, systemImage: "lightbulb")
+                    Label(FeaturePulse.L10n.featureRequests, systemImage: "lightbulb")
                 }
             }
             .navigationTitle("Settings")

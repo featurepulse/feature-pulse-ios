@@ -27,7 +27,7 @@ struct FeatureRequestRow: View {
                 if isVoting {
                     ProgressView()
                         .controlSize(.small)
-                        .tint(hasVoted ? FeaturePulseConfiguration.shared.primaryColor : voteColor)
+                        .tint(hasVoted ? FeaturePulse.shared.primaryColor : voteColor)
                 } else {
                     Image(systemName: "triangle.fill")
                         .font(.caption2.weight(.semibold))
@@ -41,7 +41,7 @@ struct FeatureRequestRow: View {
             .frame(width: 56, height: 60)
             .background(hasVoted ? voteColor : voteColor.opacity(0.1))
             .foregroundStyle(
-                hasVoted ? FeaturePulseConfiguration.shared.foregroundColor : voteColor
+                hasVoted ? FeaturePulse.shared.foregroundColor : voteColor
             )
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
@@ -86,7 +86,7 @@ struct FeatureRequestRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 // Show status badge only if enabled from dashboard
-                if FeaturePulseConfiguration.shared.showStatus {
+                if FeaturePulse.shared.showStatus {
                     HStack(spacing: 4) {
                         Image(systemName: request.status.systemImage)
                             .font(.system(size: 11, weight: .semibold))
@@ -118,6 +118,6 @@ struct FeatureRequestRow: View {
     }
 
     private var voteColor: Color {
-        FeaturePulseConfiguration.shared.primaryColor
+        FeaturePulse.shared.primaryColor
     }
 }

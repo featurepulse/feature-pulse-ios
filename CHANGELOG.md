@@ -5,6 +5,76 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-12-14
+
+### ✨ New Features
+
+- **Clean Nested Type Architecture** - Following Amplitude's pattern
+  - `Payment` → `FeaturePulse.Payment`
+  - `FeatureRequestRestrictionMode` → `FeaturePulse.RestrictionMode`
+  - `FeaturePulseL10n` → `FeaturePulse.L10n`
+  - Each type in separate file using extensions
+  - Internal typealiases for SDK convenience
+  - No naming collisions with module name
+
+### 🔧 Improvements
+
+- **Simplified Main Class** - Renamed `FeaturePulseConfiguration` → `FeaturePulse`
+  - Removed unnecessary typealias
+  - Cleaner, more intuitive API
+  - File renamed to `FeaturePulse.swift`
+
+- **Better Callback Support** - Changed `RestrictionMode.callback` to `@MainActor`
+  - Can now capture `@State` properties
+  - Perfect for showing paywalls and UI operations
+  - Removed unnecessary `DispatchQueue.main.async` wrapper
+
+- **Documentation Updates**
+  - Removed generic/obvious comments
+  - Updated payment examples to include required `currency` parameter
+  - Clearer code documentation
+
+### ⚠️ Breaking Changes
+
+- **Main class renamed**: `FeaturePulseConfiguration` → `FeaturePulse`
+  - If you used `FeaturePulseConfiguration.shared`, change to `FeaturePulse.shared`
+  - Most users already used `FeaturePulse.shared` via typealias (no change needed)
+
+- **Nested types**: Types are now nested under `FeaturePulse`
+  - `Payment` → `FeaturePulse.Payment` (internal typealias for compatibility)
+  - `FeatureRequestRestrictionMode` → `FeaturePulse.RestrictionMode` (internal typealias for compatibility)
+  - `FeaturePulseL10n` → `FeaturePulse.L10n`
+  - **Usage with type inference is unchanged**: `.free`, `.monthly()`, etc. still work
+
+- **RestrictionMode callback**: Changed from `@Sendable` to `@MainActor`
+  - More flexible, allows capturing UI state
+  - No impact unless you relied on Sendable conformance
+
+### 📦 Migration Guide
+
+Most code works without changes due to type inference:
+
+```swift
+// Before (still works)
+FeaturePulse.shared.updateUser(payment: .free)
+FeaturePulse.shared.restrictionMode = .alert(subscriptionName: "Pro")
+
+// Explicit type references (if you have them)
+// Before: let payment: Payment = .free
+// After:  let payment: FeaturePulse.Payment = .free
+
+// Localization
+// Before: Label(FeaturePulseL10n.featureRequests, ...)
+// After:  Label(FeaturePulse.L10n.featureRequests, ...)
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.3.2] - 2025-12-14
 
 ### 🐛 Bug Fixes

@@ -14,7 +14,7 @@ public struct FeaturePulseView: View {
     @State private var translations: [String: (title: String, description: String)] = [:]
     @State private var translationConfig: Any?
 
-    private let config = FeaturePulseConfiguration.shared
+    private let config = FeaturePulse.shared
 
     public init() {}
 
@@ -118,9 +118,7 @@ public struct FeaturePulseView: View {
             case let .alert(subscriptionName):
                 restrictionAlert = RestrictionAlert(subscriptionName: subscriptionName)
             case let .callback(handler):
-                DispatchQueue.main.async {
-                    handler()
-                }
+                handler()
             }
         } else {
             // Default: show alert with "Pro"
@@ -181,7 +179,7 @@ public struct FeaturePulseView: View {
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 10)
                                     .background(Color.secondary.opacity(0.2))
-                                    .foregroundStyle(FeaturePulseConfiguration.shared.foregroundColor)
+                                    .foregroundStyle(FeaturePulse.shared.foregroundColor)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                 }
                                 .buttonStyle(.plain)
@@ -291,7 +289,7 @@ public struct FeaturePulseView: View {
         VStack(spacing: 20) {
             Image(systemName: "lightbulb.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(FeaturePulseConfiguration.shared.primaryColor)
+                .foregroundStyle(FeaturePulse.shared.primaryColor)
                 .symbolEffect(.pulse)
 
             VStack(spacing: 8) {

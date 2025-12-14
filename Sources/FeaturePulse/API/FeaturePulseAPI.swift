@@ -37,7 +37,7 @@ public final class FeaturePulseAPI: Sendable {
 
     /// Tracks user activity (app opens) for engagement metrics
     public func trackActivity(type: String = "app_open") async throws {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -78,7 +78,7 @@ public final class FeaturePulseAPI: Sendable {
 
     /// Fetches all feature requests for the configured project
     public func fetchFeatureRequests() async throws -> [FeatureRequest] {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -137,7 +137,7 @@ public final class FeaturePulseAPI: Sendable {
         title: String,
         description: String
     ) async throws {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -196,7 +196,7 @@ public final class FeaturePulseAPI: Sendable {
 
     /// Votes for a feature request
     public func voteForFeatureRequest(id: String) async throws {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -245,7 +245,7 @@ public final class FeaturePulseAPI: Sendable {
 
     /// Syncs user information including payment data to the backend
     public func syncUser() async throws {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -294,7 +294,7 @@ public final class FeaturePulseAPI: Sendable {
 
     /// Removes vote from a feature request
     public func unvoteForFeatureRequest(id: String) async throws {
-        let config = FeaturePulseConfiguration.shared
+        let config = FeaturePulse.shared
 
         guard !config.apiKey.isEmpty else {
             throw FeaturePulseError.missingAPIKey
@@ -343,7 +343,7 @@ public enum FeaturePulseError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            "API key is required. Set it in FeaturePulseConfiguration.shared.apiKey"
+            "API key is required. Set it in FeaturePulse.shared.apiKey"
         case .invalidURL:
             "Invalid URL"
         case .invalidResponse:

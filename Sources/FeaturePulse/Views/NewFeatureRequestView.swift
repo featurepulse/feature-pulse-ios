@@ -33,7 +33,7 @@ public struct NewFeatureRequestView: View {
                                     title = String(newValue.prefix(50))
                                 }
                             }
-                            .tint(FeaturePulseConfiguration.shared.primaryColor)
+                            .tint(FeaturePulse.shared.primaryColor)
 
                         HStack {
                             Spacer()
@@ -61,7 +61,7 @@ public struct NewFeatureRequestView: View {
                             focusedField = nil
                             submitFeatureRequest()
                         }
-                        .tint(FeaturePulseConfiguration.shared.primaryColor)
+                        .tint(FeaturePulse.shared.primaryColor)
                         .lineLimit(5 ... 10)
                         .onChange(of: description) { _, newValue in
                             if newValue.count > 500 {
@@ -110,9 +110,9 @@ public struct NewFeatureRequestView: View {
                         (title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                             || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                             || isSubmitting)
-                            ? Color.gray.opacity(0.3) : FeaturePulseConfiguration.shared.primaryColor
+                            ? Color.gray.opacity(0.3) : FeaturePulse.shared.primaryColor
                     )
-                    .foregroundStyle(FeaturePulseConfiguration.shared.foregroundColor)
+                    .foregroundStyle(FeaturePulse.shared.foregroundColor)
                 }
             }
             .navigationTitle(L10n.newFeatureRequest)

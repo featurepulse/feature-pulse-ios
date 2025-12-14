@@ -2,12 +2,12 @@ import Foundation
 import StableID
 
 /// Represents the current user of the SDK
-public final class User: @unchecked Sendable {
+final class User: @unchecked Sendable {
     /// Custom user identifier (e.g., your app's user ID)
-    public var customID: String?
+    var customID: String?
 
     /// User's payment information for MRR tracking
-    public var payment: Payment?
+    var payment: Payment?
 
     /// Unique device identifier (persisted in Keychain, survives app reinstalls)
     private(set) var deviceID: String
