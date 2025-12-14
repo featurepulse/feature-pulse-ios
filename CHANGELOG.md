@@ -5,6 +5,21 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2025-12-14
+
+### 🐛 Bug Fixes
+
+- **Internal L10n Improvements** - Optimized localization implementation
+  - Refined internal typealias usage for better SDK consistency
+  - Improved localization architecture for maintainability
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.3.1] - 2025-12-14
 
 ### 🐛 Bug Fixes
