@@ -462,7 +462,7 @@ FeaturePulse.shared.primaryColor: Color
 FeaturePulse.shared.foregroundColor: Color
 
 // Optional Restriction Mode
-FeaturePulse.shared.restrictionMode: FeatureRequestRestrictionMode?
+FeaturePulse.shared.restrictionMode: FeaturePulse.RestrictionMode?
 
 // Methods
 FeaturePulse.shared.updateUser(customID: String?)
@@ -490,7 +490,7 @@ enum Payment {
 ### Restriction Modes
 
 ```swift
-enum FeatureRequestRestrictionMode {
+enum FeaturePulse.RestrictionMode {
     case alert(subscriptionName: String = "Pro")
     case callback(() -> Void)
 }
