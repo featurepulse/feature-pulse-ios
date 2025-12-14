@@ -198,3 +198,6 @@ public enum FeaturePulseL10n {
         String(localized: "Show Original", defaultValue: "Show Original", bundle: .module)
     }
 }
+
+/// Internal typealias for convenience within the SDK
+internal typealias L10n = FeaturePulseL10n
