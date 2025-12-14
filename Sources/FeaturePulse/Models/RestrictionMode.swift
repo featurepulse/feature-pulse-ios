@@ -10,4 +10,4 @@ public extension FeaturePulse {
     }
 }
 
-typealias FeatureRequestRestrictionMode = FeaturePulse.RestrictionMode
+typealias RestrictionMode = FeaturePulse.RestrictionMode

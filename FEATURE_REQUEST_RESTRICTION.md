@@ -14,7 +14,7 @@ Added support for restricting feature request creation to paying users only. Thi
 
 ### New Files Created
 1. **`Models/Permissions.swift`** - Permissions model
-2. **`Models/FeatureRequestRestrictionMode.swift`** - Restriction handling enum
+2. **`Models/RestrictionMode.swift`** - Restriction handling enum
 
 ### Modified Files
 1. **`API/FeaturePulseAPI.swift`**

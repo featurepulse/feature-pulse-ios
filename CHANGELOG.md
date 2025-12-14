@@ -5,6 +5,22 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-12-14
+
+### 🐛 Bug Fixes
+
+- **Fixed ambiguous type lookup error** - Removed old renamed files from public SDK repository
+  - Deleted `FeaturePulseConfiguration.swift` (renamed to `FeaturePulse.swift` in v1.4.0)
+  - Deleted `FeatureRequestRestrictionMode.swift` (renamed to `RestrictionMode.swift` in v1.4.0)
+  - This fixes "FeaturePulse is ambiguous for type lookup" error when adding the package remotely via SPM
+
+### 🔧 Improvements
+
+- **Enhanced release process** - Added automated release script and improved sync process
+  - Uses `rsync --delete` to ensure clean syncing between monorepo and public repo
+  - Prevents old renamed files from lingering in the public repository
+  - Better verification steps before committing releases
+
 ## [1.4.0] - 2025-12-14
 
 ### ✨ New Features
