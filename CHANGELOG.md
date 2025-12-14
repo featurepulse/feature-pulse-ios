@@ -5,6 +5,22 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2025-12-14
+
+### 🐛 Bug Fixes
+
+- **Fixed Naming Collision** - Renamed `L10n` to `FeaturePulseL10n`
+  - Prevents conflicts with user projects that have their own `L10n` type
+  - All SDK references updated to use `FeaturePulseL10n`
+  - Updated documentation and examples
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.3.0] - 2025-12-14
 
 ### ✨ New Features
