@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Type-safe localization accessor
-public enum L10n {
+/// Type-safe localization accessor for FeaturePulse SDK
+public enum FeaturePulseL10n {
     // MARK: - Feature Requests
 
     public static var featureRequests: String {
