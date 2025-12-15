@@ -11,6 +11,7 @@ struct FeatureRequestDetailView: View {
 
     @State private var isVoting = false
     @State private var localHasVoted: Bool
+    @State private var justVoted = false
 
     private var displayTitle: String {
         translatedTitle ?? request.title
@@ -110,6 +111,7 @@ struct FeatureRequestDetailView: View {
                     let success = await onVote()
                     if success {
                         localHasVoted.toggle()
+                        justVoted.toggle()
                     }
                     isVoting = false
                 }
@@ -134,6 +136,7 @@ struct FeatureRequestDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .disabled(isVoting)
+            .sensoryFeedback(.success, trigger: justVoted)
         }
     }
 

@@ -152,21 +152,21 @@ public struct FeaturePulseView: View {
                                 Button {
                                     withAnimation {
                                         if enableTranslations {
-                                            // Turning off - clear translations
+                                            // Turning off - keep translations cached for instant re-enable
                                             enableTranslations = false
-                                            translations.removeAll()
-                                            translationConfig = nil
                                         } else {
-                                            // Turning on - trigger translation
+                                            // Turning on - show cached translations or trigger new translation
                                             enableTranslations = true
-                                            // Set translation config to trigger .translationTask
-                                            if #available(iOS 18.0, *) {
-                                                #if canImport(Translation)
-                                                    translationConfig = TranslationSession.Configuration(
-                                                        source: Locale.Language(identifier: "en"),
-                                                        target: Locale.current.language
-                                                    )
-                                                #endif
+                                            // Set translation config to trigger .translationTask if not already set
+                                            if translationConfig == nil {
+                                                if #available(iOS 18.0, *) {
+                                                    #if canImport(Translation)
+                                                        translationConfig = TranslationSession.Configuration(
+                                                            source: Locale.Language(identifier: "en"),
+                                                            target: Locale.current.language
+                                                        )
+                                                    #endif
+                                                }
                                             }
                                         }
                                     }
