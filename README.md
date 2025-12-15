@@ -8,7 +8,7 @@ A modern SwiftUI-only SDK for collecting and managing feature requests from your
 ✅ **Modern Swift 6.0** - Uses `@Observable`, async/await, and Swift Concurrency  
 ✅ **Type-Safe Localization** - String Catalogs with compile-time checking  
 ✅ **Multi-Language Support** - English, Spanish, French, German, Italian, Portuguese included  
-✅ **Customizable** - Override any translation or appearance setting
+✅ **Customizable** - Override any translation or appearance setting  
 ✅ **Simple Integration** - Just 3 lines of code to get started
 
 ## Screenshots
