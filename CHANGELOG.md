@@ -5,6 +5,23 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2025-12-15
+
+### ✨ New Features
+
+- **Haptic feedback on vote action** - Added sensory feedback when users vote or unvote
+  - Provides tactile confirmation of successful vote actions
+  - Applied to both list view and detail view vote buttons
+  - Uses `.sensoryFeedback(.success)` modifier for native iOS haptics
+
+### 🐛 Bug Fixes
+
+- **Fixed translation caching** - Translations now persist when toggling off/on
+  - Removed `translations.removeAll()` and `translationConfig = nil` when disabling translations
+  - Translations are now cached in memory for instant re-display
+  - Significantly improves UX for users toggling between original and translated text
+  - No need to re-fetch translations from Apple's Translation API
+
 ## [1.4.2] - 2025-12-14
 
 ### 🐛 Bug Fixes

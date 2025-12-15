@@ -71,7 +71,6 @@ struct FeatureRequestRow: View {
                     }
                 }
             }
-            .sensoryFeedback(.success, trigger: justVoted)
 
             // Content
             VStack(alignment: .leading, spacing: 6) {

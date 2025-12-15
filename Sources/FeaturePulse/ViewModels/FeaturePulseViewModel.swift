@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// ViewModel managing feature requests state and operations
 @Observable
@@ -98,6 +99,10 @@ final class FeaturePulseViewModel: @unchecked Sendable {
 
     private func updateVoteOptimistically(for id: String, currentlyVoted: Bool) async {
         await MainActor.run {
+            // Haptic feedback for vote action
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 updateVoteCount(for: id, increment: !currentlyVoted)
             }
