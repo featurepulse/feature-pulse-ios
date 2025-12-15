@@ -5,6 +5,15 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2025-12-15
+
+### 🐛 Bug Fixes
+
+- **Fixed translation button state during language download** - Button no longer toggles to "See Original" prematurely
+  - Added language availability checking using Apple's `LanguageAvailability` API
+  - Button only toggles to "See Original" after translation language is fully downloaded and installed
+  - Automatically re-checks availability when user taps button if language wasn't installed
+
 ## [1.4.3] - 2025-12-15
 
 ### ✨ New Features

@@ -13,6 +13,8 @@ public struct FeaturePulseView: View {
     @State private var enableTranslations = false
     @State private var translations: [String: (title: String, description: String)] = [:]
     @State private var translationConfig: Any?
+    @State private var isLanguageInstalled = false
+    @State private var isCheckingLanguage = false
 
     private let config = FeaturePulse.shared
 
@@ -32,6 +34,97 @@ public struct FeaturePulseView: View {
             return !deviceLanguage.hasPrefix("en")
         }
         return false
+    }
+
+    /// Check if translation language is installed
+    @available(iOS 18.0, *)
+    private func checkLanguageAvailability() async {
+        #if canImport(Translation)
+            isCheckingLanguage = true
+            let languageAvailability = LanguageAvailability()
+            let status = await languageAvailability.status(
+                from: Locale.Language(identifier: "en"),
+                to: Locale.current.language
+            )
+
+            await MainActor.run {
+                isLanguageInstalled = (status == .installed)
+                isCheckingLanguage = false
+            }
+        #endif
+    }
+
+    /// Get appropriate button label based on translation state
+    private var translateButtonLabel: String {
+        // Only show "See Original" if translations are enabled AND we have actual translations
+        (enableTranslations && !translations.isEmpty) ? L10n.showOriginal : L10n.translateAll
+    }
+
+    /// Translate button view for non-English users
+    @ViewBuilder
+    private var translateButton: some View {
+        if shouldShowTranslateButton, !viewModel.isLoading {
+            HStack {
+                Button {
+                    if enableTranslations {
+                        // Have translations showing - turn off
+                        withAnimation {
+                            enableTranslations = false
+                        }
+                    } else {
+                        // Check if we have cached translations
+                        if !translations.isEmpty {
+                            // We have cached translations - just show them
+                            withAnimation {
+                                enableTranslations = true
+                            }
+                        } else {
+                            // No cached translations - trigger new translation
+                            if #available(iOS 18.0, *) {
+                                #if canImport(Translation)
+                                    // Invalidate existing config
+                                    if var config = translationConfig as? TranslationSession.Configuration {
+                                        config.invalidate()
+                                    }
+                                    // Clear config first to force download popup again
+                                    translationConfig = nil
+                                    // Create new config in next frame to re-trigger translationTask
+                                    Task { @MainActor in
+
+                                        // 0.1 second to force download popup again
+                                        try? await Task.sleep(nanoseconds: 100_000_000)
+
+                                        translationConfig = TranslationSession.Configuration(
+                                            source: Locale.Language(identifier: "en"),
+                                            target: Locale.current.language
+                                        )
+                                    }
+                                #endif
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "translate")
+                        if isCheckingLanguage {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Text(translateButtonLabel)
+                        }
+                    }
+                    .font(.subheadline.weight(.medium))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.secondary.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+        }
     }
 
     /// Alert data for restriction message
@@ -101,6 +194,13 @@ public struct FeaturePulseView: View {
         .task {
             await viewModel.loadFeatureRequests()
             configFetched = true
+
+            // Check if translation language is available
+            if shouldShowTranslateButton {
+                if #available(iOS 18.0, *) {
+                    await checkLanguageAvailability()
+                }
+            }
         }
     }
 
@@ -146,47 +246,8 @@ public struct FeaturePulseView: View {
             } else {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        // Translate button for non-English users (hidden when loading)
-                        if shouldShowTranslateButton, !viewModel.isLoading {
-                            HStack {
-                                Button {
-                                    withAnimation {
-                                        if enableTranslations {
-                                            // Turning off - keep translations cached for instant re-enable
-                                            enableTranslations = false
-                                        } else {
-                                            // Turning on - show cached translations or trigger new translation
-                                            enableTranslations = true
-                                            // Set translation config to trigger .translationTask if not already set
-                                            if translationConfig == nil {
-                                                if #available(iOS 18.0, *) {
-                                                    #if canImport(Translation)
-                                                        translationConfig = TranslationSession.Configuration(
-                                                            source: Locale.Language(identifier: "en"),
-                                                            target: Locale.current.language
-                                                        )
-                                                    #endif
-                                                }
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    Label(
-                                        enableTranslations ? L10n.showOriginal : L10n.translateAll,
-                                        systemImage: "translate"
-                                    )
-                                    .font(.subheadline.weight(.medium))
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(Color.secondary.opacity(0.2))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                }
-                                .buttonStyle(.plain)
-                                Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                        }
+                        // Translate button for non-English users
+                        translateButton
 
                         // Feature requests list
                         VStack {
@@ -259,7 +320,9 @@ public struct FeaturePulseView: View {
         .applyBatchTranslation(
             config: translationConfig,
             requests: viewModel.featureRequests,
-            translations: $translations
+            translations: $translations,
+            enableTranslations: $enableTranslations,
+            isLanguageInstalled: $isLanguageInstalled
         )
     }
 
@@ -331,38 +394,59 @@ private extension View {
     func applyBatchTranslation(
         config: Any?,
         requests: [FeatureRequest],
-        translations: Binding<[String: (title: String, description: String)]>
+        translations: Binding<[String: (title: String, description: String)]>,
+        enableTranslations: Binding<Bool>,
+        isLanguageInstalled: Binding<Bool>
     ) -> some View {
         if #available(iOS 18.0, *) {
             #if canImport(Translation)
                 translationTask(config as? TranslationSession.Configuration) { session in
-                    // Translate all feature requests in batch
-                    for request in requests {
-                        // Skip if already translated
-                        guard translations.wrappedValue[request.id] == nil else { continue }
+                    do {
+                        var translatedAny = false
 
-                        // Capture text values locally to avoid data races
-                        let titleToTranslate = request.title
-                        let descToTranslate = request.description
+                        // Translate all feature requests in batch
+                        for request in requests {
+                            // Skip if already translated
+                            guard translations.wrappedValue[request.id] == nil else { continue }
 
-                        // Translate title and description
-                        let titleResponse = await Task { @MainActor in
-                            try? await session.translate(titleToTranslate)
-                        }.value
+                            // Capture text values locally to avoid data races
+                            let titleToTranslate = request.title
+                            let descToTranslate = request.description
 
-                        let descResponse = await Task { @MainActor in
-                            try? await session.translate(descToTranslate)
-                        }.value
+                            // Translate title and description with error handling
+                            // Use Task to avoid data races with session
+                            let titleResponse = try await Task { @MainActor in
+                                try await session.translate(titleToTranslate)
+                            }.value
 
-                        await MainActor.run {
-                            if let titleText = titleResponse?.targetText,
-                               let descText = descResponse?.targetText
-                            {
-                                translations.wrappedValue[request.id] = (title: titleText, description: descText)
+                            let descResponse = try await Task { @MainActor in
+                                try await session.translate(descToTranslate)
+                            }.value
+
+                            await MainActor.run {
+                                translations.wrappedValue[request.id] = (
+                                    title: titleResponse.targetText,
+                                    description: descResponse.targetText
+                                )
+                                translatedAny = true
                             }
+                        }
+
+                        // Only enable translations if we successfully translated something
+                        if translatedAny {
+                            await MainActor.run {
+                                enableTranslations.wrappedValue = true
+                            }
+                        }
+                    } catch {
+                        // Translation failed - make sure button stays off and mark language as not installed
+                        await MainActor.run {
+                            enableTranslations.wrappedValue = false
+                            isLanguageInstalled.wrappedValue = false
                         }
                     }
                 }
+                .id((config as? TranslationSession.Configuration).debugDescription) // Force show download popup again
             #else
                 self
             #endif
