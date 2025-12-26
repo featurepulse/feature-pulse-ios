@@ -5,6 +5,26 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-12-26
+
+### ✨ New Features
+
+- **RevenueCat Integration** - Added built-in convenience method for automatic payment syncing
+  - New `updateUserFromRevenueCat(customerInfo:offerings:entitlementID:expectedLifetimeMonths:)` method
+  - Automatically matches entitlement to StoreKit product for accurate pricing
+  - Gets price and currency directly from StoreKit `storeProduct`
+  - Uses `packageType` for reliable subscription period detection (weekly, monthly, yearly, lifetime)
+  - Optional `expectedLifetimeMonths` parameter for lifetime purchase amortization (default: 24)
+  - Automatically sets user to free if no active entitlement found
+  - Only available when RevenueCat SDK is imported (uses conditional compilation)
+
+### 📝 Changes
+
+- **Updated README** - Added RevenueCat Integration section with built-in method examples
+  - Shows recommended built-in method usage
+  - Includes custom implementation example for advanced users
+  - Documents how the integration works and its benefits
+
 ## [1.4.4] - 2025-12-15
 
 ### 🐛 Bug Fixes

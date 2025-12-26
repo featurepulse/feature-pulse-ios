@@ -370,9 +370,41 @@ struct YourApp: App {
 - Identify your most active users
 - Track app usage alongside feature requests
 
-### RevenueCat Integration Example
+### RevenueCat Integration
 
-If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, here's how to automatically sync payment info:
+If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, FeaturePulse provides a built-in integration to automatically sync payment info.
+
+#### Built-in Method (Recommended)
+
+The SDK includes a convenience method that handles all the mapping automatically:
+
+```swift
+import FeaturePulse
+import RevenueCat
+
+// Call this when you receive customer info updates
+func syncRevenueCatToFeaturePulse() async throws {
+    let customerInfo = try await Purchases.shared.customerInfo()
+    let offerings = try await Purchases.shared.offerings()
+
+    FeaturePulse.shared.updateUserFromRevenueCat(
+        customerInfo: customerInfo,
+        offerings: offerings,
+        entitlementID: "pro"  // Your entitlement identifier
+    )
+}
+```
+
+**How it works:**
+- Automatically matches entitlement to StoreKit product
+- Gets accurate price and currency from StoreKit
+- Uses `packageType` to determine subscription period
+- Handles weekly, monthly, yearly, and lifetime subscriptions
+- Sets user to free if no active entitlement
+
+#### Custom Implementation (Advanced)
+
+If you need more control or have a custom wrapper around RevenueCat:
 
 ```swift
 import FeaturePulse
