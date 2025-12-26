@@ -19,12 +19,11 @@ final class User: @unchecked Sendable {
         #if targetEnvironment(simulator)
             // For simulator, generate a stable UUID stored in UserDefaults
             // (iCloud Key-Value Store requires entitlements that may not be configured)
-            let key = "com.featurepulse.deviceID"
-            if let stored = UserDefaults.standard.string(forKey: key) {
+            if let stored = UserDefaultsManager.deviceID {
                 deviceID = stored
             } else {
                 deviceID = UUID().uuidString
-                UserDefaults.standard.set(deviceID, forKey: key)
+                UserDefaultsManager.deviceID = deviceID
             }
         #else
             // For real devices, use StableID which syncs across devices via iCloud

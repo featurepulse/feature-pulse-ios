@@ -5,6 +5,19 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-12-26
+
+### ✨ New Features
+
+- **CTA Banner** - New method to encourage users to share feedback with a dismissible banner
+  - `ctaBanner(trigger:icon:text:)` method to display on home screens
+  - Auto trigger mode: Shows after X sessions (default: 3, requires session tracking)
+  - Manual trigger mode: Custom condition closure for flexible control
+  - Shows once until dismissed, never appears again
+  - Customizable SF Symbol icon (default: "lightbulb.fill")
+  - Customizable text with full multi-language support
+  - Smooth slide-in animation and haptic feedback
+
 ## [1.5.0] - 2025-12-26
 
 ### ✨ New Features

@@ -370,6 +370,82 @@ struct YourApp: App {
 - Identify your most active users
 - Track app usage alongside feature requests
 
+### CTA Banner
+
+Encourage users to share feedback with a dismissible banner on your home screen.
+
+**Features:**
+- Shows once until dismissed, then never appears again
+- Automatically triggers after X sessions (default: 3)
+- Smooth animations and haptic feedback
+- Customizable icon, text, and trigger conditions
+- Uses your primary brand color
+
+<p align="center">
+  <img src="https://github.com/alexnsbmr/feature-pulse-ios/blob/main/images/feature-pulse-cta-banner.png?raw=true" alt="CTA Banner" width="300">
+</p>
+
+#### Basic Usage
+
+```swift
+var body: some View {
+    VStack {
+        // Show CTA banner (automatically after 3 sessions)
+        FeaturePulse.shared.ctaBanner()
+
+        // Rest of your home screen
+        HomeScreenContent()
+    }
+}
+```
+
+#### Trigger Modes
+
+**Auto Mode (Recommended)**
+```swift
+// Default - show after 3 sessions
+FeaturePulse.shared.ctaBanner()
+
+// Custom session count
+FeaturePulse.shared.ctaBanner(trigger: .auto(minSessions: 5))
+```
+
+**Manual Mode**
+```swift
+// Custom condition
+FeaturePulse.shared.ctaBanner(trigger: .manual {
+    hasCompletedOnboarding && isPremiumUser
+})
+```
+
+#### Customization
+
+```swift
+FeaturePulse.shared.ctaBanner(
+    trigger: .auto(minSessions: 3),
+    icon: "star.fill",
+    text: "Help us improve the app!"
+)
+```
+
+**Parameters:**
+- `trigger`: When to show (`.auto(minSessions: Int)` or `.manual(() -> Bool)`)
+- `icon`: SF Symbol name (default: "lightbulb.fill")
+- `text`: Custom message (default: localized "Share your feedback!")
+
+**Important:** Auto mode requires session tracking:
+```swift
+WindowGroup {
+    ContentView()
+        .featurePulseSessionTracking()  // Required for auto mode
+}
+```
+
+**Behavior:**
+- Tapping banner → Opens FeaturePulse view and dismisses permanently
+- Tapping X → Dismisses permanently
+- State stored in UserDefaults (survives app restarts)
+
 ### RevenueCat Integration
 
 If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, FeaturePulse provides a built-in integration to automatically sync payment info.

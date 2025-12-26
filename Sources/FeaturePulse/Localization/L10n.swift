@@ -146,6 +146,14 @@ public extension FeaturePulse {
             String(localized: "cta.request_feature", defaultValue: "Request a Feature", bundle: .module)
         }
 
+        public static var ctaBannerMessage: String {
+            String(
+                localized: "cta.banner.message",
+                defaultValue: "Let us know what features you'd like to see",
+                bundle: .module
+            )
+        }
+
         // MARK: - Section Headers
 
         public static var titleHeader: String {

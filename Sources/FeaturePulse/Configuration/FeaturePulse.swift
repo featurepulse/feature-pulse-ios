@@ -90,14 +90,12 @@ public final class FeaturePulse: @unchecked Sendable {
     /// How to handle feature request restrictions (nil = default alert with "Pro")
     public var restrictionMode: RestrictionMode?
 
-    private let lastSessionKey = "FeaturePulse_LastSessionTime"
-
     private init() {}
 
     /// Track app open for engagement metrics (with 30-minute timeout)
     /// Called automatically by the featurePulseSessionTracking() modifier
     func trackAppOpenIfNewSession() {
-        let lastSessionTime = UserDefaults.standard.double(forKey: lastSessionKey)
+        let lastSessionTime = UserDefaultsManager.lastSessionTime
         let now = Date().timeIntervalSince1970
 
         // 30 minutes timeout (1800 seconds)
@@ -106,7 +104,8 @@ public final class FeaturePulse: @unchecked Sendable {
                 do {
                     try await FeaturePulseAPI.shared.trackActivity(type: "app_open")
                     // Only update UserDefaults if API call succeeds
-                    UserDefaults.standard.set(now, forKey: lastSessionKey)
+                    UserDefaultsManager.lastSessionTime = now
+                    UserDefaultsManager.sessionCount += 1
                 } catch {
                     // Silently fail - don't block app, but don't mark as tracked if it failed
                     // Will retry on next app open (after 30 min)
@@ -170,5 +169,86 @@ public final class FeaturePulse: @unchecked Sendable {
     /// ```
     @MainActor public func view() -> FeaturePulseView {
         FeaturePulseView()
+    }
+
+    /// Returns a CTA banner that encourages users to share feedback
+    ///
+    /// The banner shows once until dismissed, then never appears again.
+    /// Perfect for home screens to remind users they can share feedback.
+    ///
+    /// # Example Usage:
+    /// ```swift
+    /// var body: some View {
+    ///     VStack {
+    ///         // Auto mode - show after 3 sessions (default)
+    ///         FeaturePulse.shared.ctaBanner()
+    ///
+    ///         // Auto mode - show after 5 sessions
+    ///         FeaturePulse.shared.ctaBanner(trigger: .auto(minSessions: 5))
+    ///
+    ///         // Manual mode - custom condition
+    ///         FeaturePulse.shared.ctaBanner(trigger: .manual {
+    ///             hasCompletedOnboarding && isPremiumUser
+    ///         })
+    ///
+    ///         // Rest of your home screen content
+    ///         HomeScreenContent()
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// # Customization:
+    /// ```swift
+    /// // Custom icon and text
+    /// FeaturePulse.shared.ctaBanner(
+    ///     trigger: .auto(),
+    ///     icon: "star.fill",
+    ///     text: "Help us improve the app!"
+    /// )
+    /// ```
+    ///
+    /// # Parameters:
+    /// - trigger: When to show the banner (default: `.auto(minSessions: 3)`)
+    ///   - `.auto(minSessions: Int)`: Show after X sessions (requires session tracking modifier)
+    ///   - `.manual(() -> Bool)`: Custom condition closure
+    /// - icon: SF Symbol name for the icon (default: "lightbulb.fill")
+    /// - text: Custom message text (default: localized "Share your feedback!")
+    ///
+    /// # Behavior:
+    /// - Returns `nil` if trigger condition not met or already dismissed
+    /// - Tapping banner opens FeaturePulse view and dismisses permanently
+    /// - Tapping X dismisses permanently (stored in UserDefaults)
+    /// - Smooth slide-in animation on first appearance
+    /// - Haptic feedback on dismiss
+    ///
+    /// # Auto Mode Requirements:
+    /// For `.auto()` to work, add session tracking to your root view:
+    /// ```swift
+    /// WindowGroup {
+    ///     ContentView()
+    ///         .featurePulseSessionTracking()
+    /// }
+    /// ```
+    @MainActor public func ctaBanner(
+        trigger: CTATrigger = .auto(),
+        icon: String = "lightbulb.fill",
+        text: String? = nil
+    ) -> some View {
+        Group {
+            let shouldShow: Bool = {
+                switch trigger {
+                case .auto(let minSessions):
+                    return UserDefaultsManager.sessionCount >= minSessions
+                case .manual(let condition):
+                    return condition()
+                }
+            }()
+
+            if shouldShow && !UserDefaultsManager.ctaBannerDismissed {
+                CTABannerView(icon: icon, text: text) {
+                    UserDefaultsManager.ctaBannerDismissed = true
+                }
+            }
+        }
     }
 }
