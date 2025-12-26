@@ -448,18 +448,81 @@ WindowGroup {
 
 ### RevenueCat Integration
 
-If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, FeaturePulse provides a built-in integration to automatically sync payment info.
+If you're using [RevenueCat](https://www.revenuecat.com/) for subscriptions, you can easily sync payment information to FeaturePulse by adding an extension to your project.
 
-#### Built-in Method (Recommended)
+#### Step 1: Add Extension to Your Code
 
-The SDK includes a convenience method that handles all the mapping automatically:
+Copy this extension into your project (e.g., `FeaturePulse+RevenueCat.swift`):
 
 ```swift
 import FeaturePulse
 import RevenueCat
 
+extension FeaturePulse {
+    /// Sync RevenueCat customer info to FeaturePulse
+    /// - Parameters:
+    ///   - customerInfo: The RevenueCat customer info
+    ///   - offerings: The RevenueCat offerings
+    ///   - entitlementID: Your RevenueCat entitlement identifier (e.g., "pro")
+    ///   - expectedLifetimeMonths: Expected lifetime for lifetime purchases (default: 24)
+    func updateUserFromRevenueCat(
+        customerInfo: CustomerInfo,
+        offerings: Offerings,
+        entitlementID: String,
+        expectedLifetimeMonths: Int = 24
+    ) {
+        // Check if user has active entitlement
+        guard let entitlement = customerInfo.entitlements[entitlementID],
+              entitlement.isActive else {
+            updateUser(payment: .free)
+            return
+        }
+
+        // Find the current offering
+        guard let currentOffering = offerings.current else {
+            updateUser(payment: .free)
+            return
+        }
+
+        // Match entitlement to package
+        let productId = entitlement.productIdentifier
+        guard let matchedPackage = currentOffering.availablePackages.first(where: {
+            $0.storeProduct.productIdentifier == productId
+        }) else {
+            updateUser(payment: .free)
+            return
+        }
+
+        // Extract price and currency from StoreKit
+        let price = matchedPackage.storeProduct.price
+        let currency = matchedPackage.storeProduct.currencyCode ?? "USD"
+
+        // Map to FeaturePulse payment type
+        let payment: Payment = {
+            switch matchedPackage.packageType {
+            case .weekly:
+                return .weekly(price, currency: currency)
+            case .monthly:
+                return .monthly(price, currency: currency)
+            case .annual:
+                return .yearly(price, currency: currency)
+            case .lifetime:
+                return .lifetime(price, currency: currency, expectedLifetimeMonths: expectedLifetimeMonths)
+            default:
+                return .free
+            }
+        }()
+
+        updateUser(payment: payment)
+    }
+}
+```
+
+#### Step 2: Use the Extension
+
+```swift
 // Call this when you receive customer info updates
-func syncRevenueCatToFeaturePulse() async throws {
+func handleRevenueCatUpdate() async throws {
     let customerInfo = try await Purchases.shared.customerInfo()
     let offerings = try await Purchases.shared.offerings()
 
@@ -471,67 +534,35 @@ func syncRevenueCatToFeaturePulse() async throws {
 }
 ```
 
-**How it works:**
-- Automatically matches entitlement to StoreKit product
-- Gets accurate price and currency from StoreKit
-- Uses `packageType` to determine subscription period
-- Handles weekly, monthly, yearly, and lifetime subscriptions
-- Sets user to free if no active entitlement
+#### When to Call
 
-#### Custom Implementation (Advanced)
-
-If you need more control or have a custom wrapper around RevenueCat:
+Call `updateUserFromRevenueCat()` whenever:
+- User completes a purchase
+- App launches (to sync current state)
+- RevenueCat customer info updates (via delegate)
 
 ```swift
-import FeaturePulse
-import RevenueCat
-
-// Call this when you receive customer info updates
-func syncRevenueCatToFeaturePulse(userPurchases: UserPurchasesManager) {
-    guard
-        let customerInfo = userPurchases.customerInfo,
-        userPurchases.subscriptionActive,
-        let entitlement = customerInfo.entitlements[Constants.revenueCatEntitlementIdentifier],
-        let currentOffering = userPurchases.offerings?.current
-    else {
-        FeaturePulse.shared.updateUser(payment: .free)
-        return
-    }
-
-    let productId = entitlement.productIdentifier
-    guard let matchedPackage = currentOffering.availablePackages.first(where: {
-        $0.storeProduct.productIdentifier == productId
-    }) else {
-        FeaturePulse.shared.updateUser(payment: .free)
-        return
-    }
-
-    let price = matchedPackage.storeProduct.price
-    let currency = matchedPackage.storeProduct.currencyCode ?? "USD"
-    let payment: FeaturePulse.Payment = {
-        switch matchedPackage.packageType {
-        case .weekly:
-            return .weekly(price, currency: currency)
-        case .monthly:
-            return .monthly(price, currency: currency)
-        case .annual:
-            return .yearly(price, currency: currency)
-        case .lifetime:
-            return .lifetime(price, currency: currency, expectedLifetimeMonths: 24)
-        default:
-            return .free
+// Example: Listen for RevenueCat updates
+class AppDelegate: NSObject, UIApplicationDelegate, PurchasesDelegate {
+    func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
+        Task {
+            if let offerings = try? await Purchases.shared.offerings() {
+                FeaturePulse.shared.updateUserFromRevenueCat(
+                    customerInfo: customerInfo,
+                    offerings: offerings,
+                    entitlementID: "pro"
+                )
+            }
         }
-    }()
-
-    FeaturePulse.shared.updateUser(payment: payment)
+    }
 }
 ```
 
-**Integration Tips:**
-- Call this function whenever RevenueCat customer info updates
-- Use `Purchases.shared.getCustomerInfo()` to get current state
-- Set up a listener: `Purchases.shared.delegate = self`
-- Payment tiers will be automatically synced to FeaturePulse
+**Benefits:**
+- ✅ No forced RevenueCat dependency in FeaturePulse SDK
+- ✅ Full type safety with your RevenueCat setup
+- ✅ Easy to customize for your specific needs
+- ✅ Automatic price and currency detection from StoreKit
 
 ## Localization
 
