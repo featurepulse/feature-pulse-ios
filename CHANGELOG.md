@@ -5,6 +5,16 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-12-26
+
+### 🐛 Bug Fixes
+
+- **Fixed dependency scanning warning** - Changed RevenueCat integration to extension pattern
+  - Removed built-in RevenueCat integration file to prevent dependency conflicts
+  - No forced dependencies for users who don't use RevenueCat
+  - Users can add extension to their own project (see README)
+  - Clean builds with no warnings for all users
+
 ## [1.6.0] - 2025-12-26
 
 ### ✨ New Features
