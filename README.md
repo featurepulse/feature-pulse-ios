@@ -382,7 +382,7 @@ Encourage users to share feedback with a dismissible banner on your home screen.
 - Uses your primary brand color
 
 <p align="center">
-  <img src="https://github.com/alexnsbmr/feature-pulse-ios/blob/main/images/feature-pulse-cta-banner.png?raw=true" alt="CTA Banner" width="300">
+  <img src="https://github.com/featurepulse/feature-pulse-ios/blob/main/Screenshots/feature-pulse-cta-banner.png?raw=true" alt="CTA Banner" width="300">
 </p>
 
 #### Basic Usage
