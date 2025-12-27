@@ -87,7 +87,7 @@ struct CTABannerView: View {
             .padding(.horizontal, 16)
         }
         .buttonStyle(.plain)
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .transition(.scale(scale: 0.8).combined(with: .opacity))
         .sheet(isPresented: $showFeaturePulse) {
             NavigationStack {
                 FeaturePulse.shared.view()
