@@ -377,8 +377,7 @@ Encourage users to share feedback with a dismissible banner on your home screen.
 **Features:**
 - Shows once until dismissed, then never appears again
 - Automatically triggers after X sessions (default: 3)
-- Smooth scale + fade animation with spring physics
-- Haptic feedback on interaction
+- Smooth animations and haptic feedback
 - Customizable icon, text, and trigger conditions
 - Uses your primary brand color with gradient background
 
@@ -443,11 +442,9 @@ WindowGroup {
 ```
 
 **Behavior:**
-- Appears with smooth scale-in animation (0.3 → 1.0) combined with fade
 - Tapping banner → Opens FeaturePulse view and dismisses permanently
-- Tapping X → Dismisses permanently with scale-out animation
+- Tapping X → Dismisses permanently
 - State stored in UserDefaults (survives app restarts)
-- Uses SwiftUI transitions for native, smooth animations
 
 ### RevenueCat Integration
 
