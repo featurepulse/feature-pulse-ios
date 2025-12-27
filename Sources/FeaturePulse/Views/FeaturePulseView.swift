@@ -90,7 +90,6 @@ public struct FeaturePulseView: View {
                                     translationConfig = nil
                                     // Create new config in next frame to re-trigger translationTask
                                     Task { @MainActor in
-
                                         // 0.1 second to force download popup again
                                         try? await Task.sleep(nanoseconds: 100_000_000)
 

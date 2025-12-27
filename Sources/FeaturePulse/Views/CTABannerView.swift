@@ -20,8 +20,8 @@ struct CTABannerView: View {
         Button {
             // Haptic feedback
             #if os(iOS)
-            let impact = UIImpactFeedbackGenerator(style: .light)
-            impact.impactOccurred()
+                let impact = UIImpactFeedbackGenerator(style: .light)
+                impact.impactOccurred()
             #endif
 
             // Show FeaturePulse
@@ -54,8 +54,8 @@ struct CTABannerView: View {
                 Button {
                     // Haptic feedback
                     #if os(iOS)
-                    let impact = UIImpactFeedbackGenerator(style: .light)
-                    impact.impactOccurred()
+                        let impact = UIImpactFeedbackGenerator(style: .light)
+                        impact.impactOccurred()
                     #endif
 
                     // Dismiss permanently
@@ -87,7 +87,7 @@ struct CTABannerView: View {
             .padding(.horizontal, 16)
         }
         .buttonStyle(.plain)
-        .transition(.scale(scale: 0.8).combined(with: .opacity))
+        .transition(.opacity.combined(with: .scale(scale: 0.3)))
         .sheet(isPresented: $showFeaturePulse) {
             NavigationStack {
                 FeaturePulse.shared.view()

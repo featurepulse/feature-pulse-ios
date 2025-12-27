@@ -377,9 +377,10 @@ Encourage users to share feedback with a dismissible banner on your home screen.
 **Features:**
 - Shows once until dismissed, then never appears again
 - Automatically triggers after X sessions (default: 3)
-- Smooth animations and haptic feedback
+- Smooth scale + fade animation with spring physics
+- Haptic feedback on interaction
 - Customizable icon, text, and trigger conditions
-- Uses your primary brand color
+- Uses your primary brand color with gradient background
 
 <p align="center">
   <img src="https://github.com/featurepulse/feature-pulse-ios/blob/main/Screenshots/feature-pulse-cta-banner.png?raw=true" alt="CTA Banner" width="300">
@@ -442,9 +443,11 @@ WindowGroup {
 ```
 
 **Behavior:**
+- Appears with smooth scale-in animation (0.3 → 1.0) combined with fade
 - Tapping banner → Opens FeaturePulse view and dismisses permanently
-- Tapping X → Dismisses permanently
+- Tapping X → Dismisses permanently with scale-out animation
 - State stored in UserDefaults (survives app restarts)
+- Uses SwiftUI transitions for native, smooth animations
 
 ### RevenueCat Integration
 

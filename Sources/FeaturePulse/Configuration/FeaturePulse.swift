@@ -244,32 +244,24 @@ private struct CTABannerContainer: View {
     let icon: String
     let text: String?
 
-    @State private var isVisible = false
     @State private var isDismissed = UserDefaultsManager.ctaBannerDismissed
 
     var body: some View {
         Group {
-            let shouldShow: Bool = {
-                switch trigger {
-                case .auto(let minSessions):
-                    return UserDefaultsManager.sessionCount >= minSessions
-                case .manual(let condition):
-                    return condition()
-                }
-            }()
+            let shouldShow: Bool = switch trigger {
+            case let .auto(minSessions):
+                UserDefaultsManager.sessionCount >= minSessions
+            case let .manual(condition):
+                condition()
+            }
 
-            if shouldShow && !isDismissed && isVisible {
+            if shouldShow, !isDismissed {
                 CTABannerView(icon: icon, text: text) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    withAnimation {
                         isDismissed = true
                     }
                     UserDefaultsManager.ctaBannerDismissed = true
                 }
-            }
-        }
-        .task {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                isVisible = true
             }
         }
     }
