@@ -234,6 +234,20 @@ public final class FeaturePulse: @unchecked Sendable {
         icon: String = "lightbulb.fill",
         text: String? = nil
     ) -> some View {
+        CTABannerContainer(trigger: trigger, icon: icon, text: text)
+    }
+}
+
+/// Container view that handles CTA banner animations
+private struct CTABannerContainer: View {
+    let trigger: FeaturePulse.CTATrigger
+    let icon: String
+    let text: String?
+
+    @State private var isVisible = false
+    @State private var isDismissed = UserDefaultsManager.ctaBannerDismissed
+
+    var body: some View {
         Group {
             let shouldShow: Bool = {
                 switch trigger {
@@ -244,10 +258,20 @@ public final class FeaturePulse: @unchecked Sendable {
                 }
             }()
 
-            if shouldShow && !UserDefaultsManager.ctaBannerDismissed {
+            if shouldShow && !isDismissed && isVisible {
                 CTABannerView(icon: icon, text: text) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isDismissed = true
+                    }
                     UserDefaultsManager.ctaBannerDismissed = true
                 }
+            }
+        }
+        .task {
+            // Delay appearance for smooth entry
+            try? await Task.sleep(for: .milliseconds(300))
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                isVisible = true
             }
         }
     }

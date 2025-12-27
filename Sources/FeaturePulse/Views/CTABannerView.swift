@@ -14,16 +14,10 @@ struct CTABannerView: View {
         self.onDismiss = onDismiss
     }
 
-    @State private var isVisible = false
     @State private var showFeaturePulse = false
 
     var body: some View {
         Button {
-            // Dismiss banner with animation
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                isVisible = false
-            }
-
             // Haptic feedback
             #if os(iOS)
             let impact = UIImpactFeedbackGenerator(style: .light)
@@ -33,10 +27,8 @@ struct CTABannerView: View {
             // Show FeaturePulse
             showFeaturePulse = true
 
-            // Dismiss permanently after animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                onDismiss()
-            }
+            // Dismiss permanently
+            onDismiss()
         } label: {
             HStack(spacing: 16) {
                 // Icon
@@ -60,20 +52,14 @@ struct CTABannerView: View {
 
                 // Close button
                 Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        isVisible = false
-                    }
-
                     // Haptic feedback
                     #if os(iOS)
                     let impact = UIImpactFeedbackGenerator(style: .light)
                     impact.impactOccurred()
                     #endif
 
-                    // Delay dismiss to allow animation
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        onDismiss()
-                    }
+                    // Dismiss permanently
+                    onDismiss()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 14, weight: .semibold))
@@ -101,13 +87,7 @@ struct CTABannerView: View {
             .padding(.horizontal, 16)
         }
         .buttonStyle(.plain)
-        .offset(y: isVisible ? 0 : -100)
-        .opacity(isVisible ? 1 : 0)
-        .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.3)) {
-                isVisible = true
-            }
-        }
+        .transition(.move(edge: .top).combined(with: .opacity))
         .sheet(isPresented: $showFeaturePulse) {
             NavigationStack {
                 FeaturePulse.shared.view()
