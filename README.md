@@ -444,7 +444,6 @@ WindowGroup {
 **Behavior:**
 - Tapping banner → Opens FeaturePulse view and dismisses permanently
 - Tapping X → Dismisses permanently
-- State stored in UserDefaults (survives app restarts)
 
 ### RevenueCat Integration
 
