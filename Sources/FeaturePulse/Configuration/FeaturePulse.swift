@@ -268,8 +268,6 @@ private struct CTABannerContainer: View {
             }
         }
         .task {
-            // Delay appearance for smooth entry
-            try? await Task.sleep(for: .milliseconds(300))
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                 isVisible = true
             }
