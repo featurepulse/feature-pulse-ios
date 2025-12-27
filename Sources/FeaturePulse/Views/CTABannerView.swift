@@ -26,9 +26,6 @@ struct CTABannerView: View {
 
             // Show FeaturePulse
             showFeaturePulse = true
-
-            // Dismiss permanently
-            onDismiss()
         } label: {
             HStack(spacing: 16) {
                 // Icon
@@ -88,7 +85,7 @@ struct CTABannerView: View {
         }
         .buttonStyle(.plain)
         .transition(.opacity.combined(with: .scale(scale: 0.3)))
-        .sheet(isPresented: $showFeaturePulse) {
+        .sheet(isPresented: $showFeaturePulse, onDismiss: onDismiss) {
             NavigationStack {
                 FeaturePulse.shared.view()
                     .toolbar {
