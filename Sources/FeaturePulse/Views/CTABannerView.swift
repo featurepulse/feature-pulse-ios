@@ -26,6 +26,12 @@ struct CTABannerView: View {
 
             // Show FeaturePulse
             showFeaturePulse = true
+
+            // Dismiss banner after sheet starts presenting
+            Task {
+                try? await Task.sleep(for: .milliseconds(100))
+                onDismiss()
+            }
         } label: {
             HStack(spacing: 16) {
                 // Icon
@@ -85,7 +91,7 @@ struct CTABannerView: View {
         }
         .buttonStyle(.plain)
         .transition(.opacity.combined(with: .scale(scale: 0.3)))
-        .sheet(isPresented: $showFeaturePulse, onDismiss: onDismiss) {
+        .sheet(isPresented: $showFeaturePulse) {
             NavigationStack {
                 FeaturePulse.shared.view()
                     .toolbar {
