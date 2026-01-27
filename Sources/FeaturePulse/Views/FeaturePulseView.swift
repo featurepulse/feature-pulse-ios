@@ -3,11 +3,13 @@ import SwiftUI
     import Translation
 #endif
 
-/// Main view displaying list of feature requests
 public struct FeaturePulseView: View {
     @State private var viewModel = FeaturePulseViewModel()
     @State private var showingNewRequest = false
     @State private var selectedRequest: FeatureRequest?
+    @State private var scrollToRequestID: String?
+    @State private var highlightedRequestID: String?
+    @State private var existingRequestIDs: Set<String> = []
     @State private var restrictionAlert: RestrictionAlert?
     @State private var configFetched = false
     @State private var enableTranslations = false
@@ -15,28 +17,22 @@ public struct FeaturePulseView: View {
     @State private var translationConfig: Any?
     @State private var isLanguageInstalled = false
     @State private var isCheckingLanguage = false
+    @State private var showThankYouToast = false
 
     private let config = FeaturePulse.shared
 
     public init() {}
 
-    /// Check if the user's device language is NOT English AND translation is enabled in dashboard
     private var shouldShowTranslateButton: Bool {
-        // Check if translation is enabled in dashboard settings
-        guard config.showTranslation else {
-            return false
-        }
+        guard config.showTranslation else { return false }
 
-        // Check iOS version and device language
         if #available(iOS 18.0, *) {
             let deviceLanguage = Locale.current.language.languageCode?.identifier ?? "en"
-            // Check if language starts with "en" to handle all English variants (en-US, en-GB, etc.)
             return !deviceLanguage.hasPrefix("en")
         }
         return false
     }
 
-    /// Check if translation language is installed
     @available(iOS 18.0, *)
     private func checkLanguageAvailability() async {
         #if canImport(Translation)
@@ -54,45 +50,33 @@ public struct FeaturePulseView: View {
         #endif
     }
 
-    /// Get appropriate button label based on translation state
     private var translateButtonLabel: String {
-        // Only show "See Original" if translations are enabled AND we have actual translations
         (enableTranslations && !translations.isEmpty) ? L10n.showOriginal : L10n.translateAll
     }
 
-    /// Translate button view for non-English users
     @ViewBuilder
     private var translateButton: some View {
         if shouldShowTranslateButton, !viewModel.isLoading {
             HStack {
                 Button {
                     if enableTranslations {
-                        // Have translations showing - turn off
                         withAnimation {
                             enableTranslations = false
                         }
                     } else {
-                        // Check if we have cached translations
                         if !translations.isEmpty {
-                            // We have cached translations - just show them
                             withAnimation {
                                 enableTranslations = true
                             }
                         } else {
-                            // No cached translations - trigger new translation
                             if #available(iOS 18.0, *) {
                                 #if canImport(Translation)
-                                    // Invalidate existing config
                                     if var config = translationConfig as? TranslationSession.Configuration {
                                         config.invalidate()
                                     }
-                                    // Clear config first to force download popup again
                                     translationConfig = nil
-                                    // Create new config in next frame to re-trigger translationTask
                                     Task { @MainActor in
-                                        // 0.1 second to force download popup again
-                                        try? await Task.sleep(nanoseconds: 100_000_000)
-
+                                        try? await Task.sleep(for: .milliseconds(100))
                                         translationConfig = TranslationSession.Configuration(
                                             source: Locale.Language(identifier: "en"),
                                             target: Locale.current.language
@@ -126,7 +110,6 @@ public struct FeaturePulseView: View {
         }
     }
 
-    /// Alert data for restriction message
     private struct RestrictionAlert: Identifiable {
         let id = UUID()
         let subscriptionName: String
@@ -165,17 +148,47 @@ public struct FeaturePulseView: View {
                 .disabled(!configFetched)
             }
         }
-        .sheet(
-            isPresented: $showingNewRequest,
-            onDismiss: {
+        .sheet(isPresented: $showingNewRequest) {
+            NewFeatureRequestView {
                 Task {
                     await viewModel.loadFeatureRequests()
+
+                    if let newRequest = viewModel.featureRequests.first(where: { !existingRequestIDs.contains($0.id) }) {
+                        await MainActor.run {
+                            withAnimation(.smooth) {
+                                showThankYouToast = true
+                            }
+                        }
+
+                        try? await Task.sleep(for: .milliseconds(300))
+                        await MainActor.run {
+                            scrollToRequestID = newRequest.id
+                        }
+
+                        try? await Task.sleep(for: .milliseconds(400))
+                        await MainActor.run {
+                            withAnimation(.smooth(duration: 0.3)) {
+                                highlightedRequestID = newRequest.id
+                            }
+                        }
+
+                        try? await Task.sleep(for: .seconds(2))
+                        await MainActor.run {
+                            withAnimation(.smooth(duration: 0.5)) {
+                                highlightedRequestID = nil
+                            }
+                        }
+
+                        try? await Task.sleep(for: .milliseconds(300))
+                        await MainActor.run {
+                            withAnimation(.smooth) {
+                                showThankYouToast = false
+                            }
+                        }
+                    }
                 }
-            },
-            content: {
-                NewFeatureRequestView()
             }
-        )
+        }
         .alert("Vote Error", isPresented: $viewModel.showVoteError) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -194,11 +207,26 @@ public struct FeaturePulseView: View {
             await viewModel.loadFeatureRequests()
             configFetched = true
 
-            // Check if translation language is available
             if shouldShowTranslateButton {
                 if #available(iOS 18.0, *) {
                     await checkLanguageAvailability()
                 }
+            }
+        }
+        .overlay(alignment: .top) {
+            if showThankYouToast {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                    Text(L10n.thankYou)
+                        .font(.subheadline.weight(.medium))
+                }
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color(uiColor: .label), in: Capsule())
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
     }
@@ -207,6 +235,7 @@ public struct FeaturePulseView: View {
         if !config.permissions.canCreateFeatureRequest {
             handleRestriction()
         } else {
+            existingRequestIDs = Set(viewModel.featureRequests.map(\.id))
             showingNewRequest = true
         }
     }
@@ -220,12 +249,10 @@ public struct FeaturePulseView: View {
                 handler()
             }
         } else {
-            // Default: show alert with "Pro"
             restrictionAlert = RestrictionAlert(subscriptionName: "Pro")
         }
     }
 
-    /// Create a binding to a specific feature request by ID
     private func requestBinding(for id: String) -> Binding<FeatureRequest>? {
         guard let index = viewModel.featureRequests.firstIndex(where: { $0.id == id }) else {
             return nil
@@ -239,67 +266,98 @@ public struct FeaturePulseView: View {
 
     private var featureRequestsList: some View {
         Group {
-            // Show empty state if no feature requests and not loading
-            if viewModel.featureRequests.isEmpty, !viewModel.isLoading {
+            if viewModel.featureRequests.isEmpty, !viewModel.isLoading, configFetched {
                 emptyStateView
             } else {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        // Translate button for non-English users
-                        translateButton
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            translateButton
 
-                        // Feature requests list
-                        VStack {
-                            ForEach(displayedRequests) { request in
-                                Button {
-                                    selectedRequest = request
-                                } label: {
-                                    FeatureRequestRow(
-                                        request: request,
-                                        hasVoted: viewModel.hasVoted(for: request.id),
-                                        translatedTitle: enableTranslations ? translations[request.id]?.title : nil,
-                                        translatedDescription: enableTranslations ? translations[request.id]?.description : nil
-                                    ) {
-                                        await viewModel.toggleVote(for: request.id)
+                            VStack {
+                                ForEach(displayedRequests) { request in
+                                    Button {
+                                        selectedRequest = request
+                                    } label: {
+                                        FeatureRequestRow(
+                                            request: request,
+                                            hasVoted: viewModel.hasVoted(for: request.id),
+                                            translatedTitle: enableTranslations ? translations[request.id]?.title : nil,
+                                            translatedDescription: enableTranslations ? translations[request.id]?.description : nil
+                                        ) {
+                                            await viewModel.toggleVote(for: request.id)
+                                        }
                                     }
+                                    .buttonStyle(.plain)
+                                    .padding(.horizontal, 16)
+                                    .id(request.id)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(
+                                                FeaturePulse.shared.primaryColor,
+                                                lineWidth: highlightedRequestID == request.id ? 2 : 0
+                                            )
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, -4)
+                                    )
                                 }
-                                .buttonStyle(.plain)
+                            }
+                            .padding(.top, shouldShowTranslateButton ? 16 : 24)
+
+                            if configFetched {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Text(L10n.ctaMessage)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.leading)
+
+                                    Button {
+                                        handleFeatureRequestTap()
+                                    } label: {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "plus")
+                                                .font(.body.weight(.semibold))
+                                            Text(L10n.requestFeature)
+                                                .font(.body.weight(.semibold))
+                                        }
+                                        .frame(minHeight: 32)
+                                        .frame(maxWidth: .infinity)
+                                    }
+                                    .primaryGlassEffect()
+                                    .tint(Color(uiColor: .label))
+                                    .foregroundStyle(Color(uiColor: .systemBackground))
+                                }
                                 .padding(.horizontal, 16)
-                            }
-                        }
-                        .padding(.top, shouldShowTranslateButton ? 16 : 24)
+                                .padding(.vertical, 32)
 
-                        // CTA Section at bottom
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(L10n.ctaMessage)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.leading)
-
-                            Button {
-                                handleFeatureRequestTap()
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "plus")
-                                        .font(.body.weight(.semibold))
-                                    Text(L10n.requestFeature)
-                                        .font(.body.weight(.semibold))
+                                if config.showWatermark {
+                                    HStack(spacing: 6) {
+                                        Text(L10n.poweredBy)
+                                            .font(.footnote)
+                                            .foregroundStyle(.tertiary)
+                                        Image("Logo", bundle: .module)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 24)
+                                    }
+                                    .padding(.bottom, 24)
+                                    .unredacted()
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(Color(uiColor: .label))
-                                .foregroundStyle(Color(uiColor: .systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
-                            .buttonStyle(.plain)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 32)
                     }
-                }
-                .refreshable {
-                    Task {
-                        await viewModel.loadFeatureRequests(isRefresh: true)
+                    .refreshable {
+                        Task {
+                            await viewModel.loadFeatureRequests(isRefresh: true)
+                        }
+                    }
+                    .onChange(of: scrollToRequestID) { _, newID in
+                        if let id = newID {
+                            withAnimation(.smooth(duration: 0.5)) {
+                                proxy.scrollTo(id, anchor: .center)
+                            }
+                            scrollToRequestID = nil
+                        }
                     }
                 }
             }
@@ -325,11 +383,8 @@ public struct FeaturePulseView: View {
         )
     }
 
-    /// Returns feature requests or placeholder data when loading
     private var displayedRequests: [FeatureRequest] {
         if viewModel.isLoading, viewModel.featureRequests.isEmpty {
-            // Show placeholder items while loading
-            // Use previous count if available, otherwise default to 5
             let placeholderCount = max(viewModel.previousRequestCount, 5)
             return (0 ..< placeholderCount).map { index in
                 FeatureRequest(
@@ -345,7 +400,6 @@ public struct FeaturePulseView: View {
         return viewModel.featureRequests
     }
 
-    /// Empty state view when there are no feature requests
     private var emptyStateView: some View {
         VStack(spacing: 20) {
             Image(systemName: "lightbulb.fill")
@@ -386,7 +440,7 @@ public struct FeaturePulseView: View {
     }
 }
 
-// MARK: - Batch Translation Extension
+// MARK: - Batch Translation
 
 private extension View {
     @ViewBuilder
@@ -403,17 +457,12 @@ private extension View {
                     do {
                         var translatedAny = false
 
-                        // Translate all feature requests in batch
                         for request in requests {
-                            // Skip if already translated
                             guard translations.wrappedValue[request.id] == nil else { continue }
 
-                            // Capture text values locally to avoid data races
                             let titleToTranslate = request.title
                             let descToTranslate = request.description
 
-                            // Translate title and description with error handling
-                            // Use Task to avoid data races with session
                             let titleResponse = try await Task { @MainActor in
                                 try await session.translate(titleToTranslate)
                             }.value
@@ -431,21 +480,19 @@ private extension View {
                             }
                         }
 
-                        // Only enable translations if we successfully translated something
                         if translatedAny {
                             await MainActor.run {
                                 enableTranslations.wrappedValue = true
                             }
                         }
                     } catch {
-                        // Translation failed - make sure button stays off and mark language as not installed
                         await MainActor.run {
                             enableTranslations.wrappedValue = false
                             isLanguageInstalled.wrappedValue = false
                         }
                     }
                 }
-                .id((config as? TranslationSession.Configuration).debugDescription) // Force show download popup again
+                .id((config as? TranslationSession.Configuration).debugDescription)
             #else
                 self
             #endif
@@ -453,4 +500,8 @@ private extension View {
             self
         }
     }
+}
+
+#Preview("Default") {
+    FeaturePulseView()
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Individual feature request row
 struct FeatureRequestRow: View {
+    // MARK: - Properties
     let request: FeatureRequest
     let hasVoted: Bool
     let translatedTitle: String?
@@ -10,7 +11,7 @@ struct FeatureRequestRow: View {
 
     @State private var isVoting = false
     @State private var justVoted = false
-    @State private var scale: CGFloat = 1.0
+    @State private var isPressing = false
 
     private var displayTitle: String {
         translatedTitle ?? request.title
@@ -20,18 +21,22 @@ struct FeatureRequestRow: View {
         translatedDescription ?? request.description
     }
 
+    // MARK: - UI
     var body: some View {
         HStack(spacing: 12) {
             // Vote Button
             VStack(spacing: 4) {
-                if isVoting {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(hasVoted ? FeaturePulse.shared.primaryColor : voteColor)
-                } else {
+                ZStack {
                     Image(systemName: "triangle.fill")
                         .font(.caption2.weight(.semibold))
+                        .opacity(isVoting ? 0 : 1)
                         .symbolEffect(.bounce, value: justVoted)
+                        .scaleEffect(isPressing ? 1.2 : 1)
+
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(hasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
+                        .opacity(isVoting ? 1 : 0)
                 }
                 Text("\(request.voteCount)")
                     .font(.headline)
@@ -48,29 +53,33 @@ struct FeatureRequestRow: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(hasVoted ? Color.clear : voteColor.opacity(0.2), lineWidth: 1)
             )
-            .scaleEffect(scale)
             .contentShape(Rectangle())
-            .disabled(isVoting)
+            .scaleEffect(isPressing ? 0.9 : 1)
             .opacity(isVoting ? 0.6 : 1.0)
-            .onTapGesture {
-                guard !isVoting else { return }
-                Task {
-                    isVoting = true
-                    let success = await onVote()
-                    isVoting = false
-
-                    if success {
-                        // Animate vote/unvote
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            scale = 1.2
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        guard !isVoting else { return }
+                        withAnimation(.smooth(duration: 0.2)) {
+                            isPressing = true
                         }
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6).delay(0.1)) {
-                            scale = 1.0
-                        }
-                        justVoted.toggle()
                     }
-                }
-            }
+                    .onEnded { _ in
+                        withAnimation(.bouncy(duration: 0.5)) {
+                            isPressing = false
+                        }
+                        guard !isVoting else { return }
+                        Task {
+                            isVoting = true
+                            let success = await onVote()
+                            isVoting = false
+
+                            if success {
+                                justVoted.toggle()
+                            }
+                        }
+                    }
+            )
 
             // Content
             VStack(alignment: .leading, spacing: 6) {
@@ -120,4 +129,41 @@ struct FeatureRequestRow: View {
     private var voteColor: Color {
         FeaturePulse.shared.primaryColor
     }
+}
+
+// MARK: - Previews
+#Preview("Default") {
+    FeatureRequestRow(
+        request: FeatureRequest(
+            id: "1",
+            title: "Dark Mode Support",
+            description: "Add dark mode to make the app easier to use at night",
+            status: .pending,
+            voteCount: 42,
+            hasVoted: false
+        ),
+        hasVoted: false,
+        translatedTitle: nil,
+        translatedDescription: nil,
+        onVote: { true }
+    )
+    .padding()
+}
+
+#Preview("Voted") {
+    FeatureRequestRow(
+        request: FeatureRequest(
+            id: "2",
+            title: "Export to PDF",
+            description: "Allow users to export their data as PDF documents for offline viewing",
+            status: .inProgress,
+            voteCount: 128,
+            hasVoted: true
+        ),
+        hasVoted: true,
+        translatedTitle: nil,
+        translatedDescription: nil,
+        onVote: { true }
+    )
+    .padding()
 }

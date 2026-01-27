@@ -91,6 +91,10 @@ public extension FeaturePulse {
             String(localized: "ok", defaultValue: "OK", bundle: .module)
         }
 
+        public static var thankYou: String {
+            String(localized: "thank.you", defaultValue: "Thanks for your feedback!", bundle: .module)
+        }
+
         public static var invalidEmail: String {
             String(
                 localized: "invalid.email", defaultValue: "Please enter a valid email address",
@@ -204,6 +208,12 @@ public extension FeaturePulse {
 
         public static var showOriginal: String {
             String(localized: "Show Original", defaultValue: "Show Original", bundle: .module)
+        }
+
+        // MARK: - Branding
+
+        public static var poweredBy: String {
+            String(localized: "powered.by", defaultValue: "Powered by", bundle: .module)
         }
     }
 }

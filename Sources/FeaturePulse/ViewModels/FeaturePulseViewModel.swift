@@ -74,65 +74,54 @@ final class FeaturePulseViewModel: @unchecked Sendable {
     }
 
     func toggleVote(for id: String) async -> Bool {
-        let hasVoted = votedRequestIds.contains(id)
+        let wasVoted = votedRequestIds.contains(id)
+
+        await applyVoteUpdate(for: id, voted: !wasVoted)
 
         do {
-            await updateVoteOptimistically(for: id, currentlyVoted: hasVoted)
-
-            if hasVoted {
+            if wasVoted {
                 try await FeaturePulseAPI.shared.unvoteForFeatureRequest(id: id)
-                votedRequestIds.remove(id)
             } else {
                 try await FeaturePulseAPI.shared.voteForFeatureRequest(id: id)
-                votedRequestIds.insert(id)
             }
-
             return true
         } catch let error as FeaturePulseError where error == .alreadyVoted {
-            votedRequestIds.insert(id)
+            await MainActor.run { votedRequestIds.insert(id) }
             return false
         } catch {
-            await revertVoteUpdate(for: id, previouslyVoted: hasVoted, error: error)
+            await applyVoteUpdate(for: id, voted: wasVoted, error: error)
             return false
         }
     }
 
-    private func updateVoteOptimistically(for id: String, currentlyVoted: Bool) async {
-        await MainActor.run {
-            // Haptic feedback for vote action
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+    @MainActor
+    private func applyVoteUpdate(for id: String, voted: Bool, error: Error? = nil) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
 
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                updateVoteCount(for: id, increment: !currentlyVoted)
-            }
+        if voted {
+            votedRequestIds.insert(id)
+        } else {
+            votedRequestIds.remove(id)
         }
-    }
 
-    private func revertVoteUpdate(for id: String, previouslyVoted: Bool, error: Error) async {
-        await MainActor.run {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                updateVoteCount(for: id, increment: previouslyVoted)
-            }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            guard let index = featureRequests.firstIndex(where: { $0.id == id }) else { return }
+            let current = featureRequests[index]
+
+            featureRequests[index] = FeatureRequest(
+                id: current.id,
+                title: current.title,
+                description: current.description,
+                status: current.status,
+                voteCount: voted ? current.voteCount + 1 : max(0, current.voteCount - 1),
+                hasVoted: voted
+            )
+        }
+
+        if let error {
             voteErrorMessage = error.localizedDescription
             showVoteError = true
         }
-    }
-
-    private func updateVoteCount(for id: String, increment: Bool) {
-        guard let index = featureRequests.firstIndex(where: { $0.id == id }) else { return }
-
-        let current = featureRequests[index]
-        let newVoteCount = increment ? current.voteCount + 1 : max(0, current.voteCount - 1)
-
-        featureRequests[index] = FeatureRequest(
-            id: current.id,
-            title: current.title,
-            description: current.description,
-            status: current.status,
-            voteCount: newVoteCount,
-            hasVoted: increment
-        )
     }
 
     func hasVoted(for id: String) -> Bool {

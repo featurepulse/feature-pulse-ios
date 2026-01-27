@@ -2,21 +2,35 @@ import SwiftUI
 
 /// View for creating a new feature request
 public struct NewFeatureRequestView: View {
+    // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
+
     @State private var title = ""
     @State private var description = ""
     @State private var isSubmitting = false
     @State private var showError = false
     @State private var errorMessage = ""
+
     @FocusState private var focusedField: Field?
+
+    private var onSubmit: (() -> Void)?
 
     private enum Field: Hashable {
         case title
         case description
     }
 
-    public init() {}
+    private var isSubmitDisabled: Bool {
+        title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || isSubmitting
+    }
 
+    public init(onSubmit: (() -> Void)? = nil) {
+        self.onSubmit = onSubmit
+    }
+
+    // MARK: - UI
     public var body: some View {
         NavigationStack {
             Form {
@@ -34,6 +48,7 @@ public struct NewFeatureRequestView: View {
                                 }
                             }
                             .tint(FeaturePulse.shared.primaryColor)
+                            .disabled(isSubmitting)
 
                         HStack {
                             Spacer()
@@ -41,6 +56,8 @@ public struct NewFeatureRequestView: View {
                                 .font(.caption)
                                 .foregroundStyle(
                                     title.count >= 45 ? (title.count == 50 ? .red : .orange) : .secondary)
+                                .contentTransition(.numericText())
+                                .animation(.default, value: title.count)
                         }
                     }
                 } header: {
@@ -68,6 +85,7 @@ public struct NewFeatureRequestView: View {
                                 description = String(newValue.prefix(500))
                             }
                         }
+                        .disabled(isSubmitting)
 
                         HStack {
                             Spacer()
@@ -76,43 +94,13 @@ public struct NewFeatureRequestView: View {
                                 .foregroundStyle(
                                     description.count >= 450
                                         ? (description.count == 500 ? .red : .orange) : .secondary)
+                                .contentTransition(.numericText())
+                                .animation(.default, value: description.count)
                         }
                     }
+
                 } header: {
                     Text(L10n.descriptionHeader)
-                }
-
-                Section {
-                    Button {
-                        submitFeatureRequest()
-                    } label: {
-                        if isSubmitting {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                    .tint(.white)
-                                Spacer()
-                            }
-                        } else {
-                            HStack {
-                                Spacer()
-                                Text(L10n.submit)
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-                        }
-                    }
-                    .disabled(
-                        title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting
-                    )
-                    .listRowBackground(
-                        (title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            || isSubmitting)
-                            ? Color.gray.opacity(0.3) : FeaturePulse.shared.primaryColor
-                    )
-                    .foregroundStyle(FeaturePulse.shared.foregroundColor)
                 }
             }
             .navigationTitle(L10n.newFeatureRequest)
@@ -126,11 +114,24 @@ public struct NewFeatureRequestView: View {
                         }
                         .disabled(isSubmitting)
                     }
+
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Group {
+                            if isSubmitDisabled {
+                                glassSubmitButton(tint: Color.gray.opacity(0.3))
+                            } else {
+                                glassSubmitButton(tint: FeaturePulse.shared.primaryColor)
+                            }
+                        }
+                    }
                 }
                 .alert(L10n.error, isPresented: $showError) {
                     Button(L10n.ok, role: .cancel) {}
                 } message: {
                     Text(errorMessage)
+                }
+                .onAppear {
+                    focusedField = .title
                 }
         }
     }
@@ -162,7 +163,12 @@ public struct NewFeatureRequestView: View {
             return
         }
 
-        isSubmitting = true
+        // Dismiss keyboard
+        focusedField = nil
+
+        withAnimation(.smooth(duration: 0.3)) {
+            isSubmitting = true
+        }
 
         Task {
             do {
@@ -171,6 +177,7 @@ public struct NewFeatureRequestView: View {
                     description: description.trimmingCharacters(in: .whitespacesAndNewlines)
                 )
                 await MainActor.run {
+                    onSubmit?()
                     dismiss()
                 }
             } catch {
@@ -182,4 +189,36 @@ public struct NewFeatureRequestView: View {
             }
         }
     }
+}
+
+// MARK: - Views
+extension NewFeatureRequestView {
+    @ViewBuilder
+    private func glassSubmitButton(tint: Color) -> some View {
+        Button {
+            submitFeatureRequest()
+        } label: {
+            ZStack {
+                Text(L10n.submit)
+                    .offset(x: isSubmitting ? 50 : 0, y: isSubmitting ? -30 : 0)
+                    .scaleEffect(isSubmitting ? 0.5 : 1)
+                    .opacity(isSubmitting ? 0 : 1)
+
+                ProgressView()
+                    .controlSize(.small)
+                    .scaleEffect(isSubmitting ? 1 : 0)
+                    .opacity(isSubmitting ? 1 : 0)
+            }
+            .animation(.smooth(duration: 0.4), value: isSubmitting)
+        }
+        .foregroundStyle(FeaturePulse.shared.foregroundColor)
+        .tint(tint)
+        .buttonStyle(.borderedProminent)
+        .disabled(isSubmitDisabled)
+    }
+}
+
+// MARK: - Previews
+#Preview("Default") {
+    NewFeatureRequestView()
 }

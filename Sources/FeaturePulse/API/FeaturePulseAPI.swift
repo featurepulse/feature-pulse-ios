@@ -1,361 +1,136 @@
-import SwiftUI
-
-/// API response wrapper
-private struct APIResponse<T: Codable>: Codable {
-    let success: Bool
-    let data: T
-}
-
-private struct FeatureRequestsResponse: Codable {
-    let success: Bool
-    let data: [FeatureRequest]
-    let showStatus: Bool?
-    let showTranslation: Bool?
-    let permissions: Permissions?
-
-    enum CodingKeys: String, CodingKey {
-        case success, data, permissions
-        case showStatus = "show_status"
-        case showTranslation = "show_translation"
-    }
-}
-
-private struct ActivityResponse: Codable {
-    let success: Bool
-    let message: String?
-}
+import Foundation
 
 /// API client for communicating with FeaturePulse backend
 public final class FeaturePulseAPI: Sendable {
     public static let shared = FeaturePulseAPI()
 
-    private let session = URLSession.shared
+    private let client = NetworkClient.shared
 
     private init() {}
 
-    // MARK: - Track Activity
-
+    // MARK: - Activity Tracking
     /// Tracks user activity (app opens) for engagement metrics
+    /// - Parameter type: The type of activity to track (default: "app_open")
     public func trackActivity(type: String = "app_open") async throws {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
-        }
+        let request = ActivityRequest(
+            userIdentifier: config.user.deviceID,
+            activityType: type
+        )
 
-        let urlString = "\(config.baseURL)/api/sdk/activity"
-        guard let url = URL(string: urlString) else {
-            throw FeaturePulseError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(config.apiKey, forHTTPHeaderField: "x-api-key")
-
-        let body: [String: Any] = [
-            "user_identifier": config.user.deviceID,
-            "activity_type": type
-        ]
-
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
-        }
-
-        if !(200 ... 299).contains(httpResponse.statusCode) {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
-
-        // Decode response (optional, just for validation)
-        _ = try JSONDecoder().decode(ActivityResponse.self, from: data)
+        let _: ActivityResponse = try await client.request(.activity, body: request)
     }
 
-    // MARK: - Fetch Feature Requests
-
+    // MARK: - Feature Requests
     /// Fetches all feature requests for the configured project
+    /// - Returns: Array of feature requests
     public func fetchFeatureRequests() async throws -> [FeatureRequest] {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
-        }
-
-        // Add device_id query parameter for filtering pending requests
-        var urlComponents = URLComponents(string: "\(config.baseURL)/api/sdk/feature-requests")
-        urlComponents?.queryItems = [
+        let queryItems = [
             URLQueryItem(name: "device_id", value: config.user.deviceID)
         ]
 
-        guard let url = urlComponents?.url else {
-            throw FeaturePulseError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.addValue(config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
-        }
-
-        guard httpResponse.statusCode == 200 else {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
-
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-
-        let apiResponse = try decoder.decode(FeatureRequestsResponse.self, from: data)
+        let response: FeatureRequestsResponse = try await client.request(
+            .featureRequests,
+            queryItems: queryItems
+        )
 
         // Update configuration with settings from server
-        if let showStatus = apiResponse.showStatus {
-            config.showStatus = showStatus
-        }
+        applyServerSettings(from: response)
 
-        if let showTranslation = apiResponse.showTranslation {
-            config.showTranslation = showTranslation
-        }
-
-        // Update permissions from server
-        if let permissions = apiResponse.permissions {
-            config.permissions = permissions
-        }
-
-        return apiResponse.data
+        return response.data
     }
-
-    // MARK: - Submit Feature Request
 
     /// Submits a new feature request
-    public func submitFeatureRequest(
-        title: String,
-        description: String
-    ) async throws {
+    /// - Parameters:
+    ///   - title: Title of the feature request
+    ///   - description: Detailed description
+    public func submitFeatureRequest(title: String, description: String) async throws {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
-        }
+        let deviceInfo = DeviceInfo(
+            deviceID: config.user.deviceID,
+            bundleID: Bundle.main.bundleIdentifier ?? "unknown"
+        )
 
-        let urlString = "\(config.baseURL)/api/sdk/feature-requests"
-        guard let url = URL(string: urlString) else {
-            throw FeaturePulseError.invalidURL
-        }
+        let request = SubmitFeatureRequest(
+            title: title,
+            description: description,
+            deviceInfo: deviceInfo,
+            paymentType: config.user.payment?.paymentType.rawValue,
+            monthlyValueCents: config.user.payment?.monthlyValueInCents,
+            originalAmountCents: config.user.payment.map {
+                NSDecimalNumber(decimal: $0.originalAmount * 100).intValue
+            },
+            currency: config.user.payment?.currency
+        )
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue(config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        // Use user information from configuration
-        let deviceInfo: [String: Any] = [
-            "device_id": config.user.deviceID,
-            "bundle_id": Bundle.main.bundleIdentifier ?? "unknown"
-        ]
-
-        var body: [String: Any] = [
-            "title": title,
-            "description": description,
-            "device_info": deviceInfo
-        ]
-
-        // Include payment information if available
-        if let payment = config.user.payment {
-            body["payment_type"] = payment.paymentType.rawValue
-            body["monthly_value_cents"] = payment.monthlyValueInCents
-            body["original_amount_cents"] =
-                NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
-            body["currency"] = payment.currency
-        }
-
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (_, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
-        }
-
-        // Handle payment required (403 Forbidden)
-        if httpResponse.statusCode == 403 {
-            throw FeaturePulseError.paymentRequired
-        }
-
-        guard (200 ... 299).contains(httpResponse.statusCode) else {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
+        try await client.requestVoid(.submitFeatureRequest, body: request)
     }
 
-    // MARK: - Vote for Feature Request
-
+    // MARK: - Voting
     /// Votes for a feature request
+    /// - Parameter id: The feature request ID to vote for
     public func voteForFeatureRequest(id: String) async throws {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
-        }
+        let request = VoteRequest(
+            deviceID: config.user.deviceID,
+            paymentType: config.user.payment?.paymentType.rawValue,
+            monthlyValueCents: config.user.payment?.monthlyValueInCents
+        )
 
-        let urlString = "\(config.baseURL)/api/sdk/feature-requests/\(id)/vote"
-        guard let url = URL(string: urlString) else {
-            throw FeaturePulseError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue(config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        // Send device_id to track votes per user and payment info for MRR tracking
-        var body: [String: Any] = [
-            "device_id": config.user.deviceID
-        ]
-
-        // Include payment information if available
-        if let payment = config.user.payment {
-            body["payment_type"] = payment.paymentType.rawValue
-            body["monthly_value_cents"] = payment.monthlyValueInCents
-        }
-
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (_, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
-        }
-
-        // Handle duplicate vote (409 Conflict)
-        if httpResponse.statusCode == 409 {
-            throw FeaturePulseError.alreadyVoted
-        }
-
-        guard (200 ... 299).contains(httpResponse.statusCode) else {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
+        try await client.requestVoid(.vote(featureRequestID: id), body: request)
     }
 
-    // MARK: - Update User
+    /// Removes vote from a feature request
+    /// - Parameter id: The feature request ID to unvote
+    public func unvoteForFeatureRequest(id: String) async throws {
+        let config = FeaturePulse.shared
 
+        let request = UnvoteRequest(deviceID: config.user.deviceID)
+
+        try await client.requestVoid(.unvote(featureRequestID: id), body: request)
+    }
+
+    // MARK: - User Management
     /// Syncs user information including payment data to the backend
     public func syncUser() async throws {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
-        }
+        let request = SyncUserRequest(
+            userIdentifier: config.user.userIdentifier,
+            customID: config.user.customID,
+            paymentType: config.user.payment?.paymentType.rawValue,
+            monthlyValueCents: config.user.payment?.monthlyValueInCents,
+            originalAmountCents: config.user.payment.map {
+                NSDecimalNumber(decimal: $0.originalAmount * 100).intValue
+            },
+            currency: config.user.payment?.currency
+        )
 
-        let urlString = "\(config.baseURL)/api/sdk/user"
-        guard let url = URL(string: urlString) else {
-            throw FeaturePulseError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue(config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        // Prepare user data
-        var body: [String: Any] = [
-            "user_identifier": config.user.userIdentifier
-        ]
-
-        if let customID = config.user.customID {
-            body["custom_id"] = customID
-        }
-
-        // Include payment information if available
-        if let payment = config.user.payment {
-            body["payment_type"] = payment.paymentType.rawValue
-            body["monthly_value_cents"] = payment.monthlyValueInCents
-            body["original_amount_cents"] =
-                NSDecimalNumber(decimal: payment.originalAmount * 100).intValue
-            body["currency"] = payment.currency
-        }
-
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (_, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
-        }
-
-        if !(200 ... 299).contains(httpResponse.statusCode) {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
+        try await client.requestVoid(.syncUser, body: request)
     }
 
-    /// Removes vote from a feature request
-    public func unvoteForFeatureRequest(id: String) async throws {
+    private func applyServerSettings(from response: FeatureRequestsResponse) {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
-            throw FeaturePulseError.missingAPIKey
+        if let showStatus = response.showStatus {
+            config.showStatus = showStatus
         }
 
-        let urlString = "\(config.baseURL)/api/sdk/feature-requests/\(id)/vote"
-        guard let url = URL(string: urlString) else {
-            throw FeaturePulseError.invalidURL
+        if let showTranslation = response.showTranslation {
+            config.showTranslation = showTranslation
         }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        request.addValue(config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        // Send device_id to identify which vote to remove
-        let body: [String: Any] = [
-            "device_id": config.user.deviceID
-        ]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (_, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeaturePulseError.invalidResponse
+        if let showWatermark = response.showWatermark {
+            config.showWatermark = showWatermark
         }
 
-        guard (200 ... 299).contains(httpResponse.statusCode) else {
-            throw FeaturePulseError.serverError(httpResponse.statusCode)
-        }
-    }
-}
-
-// MARK: - Errors
-
-/// Errors that can occur when using the FeaturePulse API
-public enum FeaturePulseError: LocalizedError, Equatable {
-    case missingAPIKey
-    case invalidURL
-    case invalidResponse
-    case serverError(Int)
-    case decodingError
-    case alreadyVoted
-    case paymentRequired
-
-    public var errorDescription: String? {
-        switch self {
-        case .missingAPIKey:
-            "API key is required. Set it in FeaturePulse.shared.apiKey"
-        case .invalidURL:
-            "Invalid URL"
-        case .invalidResponse:
-            "Invalid response from server"
-        case let .serverError(code):
-            "Server error: \(code)"
-        case .decodingError:
-            "Failed to decode response"
-        case .alreadyVoted:
-            "You have already voted for this feature request"
-        case .paymentRequired:
-            "Subscription required to create feature requests"
+        if let permissions = response.permissions {
+            config.permissions = permissions
         }
     }
 }

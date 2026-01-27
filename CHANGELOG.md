@@ -5,6 +5,45 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-01-27
+
+### ✨ New Features
+
+- **Watermark Control** - API-controlled "Powered by FeaturePulse" branding
+  - Free tier users see watermark branding in the SDK
+  - Premium/Enterprise users have watermark hidden automatically
+  - No SDK configuration needed - controlled entirely from your subscription
+
+- **Thank You Toast** - Shows confirmation after submitting feedback
+  - Instant toast notification with checkmark animation
+  - Auto-dismisses after the new request is highlighted
+  - Localized in all supported languages
+
+- **Scroll & Highlight New Requests** - Better UX after submission
+  - Automatically scrolls to the newly created feature request
+  - Highlights with a border animation for 2 seconds
+  - Smooth `.smooth(duration: 0.5)` animation
+
+### 🔧 Improvements
+
+- **Type-Safe API Layer** - Refactored internal networking
+  - New `APIEndpoint` enum for type-safe endpoint definitions
+  - Generic `NetworkClient` with async/await support
+  - Cleaner separation of concerns with dedicated response/request models
+
+### 📦 Installation
+
+```swift
+.package(url: "https://github.com/featurepulse/feature-pulse-ios.git", from: "1.7.0")
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.6.3] - 2025-12-26
 
 ### 🔧 Improvements

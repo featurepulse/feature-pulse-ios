@@ -14,6 +14,20 @@ public struct FeaturePulseSessionTracker: ViewModifier {
 }
 
 public extension View {
+    /// Applies a tinted glass effect on iOS 26+, falls back to styled button on older versions
+    /// - Parameter color: The tint color to apply (defaults to primaryColor)
+    @ViewBuilder
+    func primaryGlassEffect() -> some View {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            glassEffect(.regular.interactive())
+                .buttonStyle(.borderedProminent)
+        } else {
+            buttonStyle(.borderedProminent)
+        }
+    }
+}
+
+public extension View {
     /// Automatically track app sessions when the view becomes active
     /// Tracks app opens with a 30-minute timeout (Firebase-style)
     ///
@@ -86,6 +100,9 @@ public final class FeaturePulse: @unchecked Sendable {
     /// User permissions (fetched from API)
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var permissions: Permissions = .init(canCreateFeatureRequest: true)
+
+    /// Whether to show watermark branding (controlled from API based on subscription)
+    public internal(set) var showWatermark: Bool = true
 
     /// How to handle feature request restrictions (nil = default alert with "Pro")
     public var restrictionMode: RestrictionMode?
