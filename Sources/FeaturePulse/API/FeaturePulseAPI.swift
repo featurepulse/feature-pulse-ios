@@ -129,6 +129,10 @@ public final class FeaturePulseAPI: Sendable {
             config.showWatermark = showWatermark
         }
 
+        if let statusConfig = response.statusConfig {
+            config.statusConfig = statusConfig
+        }
+
         if let permissions = response.permissions {
             config.permissions = permissions
         }

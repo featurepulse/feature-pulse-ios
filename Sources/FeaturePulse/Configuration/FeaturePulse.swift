@@ -101,6 +101,10 @@ public final class FeaturePulse: @unchecked Sendable {
     /// This value is set automatically by the API and cannot be changed by the client
     public internal(set) var permissions: Permissions = .init(canCreateFeatureRequest: true)
 
+    /// Status appearance configuration (color hex + SF Symbol) from API
+    /// This value is set automatically by the API and cannot be changed by the client
+    public internal(set) var statusConfig: StatusConfig?
+
     /// Whether to show watermark branding (controlled from API based on subscription)
     public internal(set) var showWatermark: Bool = true
 

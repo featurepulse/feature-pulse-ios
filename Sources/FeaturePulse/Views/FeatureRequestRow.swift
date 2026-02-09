@@ -95,7 +95,8 @@ struct FeatureRequestRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 // Show status badge only if enabled from dashboard
-                if FeaturePulse.shared.showStatus {
+                // Hide "approved" badge for non-owners
+                if FeaturePulse.shared.showStatus, !(request.status == .approved && !request.isOwner) {
                     HStack(spacing: 4) {
                         Image(systemName: request.status.systemImage)
                             .font(.system(size: 11, weight: .semibold))

@@ -33,7 +33,7 @@ struct FeatureRequestDetailView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if FeaturePulse.shared.showStatus {
+                    if FeaturePulse.shared.showStatus, !(request.status == .approved && !request.isOwner) {
                         HStack(spacing: 4) {
                             Image(systemName: request.status.systemImage)
                                 .font(.system(size: 11, weight: .semibold))

@@ -8,6 +8,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
     @Default<FirstCase> public var status: FeatureRequestStatus
     public let voteCount: Int
     public let hasVoted: Bool
+    public let isOwner: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -16,6 +17,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         case status
         case voteCount = "vote_count"
         case hasVoted = "has_voted"
+        case isOwner = "is_owner"
     }
 
     public init(
@@ -24,7 +26,8 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         description: String,
         status: FeatureRequestStatus,
         voteCount: Int,
-        hasVoted: Bool = false
+        hasVoted: Bool = false,
+        isOwner: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -32,6 +35,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         _status = Default(wrappedValue: status)
         self.voteCount = voteCount
         self.hasVoted = hasVoted
+        self.isOwner = isOwner
     }
 
     // MARK: - Equatable
@@ -42,7 +46,8 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
             lhs.description == rhs.description &&
             lhs.status == rhs.status &&
             lhs.voteCount == rhs.voteCount &&
-            lhs.hasVoted == rhs.hasVoted
+            lhs.hasVoted == rhs.hasVoted &&
+            lhs.isOwner == rhs.isOwner
     }
 
     // MARK: - Hashable
@@ -54,5 +59,6 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         hasher.combine(status)
         hasher.combine(voteCount)
         hasher.combine(hasVoted)
+        hasher.combine(isOwner)
     }
 }

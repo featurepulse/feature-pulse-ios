@@ -62,6 +62,10 @@ public extension FeaturePulse {
                 String(localized: "status.approved", defaultValue: "Approved", bundle: .module)
             }
 
+            public static var planned: String {
+                String(localized: "status.planned", defaultValue: "Planned", bundle: .module)
+            }
+
             public static var inProgress: String {
                 String(localized: "status.in_progress", defaultValue: "In Progress", bundle: .module)
             }
