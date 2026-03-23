@@ -133,6 +133,7 @@ struct FeatureRequestDetailView: View {
                 .foregroundStyle(localHasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .buttonStyle(.plain)
             .disabled(isVoting)
         }
     }

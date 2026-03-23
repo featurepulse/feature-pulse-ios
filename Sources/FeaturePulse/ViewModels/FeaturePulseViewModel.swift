@@ -1,5 +1,7 @@
 import SwiftUI
+#if os(iOS)
 import UIKit
+#endif
 
 /// ViewModel managing feature requests state and operations
 @Observable
@@ -96,7 +98,9 @@ final class FeaturePulseViewModel: @unchecked Sendable {
 
     @MainActor
     private func applyVoteUpdate(for id: String, voted: Bool, error: Error? = nil) {
+        #if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        #endif
 
         if voted {
             votedRequestIds.insert(id)

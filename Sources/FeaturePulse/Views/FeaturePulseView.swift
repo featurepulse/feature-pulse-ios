@@ -26,14 +26,14 @@ public struct FeaturePulseView: View {
     private var shouldShowTranslateButton: Bool {
         guard config.showTranslation else { return false }
 
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, macOS 15.0, *) {
             let deviceLanguage = Locale.current.language.languageCode?.identifier ?? "en"
             return !deviceLanguage.hasPrefix("en")
         }
         return false
     }
 
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, macOS 15.0, *)
     private func checkLanguageAvailability() async {
         #if canImport(Translation)
             isCheckingLanguage = true
@@ -69,7 +69,7 @@ public struct FeaturePulseView: View {
                                 enableTranslations = true
                             }
                         } else {
-                            if #available(iOS 18.0, *) {
+                            if #available(iOS 18.0, macOS 15.0, *) {
                                 #if canImport(Translation)
                                     if var config = translationConfig as? TranslationSession.Configuration {
                                         config.invalidate()
@@ -137,14 +137,16 @@ public struct FeaturePulseView: View {
             }
         }
         .navigationTitle(L10n.featureRequests)
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(L10n.requestFeature, systemImage: "plus") {
                     handleFeatureRequestTap()
                 }
-                .foregroundStyle(Color(uiColor: .systemBackground))
-                .tint(Color(uiColor: .label))
+                .foregroundStyle(Color.systemBackground)
+                .tint(Color.label)
                 .disabled(!configFetched)
             }
         }
@@ -208,7 +210,7 @@ public struct FeaturePulseView: View {
             configFetched = true
 
             if shouldShowTranslateButton {
-                if #available(iOS 18.0, *) {
+                if #available(iOS 18.0, macOS 15.0, *) {
                     await checkLanguageAvailability()
                 }
             }
@@ -220,10 +222,10 @@ public struct FeaturePulseView: View {
                     Text(L10n.thankYou)
                         .font(.subheadline.weight(.medium))
                 }
-                .foregroundStyle(Color(uiColor: .systemBackground))
+                .foregroundStyle(Color.systemBackground)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(Color(uiColor: .label), in: Capsule())
+                .background(Color.label, in: Capsule())
                 .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
                 .padding(.top, 8)
                 .transition(.move(edge: .top).combined(with: .opacity))
@@ -324,8 +326,8 @@ public struct FeaturePulseView: View {
                                         .frame(maxWidth: .infinity)
                                     }
                                     .primaryGlassEffect()
-                                    .tint(Color(uiColor: .label))
-                                    .foregroundStyle(Color(uiColor: .systemBackground))
+                                    .tint(Color.label)
+                                    .foregroundStyle(Color.systemBackground)
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 32)
@@ -429,8 +431,8 @@ public struct FeaturePulseView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(Color(uiColor: .label))
-                .foregroundStyle(Color(uiColor: .systemBackground))
+                .background(Color.label)
+                .foregroundStyle(Color.systemBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .buttonStyle(.plain)
@@ -451,7 +453,7 @@ private extension View {
         enableTranslations: Binding<Bool>,
         isLanguageInstalled: Binding<Bool>
     ) -> some View {
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, macOS 15.0, *) {
             #if canImport(Translation)
                 translationTask(config as? TranslationSession.Configuration) { session in
                     do {

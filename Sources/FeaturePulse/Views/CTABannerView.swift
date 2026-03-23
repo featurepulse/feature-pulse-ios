@@ -89,7 +89,7 @@ struct CTABannerView: View {
             NavigationStack {
                 FeaturePulse.shared.view()
                     .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
+                        ToolbarItem(placement: .cancellationAction) {
                             Button {
                                 showFeaturePulse = false
                             } label: {
@@ -113,5 +113,5 @@ struct CTABannerView: View {
         Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(.systemGroupedBackground))
+    .background(Color.primary.opacity(0.05))
 }

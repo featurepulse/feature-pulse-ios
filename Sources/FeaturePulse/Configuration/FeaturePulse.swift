@@ -86,7 +86,7 @@ public final class FeaturePulse: @unchecked Sendable {
     public var primaryColor: Color = .init(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
 
     /// Foreground color for vote title and icons and new feature request button CTA
-    public var foregroundColor: Color = .init(uiColor: .white)
+    public var foregroundColor: Color = .white
 
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
