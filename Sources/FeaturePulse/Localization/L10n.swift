@@ -189,6 +189,18 @@ public extension FeaturePulse {
             )
         }
 
+        public static var emptyStateCompletedTitle: String {
+            String(localized: "empty.state.completed.title", defaultValue: "No Completed Features Yet", bundle: .module)
+        }
+
+        public static var emptyStateCompletedMessage: String {
+            String(
+                localized: "empty.state.completed.message",
+                defaultValue: "Completed features will appear here.",
+                bundle: .module
+            )
+        }
+
         // MARK: - Restrictions
         public static var restrictionAlertTitle: String {
             String(localized: "restriction.alert.title", defaultValue: "Subscription Required", bundle: .module)

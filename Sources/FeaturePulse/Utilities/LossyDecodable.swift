@@ -6,8 +6,10 @@ public protocol DefaultValueProvider {
     static var defaultValue: Value { get }
 }
 
+// swiftlint:disable line_length
 /// Provides the first case of a CaseIterable enum as default
 public struct FirstCase<T: Codable & CaseIterable>: DefaultValueProvider, Sendable where T: RawRepresentable, T.RawValue == String, T: Sendable {
+    // swiftlint:enable line_length
     public static var defaultValue: T {
         T.allCases.first!
     }
@@ -15,7 +17,9 @@ public struct FirstCase<T: Codable & CaseIterable>: DefaultValueProvider, Sendab
 
 /// Property wrapper that provides a default value when decoding fails
 @propertyWrapper
+// swiftlint:disable line_length
 public struct Default<Provider: DefaultValueProvider>: Codable, Equatable, Hashable, Sendable where Provider.Value: Equatable & Hashable & Sendable, Provider: Sendable {
+    // swiftlint:enable line_length
     public var wrappedValue: Provider.Value
 
     public init(wrappedValue: Provider.Value) {

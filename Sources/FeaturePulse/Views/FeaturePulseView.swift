@@ -223,6 +223,9 @@ public struct FeaturePulseView: View {
             NewFeatureRequestView {
                 Task {
                     await viewModel.loadFeatureRequests()
+                    await MainActor.run {
+                        withAnimation(.smooth) { selectedTab = .requests }
+                    }
 
                     let newRequest = viewModel.featureRequests.first { !existingRequestIDs.contains($0.id) }
                     if let newRequest {
@@ -396,7 +399,7 @@ public struct FeaturePulseView: View {
 
     private var featureRequestsList: some View {
         Group {
-            if viewModel.featureRequests.isEmpty, !viewModel.isLoading, configFetched {
+            if displayedRequests.isEmpty, !viewModel.isLoading, configFetched {
                 emptyStateView
             } else {
                 ScrollViewReader { proxy in
@@ -541,39 +544,41 @@ public struct FeaturePulseView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "lightbulb.fill")
+            Image(systemName: selectedTab == .completed ? "checkmark.circle" : "lightbulb.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(FeaturePulse.shared.primaryColor)
                 .symbolEffect(.pulse)
 
             VStack(spacing: 8) {
-                Text(L10n.emptyStateTitle)
+                Text(selectedTab == .completed ? L10n.emptyStateCompletedTitle : L10n.emptyStateTitle)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.primary)
 
-                Text(L10n.emptyStateMessage)
+                Text(selectedTab == .completed ? L10n.emptyStateCompletedMessage : L10n.emptyStateMessage)
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
-            Button {
-                handleFeatureRequestTap()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "plus")
-                        .font(.body.weight(.semibold))
-                    Text(L10n.requestFeature)
-                        .font(.body.weight(.semibold))
+            if selectedTab == .requests {
+                Button {
+                    handleFeatureRequestTap()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus")
+                            .font(.body.weight(.semibold))
+                        Text(L10n.requestFeature)
+                            .font(.body.weight(.semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.label)
+                    .foregroundStyle(Color.systemBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.label)
-                .foregroundStyle(Color.systemBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .buttonStyle(.plain)
+                .padding(.top, 12)
             }
-            .buttonStyle(.plain)
-            .padding(.top, 12)
         }
         .padding(.horizontal, 40)
     }

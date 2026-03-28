@@ -31,7 +31,7 @@ public extension View {
     /// Automatically track app sessions when the view becomes active
     /// Tracks app opens with a 30-minute timeout (Firebase-style)
     ///
-    /// Simply add this modifier to your root view inside `WindowGroup` to enable session tracking. No configuration needed!
+    /// Simply add this modifier to your root view inside `WindowGroup` to enable session tracking.
     ///
     /// # Example Usage:
     /// ```swift
