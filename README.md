@@ -1,15 +1,12 @@
 # FeaturePulse iOS SDK
 
-A modern SwiftUI-only SDK for collecting and managing feature requests from your iOS app users.
+![iOS](https://img.shields.io/badge/iOS-17%2B-blue?logo=apple)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple)
+![Swift](https://img.shields.io/badge/Swift-6.0-orange?logo=swift)
+![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen)
+![Languages](https://img.shields.io/badge/languages-7-informational)
 
-## Features
-
-✅ **SwiftUI-Only** - Pure SwiftUI implementation, no UIKit dependencies
-✅ **Modern Swift 6.0** - Uses `@Observable`, async/await, and Swift Concurrency
-✅ **Type-Safe Localization** - String Catalogs with compile-time checking
-✅ **Multi-Language Support** - English, Spanish, French, German, Italian, Portuguese, Chinese Simplified included
-✅ **Customizable** - Override any translation or appearance setting
-✅ **Simple Integration** - Just 3 lines of code to get started
+A SwiftUI SDK for collecting and managing feature requests from your app users.
 
 ## Screenshots
 
@@ -18,13 +15,6 @@ A modern SwiftUI-only SDK for collecting and managing feature requests from your
   <img src="Screenshots/feature-pulse-screenshot-detail-blue.png" width="250" alt="Feature Request Detail">
   <img src="Screenshots/feature-pulse-screenshot-new-blue.png" width="250" alt="Submit New Feature">
 </p>
-
-## Requirements
-
-- iOS 17.0+
-- macOS 14.0+
-- Swift 6.0+
-- Xcode 15.0+
 
 ## Installation
 
@@ -577,14 +567,15 @@ FeaturePulse includes translations for:
 
 The SDK automatically uses the user's device language. No additional configuration needed!
 
-### Adding More Languages
-
-To add more languages:
+<details>
+<summary>Adding more languages</summary>
 
 1. Open `Localizable.xcstrings` in Xcode
 2. Click "+" to add a new language
 3. Translate all strings
 4. Rebuild the package
+
+</details>
 
 ## API Reference
 
