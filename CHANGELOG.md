@@ -5,6 +5,28 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-03-28
+
+### ✨ New Features
+
+- **Requests / Completed tabs** - Toolbar picker to switch between active feature requests and completed ones
+- **Sorting** - Sort requests by Top (most votes) or Newest, with reset option
+- **All users can submit** - Feature request submission no longer requires a premium subscription
+- **Chinese Simplified localization** - Added zh-Hans support
+
+### 📦 Installation
+
+```swift
+.package(url: "https://github.com/featurepulse/feature-pulse-ios.git", from: "1.10.0")
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.9.0] - 2026-03-23
 
 ### ✨ New Features
@@ -747,24 +769,24 @@ let payment: FeaturePulse.Payment = {
   - Detail view for viewing full request information
   - Real-time vote count updates
   - Status badges (pending, approved, in progress, completed, rejected)
-  
+
 - **Customization**
   - **Primary Color** - Customize vote and submit button colors to match your brand
   - **Status Badge Visibility** - Dashboard-controlled option to show/hide status badges
-  
+
 - **User Management**
   - Stable device-based user identification
   - Custom user ID support
   - Email collection (optional, hidden by default)
   - User name tracking
-  
+
 - **Vote Weighting by Payment Tier** 💰
   - Free users: 0 weight
   - Paid users: Weighted by Monthly Recurring Revenue (MRR)
   - Support for weekly, monthly, yearly, and lifetime subscriptions
   - Automatic MRR calculation from any subscription type
   - Perfect for prioritizing paying customer feedback
-  
+
 - **Multi-Language Support** 🌍
   - **Type-Safe Localization** using String Catalogs (`.xcstrings`)
   - Built-in translations for 4 languages:
@@ -773,19 +795,19 @@ let payment: FeaturePulse.Payment = {
     - 🇫🇷 French (Français)
     - 🇩🇪 German (Deutsch)
   - Automatic language selection based on device settings
-  
+
 - **Shimmer Loading Effect** - Elegant loading animation with smart placeholder count
 - **Smart Keyboard Handling** ⌨️
   - `@FocusState` for seamless field navigation
   - Return key changes based on context: "Next" → "Send"
   - Press "Send" on last field to submit form directly
   - Automatic field progression (Title → Description → Email)
-  
+
 - **Privacy-Focused** 🔒
   - Email field hidden by default
   - Device ID-only tracking unless email explicitly enabled
   - Dashboard control for email field visibility
-  
+
 - **RevenueCat Integration Support** - Easy sync with subscription data for vote weighting
 
 #### 🎨 UI/UX
@@ -814,4 +836,3 @@ let payment: FeaturePulse.Payment = {
 
 - [GitHub Repository](https://github.com/featurepulse/feature-pulse-ios)
 - [Release v1.0.0](https://github.com/featurepulse/feature-pulse-ios/releases/tag/1.0.0)
-

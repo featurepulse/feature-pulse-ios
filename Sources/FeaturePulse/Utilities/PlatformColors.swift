@@ -4,18 +4,18 @@ extension Color {
     /// Adaptive background color (UIColor.systemBackground on iOS, NSColor.windowBackgroundColor on macOS)
     static var systemBackground: Color {
         #if os(iOS)
-        Color(uiColor: .systemBackground)
+            Color(uiColor: .systemBackground)
         #else
-        Color(nsColor: .windowBackgroundColor)
+            Color(nsColor: .windowBackgroundColor)
         #endif
     }
 
     /// Adaptive label color (UIColor.label on iOS, NSColor.labelColor on macOS)
     static var label: Color {
         #if os(iOS)
-        Color(uiColor: .label)
+            Color(uiColor: .label)
         #else
-        Color(nsColor: .labelColor)
+            Color(nsColor: .labelColor)
         #endif
     }
 }

@@ -20,7 +20,13 @@ struct FeatureRequestDetailView: View {
         translatedDescription ?? request.description
     }
 
-    init(request: Binding<FeatureRequest>, hasVoted: Bool, translatedTitle: String? = nil, translatedDescription: String? = nil, onVote: @escaping () async -> Bool) {
+    init(
+        request: Binding<FeatureRequest>,
+        hasVoted: Bool,
+        translatedTitle: String? = nil,
+        translatedDescription: String? = nil,
+        onVote: @escaping () async -> Bool
+    ) {
         _request = request
         self.hasVoted = hasVoted
         self.translatedTitle = translatedTitle
@@ -123,7 +129,7 @@ struct FeatureRequestDetailView: View {
                             .font(.caption2.weight(.semibold))
                             .symbolEffect(.bounce, value: request.hasVoted)
                     }
-                    Text("\(request.voteCount)")
+                    Text(verbatim: "\(request.voteCount)")
                         .font(.subheadline.weight(.semibold))
                         .contentTransition(.numericText(value: Double(request.voteCount)))
                 }

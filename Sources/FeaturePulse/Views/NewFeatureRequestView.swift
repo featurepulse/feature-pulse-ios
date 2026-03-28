@@ -2,7 +2,6 @@ import SwiftUI
 
 /// View for creating a new feature request
 public struct NewFeatureRequestView: View {
-    
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
 
@@ -59,54 +58,64 @@ public struct NewFeatureRequestView: View {
     public var body: some View {
         NavigationStack {
             #if os(macOS)
-            macOSContent
+                macOSContent
             #else
-            iOSContent
+                iOSContent
             #endif
         }
     }
 
     // MARK: - macOS
     #if os(macOS)
-    private var macOSContent: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text(L10n.newFeatureRequest).font(.headline)
+        private var macOSContent: some View {
+            VStack(alignment: .leading, spacing: 20) {
+                Text(L10n.newFeatureRequest).font(.headline)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.titleHeader).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
-                TextField(L10n.titlePlaceholder, text: $title)
-                    .focused($focusedField, equals: .title)
-                    .textFieldStyle(.roundedBorder)
-                    .tint(FeaturePulse.shared.primaryColor)
-                    .disabled(isSubmitting)
-                    .onChange(of: title) { _, v in if v.count > Limits.titleMax { title = String(v.prefix(Limits.titleMax)) } }
-                charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.titleHeader).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
+                    TextField(L10n.titlePlaceholder, text: $title)
+                        .focused($focusedField, equals: .title)
+                        .textFieldStyle(.roundedBorder)
+                        .tint(FeaturePulse.shared.primaryColor)
+                        .disabled(isSubmitting)
+                        .onChange(of: title) { _, newValue in
+                            if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
+                        }
+                    charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.descriptionHeader).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
+                    TextEditor(text: $description)
+                        .focused($focusedField, equals: .description)
+                        .frame(minHeight: 100)
+                        .tint(FeaturePulse.shared.primaryColor)
+                        .disabled(isSubmitting)
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
+                        .onChange(of: description) { _, newValue in
+                            if newValue.count > Limits.descriptionMax {
+                                description = String(newValue.prefix(Limits.descriptionMax))
+                            }
+                        }
+                    charCounter(
+                        count: description.count,
+                        limit: Limits.descriptionMax,
+                        threshold: Limits.descriptionWarning
+                    )
+                }
+
+                Divider()
+
+                HStack {
+                    Spacer()
+                    Button(L10n.cancel) { dismiss() }.disabled(isSubmitting)
+                    submitButton
+                }
             }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.descriptionHeader).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
-                TextEditor(text: $description)
-                    .focused($focusedField, equals: .description)
-                    .frame(minHeight: 100)
-                    .tint(FeaturePulse.shared.primaryColor)
-                    .disabled(isSubmitting)
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
-                    .onChange(of: description) { _, v in if v.count > Limits.descriptionMax { description = String(v.prefix(Limits.descriptionMax)) } }
-                charCounter(count: description.count, limit: Limits.descriptionMax, threshold: Limits.descriptionWarning)
-            }
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button(L10n.cancel) { dismiss() }.disabled(isSubmitting)
-                submitButton
-            }
+            .padding(24)
+            .frame(minWidth: 420)
+            .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
         }
-        .padding(24)
-        .frame(minWidth: 420)
-        .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
-    }
     #endif
 
     // MARK: - iOS
@@ -120,44 +129,61 @@ public struct NewFeatureRequestView: View {
                         .onSubmit { focusedField = .description }
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
-                        .onChange(of: title) { _, v in if v.count > Limits.titleMax { title = String(v.prefix(Limits.titleMax)) } }
+                        .onChange(of: title) { _, newValue in
+                            if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
+                        }
                     charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
                 }
             } header: { Text(L10n.titleHeader) }
 
             Section {
                 VStack(alignment: .leading, spacing: 4) {
-                    TextField(L10n.description, text: $description, prompt: Text(L10n.descriptionPlaceholder), axis: .vertical)
-                        .focused($focusedField, equals: .description)
-                        .submitLabel(.send)
-                        .onSubmit { focusedField = nil; submitFeatureRequest() }
-                        .tint(FeaturePulse.shared.primaryColor)
-                        .lineLimit(5...10)
-                        .disabled(isSubmitting)
-                        .onChange(of: description) { _, v in if v.count > Limits.descriptionMax { description = String(v.prefix(Limits.descriptionMax)) } }
-                    charCounter(count: description.count, limit: Limits.descriptionMax, threshold: Limits.descriptionWarning)
+                    TextField(
+                        L10n.description, text: $description,
+                        prompt: Text(L10n.descriptionPlaceholder), axis: .vertical
+                    )
+                    .focused($focusedField, equals: .description)
+                    .submitLabel(.send)
+                    .onSubmit { focusedField = nil; submitFeatureRequest() }
+                    .tint(FeaturePulse.shared.primaryColor)
+                    .lineLimit(5 ... 10)
+                    .disabled(isSubmitting)
+                    .onChange(of: description) { _, newValue in
+                        if newValue.count > Limits.descriptionMax {
+                            description = String(newValue.prefix(Limits.descriptionMax))
+                        }
+                    }
+                    charCounter(
+                        count: description.count,
+                        limit: Limits.descriptionMax,
+                        threshold: Limits.descriptionWarning
+                    )
                 }
             } header: { Text(L10n.descriptionHeader) }
         }
         .navigationTitle(L10n.newFeatureRequest)
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
         #endif
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(L10n.cancel) { dismiss() }.disabled(isSubmitting)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.cancel) { dismiss() }.disabled(isSubmitting)
+                }
+                ToolbarItem(placement: .confirmationAction) { submitButton }
             }
-            ToolbarItem(placement: .confirmationAction) { submitButton }
-        }
-        .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
+            .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
     }
 
     // MARK: - Submit
     private func submitFeatureRequest() {
         guard title.count >= Limits.titleMin else { errorMessage = L10n.titleTooShort; showError = true; return }
         guard title.count <= Limits.titleMax else { errorMessage = L10n.titleTooLong; showError = true; return }
-        guard description.count >= Limits.descriptionMin else { errorMessage = L10n.descriptionTooShort; showError = true; return }
-        guard description.count <= Limits.descriptionMax else { errorMessage = L10n.descriptionTooLong; showError = true; return }
+        guard description.count >= Limits.descriptionMin else {
+            errorMessage = L10n.descriptionTooShort; showError = true; return
+        }
+        guard description.count <= Limits.descriptionMax else {
+            errorMessage = L10n.descriptionTooLong; showError = true; return
+        }
 
         focusedField = nil
         withAnimation(.smooth(duration: 0.3)) { isSubmitting = true }
@@ -188,10 +214,10 @@ extension NewFeatureRequestView {
         Button { submitFeatureRequest() } label: {
             ZStack {
                 Text(L10n.submit)
-                    #if os(iOS)
+                #if os(iOS)
                     .offset(x: isSubmitting ? 50 : 0, y: isSubmitting ? -30 : 0)
                     .scaleEffect(isSubmitting ? 0.5 : 1)
-                    #endif
+                #endif
                     .opacity(isSubmitting ? 0 : 1)
                 ProgressView()
                     .controlSize(.small)
@@ -209,19 +235,17 @@ extension NewFeatureRequestView {
 
 // MARK: - Shared View Modifier
 private extension View {
-
     func commonModifiers(
         showError: Binding<Bool>,
         errorMessage: String,
         onAppear: @escaping () -> Void
     ) -> some View {
-        self
-            .alert(L10n.error, isPresented: showError) {
-                Button(L10n.ok, role: .cancel) {}
-            } message: {
-                Text(errorMessage)
-            }
-            .onAppear(perform: onAppear)
+        alert(L10n.error, isPresented: showError) {
+            Button(L10n.ok, role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
+        .onAppear(perform: onAppear)
     }
 }
 

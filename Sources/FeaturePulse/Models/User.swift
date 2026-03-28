@@ -16,7 +16,7 @@ final class User: @unchecked Sendable {
     private static let configurationQueue = DispatchQueue(label: "se.featurepul.stableid.config")
 
     /// Flag to track if StableID has been configured by this SDK
-    nonisolated(unsafe) private static var hasConfiguredStableID = false
+    private nonisolated(unsafe) static var hasConfiguredStableID = false
 
     init() {
         // Use StableID for persistent device identification
@@ -46,7 +46,7 @@ final class User: @unchecked Sendable {
     private static func configureAndGetStableID() -> String {
         configurationQueue.sync {
             // Check if already configured (by us or externally)
-            if !hasConfiguredStableID && !StableID.isConfigured {
+            if !hasConfiguredStableID, !StableID.isConfigured {
                 // Use .preferStored policy to respect any existing ID
                 if StableID.hasStoredID {
                     StableID.configure()

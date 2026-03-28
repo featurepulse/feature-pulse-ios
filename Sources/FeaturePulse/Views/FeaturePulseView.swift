@@ -1,8 +1,10 @@
+// swiftlint:disable file_length
 import SwiftUI
 #if canImport(Translation)
     import Translation
 #endif
 
+// swiftlint:disable:next type_body_length
 public struct FeaturePulseView: View {
     @State private var viewModel = FeaturePulseViewModel()
     @State private var showingNewRequest = false
@@ -18,6 +20,64 @@ public struct FeaturePulseView: View {
     @State private var isLanguageInstalled = false
     @State private var isCheckingLanguage = false
     @State private var showThankYouToast = false
+    @State private var selectedTab: FeatureTab = .requests
+    @State private var sortOption: SortOption?
+
+    enum FeatureTab: CaseIterable {
+        case requests, completed
+        var label: String {
+            switch self {
+            case .requests: L10n.tabRequests
+            case .completed: L10n.tabCompleted
+            }
+        }
+
+        var systemImage: String {
+            switch self {
+            case .requests: "list.bullet"
+            case .completed: "checkmark.circle.fill"
+            }
+        }
+
+        func filter(_ requests: [FeatureRequest]) -> [FeatureRequest] {
+            switch self {
+            case .requests:
+                requests.filter { $0.status != .completed && $0.status != .rejected }
+            case .completed:
+                requests.filter { $0.status == .completed }
+            }
+        }
+    }
+
+    enum SortOption: CaseIterable {
+        case top, newest
+        var label: String {
+            switch self {
+            case .top: L10n.sortTop
+            case .newest: L10n.sortNewest
+            }
+        }
+
+        var systemImage: String {
+            switch self {
+            case .top: "arrow.up"
+            case .newest: "clock"
+            }
+        }
+
+        func sort(_ requests: [FeatureRequest]) -> [FeatureRequest] {
+            switch self {
+            case .top:
+                requests.sorted {
+                    $0.voteCount != $1.voteCount
+                        ? $0.voteCount > $1.voteCount
+                        : ($0.createdAt ?? "") > ($1.createdAt ?? "")
+                }
+            case .newest:
+                requests.sorted { ($0.createdAt ?? "") > ($1.createdAt ?? "") }
+            }
+        }
+    }
 
     private let config = FeaturePulse.shared
 
@@ -123,7 +183,7 @@ public struct FeaturePulseView: View {
                 } description: {
                     Text(error.localizedDescription)
                 } actions: {
-                    Button("Retry") {
+                    Button(L10n.retry) {
                         Task {
                             await viewModel.loadFeatureRequests()
                         }
@@ -136,11 +196,20 @@ public struct FeaturePulseView: View {
                     .modifier(ShimmerModifier(isLoading: viewModel.isLoading))
             }
         }
-        .navigationTitle(L10n.featureRequests)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
+            #if os(iOS)
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    tabAndSortMenus
+                }
+            #else
+                ToolbarItemGroup(placement: .automatic) {
+                    tabAndSortMenus
+                }
+            #endif
+
             ToolbarItem(placement: .confirmationAction) {
                 Button(L10n.requestFeature, systemImage: "plus") {
                     handleFeatureRequestTap()
@@ -155,7 +224,8 @@ public struct FeaturePulseView: View {
                 Task {
                     await viewModel.loadFeatureRequests()
 
-                    if let newRequest = viewModel.featureRequests.first(where: { !existingRequestIDs.contains($0.id) }) {
+                    let newRequest = viewModel.featureRequests.first { !existingRequestIDs.contains($0.id) }
+                    if let newRequest {
                         await MainActor.run {
                             withAnimation(.smooth) {
                                 showThankYouToast = true
@@ -192,7 +262,7 @@ public struct FeaturePulseView: View {
             }
         }
         .alert("Vote Error", isPresented: $viewModel.showVoteError) {
-            Button("OK", role: .cancel) {}
+            Button(L10n.ok, role: .cancel) {}
         } message: {
             if let errorMessage = viewModel.voteErrorMessage {
                 Text(errorMessage)
@@ -242,6 +312,64 @@ public struct FeaturePulseView: View {
         }
     }
 
+    @ViewBuilder
+    private var tabAndSortMenus: some View {
+        Menu {
+            ForEach(FeatureTab.allCases, id: \.self) { tab in
+                Button {
+                    selectedTab = tab
+                } label: {
+                    Label(
+                        title: { Text(tab.label) },
+                        icon: {
+                            if selectedTab == tab {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    )
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Text(selectedTab.label)
+                #if os(iOS)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 8))
+                        .opacity(0.5)
+                #endif
+            }
+            .padding(.horizontal, 4)
+        }
+        .disabled(!configFetched)
+
+        Menu {
+            ForEach(SortOption.allCases, id: \.self) { option in
+                Button {
+                    sortOption = option
+                } label: {
+                    Label(option.label, systemImage: sortOption == option ? "checkmark" : option.systemImage)
+                }
+            }
+            if sortOption != nil {
+                Divider()
+                Button(L10n.sortReset, role: .destructive) {
+                    sortOption = nil
+                }
+            }
+        } label: {
+            #if os(macOS)
+                HStack(spacing: 4) {
+                    Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
+                    Text(sortOption?.label ?? L10n.sort)
+                }
+                .padding(.horizontal, 4)
+            #else
+                Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
+            #endif
+        }
+        .disabled(!configFetched)
+    }
+
     private func handleRestriction() {
         if let mode = config.restrictionMode {
             switch mode {
@@ -285,7 +413,9 @@ public struct FeaturePulseView: View {
                                             request: request,
                                             hasVoted: viewModel.hasVoted(for: request.id),
                                             translatedTitle: enableTranslations ? translations[request.id]?.title : nil,
-                                            translatedDescription: enableTranslations ? translations[request.id]?.description : nil
+                                            translatedDescription: enableTranslations
+                                                ? translations[request.id]?.description
+                                                : nil
                                         ) {
                                             await viewModel.toggleVote(for: request.id)
                                         }
@@ -399,7 +529,14 @@ public struct FeaturePulseView: View {
                 )
             }
         }
-        return viewModel.featureRequests
+
+        let filtered = selectedTab.filter(viewModel.featureRequests)
+
+        if selectedTab == .completed {
+            return SortOption.newest.sort(filtered)
+        }
+
+        return sortOption?.sort(filtered) ?? filtered
     }
 
     private var emptyStateView: some View {

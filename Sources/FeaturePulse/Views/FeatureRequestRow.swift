@@ -38,7 +38,7 @@ struct FeatureRequestRow: View {
                         .tint(hasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
                         .opacity(isVoting ? 1 : 0)
                 }
-                Text("\(request.voteCount)")
+                Text(verbatim: "\(request.voteCount)")
                     .font(.headline)
                     .fontWeight(.bold)
                     .contentTransition(.numericText(value: Double(request.voteCount)))

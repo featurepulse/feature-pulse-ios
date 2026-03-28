@@ -23,8 +23,7 @@ public enum FeatureRequestStatus: String, Codable, CaseIterable, Sendable {
 
     /// Color associated with the status — uses API config if available, else defaults
     public var color: Color {
-        if let appearance = FeaturePulse.shared.statusConfig?[rawValue],
-           let apiColor = Color(hex: appearance.color) {
+        if let appearance = FeaturePulse.shared.statusConfig?[rawValue], let apiColor = Color(hex: appearance.color) {
             return apiColor
         }
         return switch self {

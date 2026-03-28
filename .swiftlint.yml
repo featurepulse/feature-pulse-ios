@@ -9,3 +9,9 @@ identifier_name:
   excluded:
     - ok
     - id
+
+nesting:
+  type_level: 2
+
+line_length:
+  ignores_urls: true

@@ -1,6 +1,6 @@
 import SwiftUI
 #if os(iOS)
-import UIKit
+    import UIKit
 #endif
 
 /// ViewModel managing feature requests state and operations
@@ -99,7 +99,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
     @MainActor
     private func applyVoteUpdate(for id: String, voted: Bool, error: Error? = nil) {
         #if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         #endif
 
         if voted {
@@ -118,7 +118,8 @@ final class FeaturePulseViewModel: @unchecked Sendable {
                 description: current.description,
                 status: current.status,
                 voteCount: voted ? current.voteCount + 1 : max(0, current.voteCount - 1),
-                hasVoted: voted
+                hasVoted: voted,
+                createdAt: current.createdAt
             )
         }
 

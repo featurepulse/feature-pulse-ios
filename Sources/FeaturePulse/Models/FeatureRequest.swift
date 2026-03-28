@@ -9,6 +9,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
     public let voteCount: Int
     public let hasVoted: Bool
     public let isOwner: Bool
+    public let createdAt: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -18,6 +19,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         case voteCount = "vote_count"
         case hasVoted = "has_voted"
         case isOwner = "is_owner"
+        case createdAt = "created_at"
     }
 
     public init(
@@ -27,7 +29,8 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         status: FeatureRequestStatus,
         voteCount: Int,
         hasVoted: Bool = false,
-        isOwner: Bool = false
+        isOwner: Bool = false,
+        createdAt: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -36,6 +39,7 @@ public struct FeatureRequest: Identifiable, Codable, Hashable, Sendable {
         self.voteCount = voteCount
         self.hasVoted = hasVoted
         self.isOwner = isOwner
+        self.createdAt = createdAt
     }
 
     // MARK: - Equatable

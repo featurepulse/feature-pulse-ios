@@ -3,7 +3,6 @@ import SwiftUI
 public extension FeaturePulse {
     enum L10n {
         // MARK: - Feature Requests
-
         public static var featureRequests: String {
             String(localized: "feature.requests", defaultValue: "Feature Requests", bundle: .module)
         }
@@ -13,7 +12,6 @@ public extension FeaturePulse {
         }
 
         // MARK: - Form Fields
-
         public static var title: String {
             String(localized: "title", defaultValue: "Title", bundle: .module)
         }
@@ -42,7 +40,6 @@ public extension FeaturePulse {
         }
 
         // MARK: - Actions
-
         public static var submit: String {
             String(localized: "submit", defaultValue: "Submit", bundle: .module)
         }
@@ -51,8 +48,11 @@ public extension FeaturePulse {
             String(localized: "cancel", defaultValue: "Cancel", bundle: .module)
         }
 
-        // MARK: - Status
+        public static var retry: String {
+            String(localized: "retry", defaultValue: "Retry", bundle: .module)
+        }
 
+        // MARK: - Status
         public enum Status {
             public static var pending: String {
                 String(localized: "status.pending", defaultValue: "Pending", bundle: .module)
@@ -67,7 +67,7 @@ public extension FeaturePulse {
             }
 
             public static var inProgress: String {
-                String(localized: "status.in_progress", defaultValue: "In Progress", bundle: .module)
+                String(localized: "status.inProgress", defaultValue: "In Progress", bundle: .module)
             }
 
             public static var completed: String {
@@ -80,7 +80,6 @@ public extension FeaturePulse {
         }
 
         // MARK: - Messages
-
         public static var loadingError: String {
             String(
                 localized: "loading.error", defaultValue: "Failed to load feature requests", bundle: .module
@@ -107,10 +106,9 @@ public extension FeaturePulse {
         }
 
         // MARK: - Validation
-
         public static var titleTooShort: String {
             String(
-                localized: "validation.title.too_short",
+                localized: "validation.title.tooShort",
                 defaultValue: "Title must be at least 3 characters",
                 bundle: .module
             )
@@ -118,7 +116,7 @@ public extension FeaturePulse {
 
         public static var titleTooLong: String {
             String(
-                localized: "validation.title.too_long",
+                localized: "validation.title.tooLong",
                 defaultValue: "Title must not exceed 50 characters",
                 bundle: .module
             )
@@ -126,7 +124,7 @@ public extension FeaturePulse {
 
         public static var descriptionTooShort: String {
             String(
-                localized: "validation.description.too_short",
+                localized: "validation.description.tooShort",
                 defaultValue: "Description must be at least 10 characters",
                 bundle: .module
             )
@@ -134,14 +132,13 @@ public extension FeaturePulse {
 
         public static var descriptionTooLong: String {
             String(
-                localized: "validation.description.too_long",
+                localized: "validation.description.tooLong",
                 defaultValue: "Description must not exceed 500 characters",
                 bundle: .module
             )
         }
 
         // MARK: - CTA
-
         public static var ctaMessage: String {
             String(
                 localized: "cta.message",
@@ -151,7 +148,7 @@ public extension FeaturePulse {
         }
 
         public static var requestFeature: String {
-            String(localized: "cta.request_feature", defaultValue: "Request a Feature", bundle: .module)
+            String(localized: "cta.requestFeature", defaultValue: "Request a Feature", bundle: .module)
         }
 
         public static var ctaBannerMessage: String {
@@ -163,7 +160,6 @@ public extension FeaturePulse {
         }
 
         // MARK: - Section Headers
-
         public static var titleHeader: String {
             String(localized: "section.title", defaultValue: "Title", bundle: .module)
         }
@@ -181,7 +177,6 @@ public extension FeaturePulse {
         }
 
         // MARK: - Empty State
-
         public static var emptyStateTitle: String {
             String(localized: "empty.state.title", defaultValue: "No Feature Requests Yet", bundle: .module)
         }
@@ -195,17 +190,16 @@ public extension FeaturePulse {
         }
 
         // MARK: - Restrictions
-
         public static var restrictionAlertTitle: String {
             String(localized: "restriction.alert.title", defaultValue: "Subscription Required", bundle: .module)
         }
 
         public static func restrictionMessage(subscriptionName: String = "Pro") -> String {
+            // swiftlint:disable:next line_length
             String(localized: "restriction.message", defaultValue: "Only \(subscriptionName) users can add new feature requests, but you can vote for already added requests.", bundle: .module)
         }
 
         // MARK: - Translation
-
         public static var translateAll: String {
             String(localized: "Translate All", defaultValue: "Translate All", bundle: .module)
         }
@@ -215,9 +209,34 @@ public extension FeaturePulse {
         }
 
         // MARK: - Branding
-
         public static var poweredBy: String {
             String(localized: "powered.by", defaultValue: "Powered by", bundle: .module)
+        }
+
+        // MARK: - Tabs
+        public static var tabRequests: String {
+            String(localized: "tab.requests", defaultValue: "Requests", bundle: .module)
+        }
+
+        public static var tabCompleted: String {
+            String(localized: "tab.completed", defaultValue: "Completed", bundle: .module)
+        }
+
+        // MARK: - Sort
+        public static var sortTop: String {
+            String(localized: "sort.top", defaultValue: "Top", bundle: .module)
+        }
+
+        public static var sortNewest: String {
+            String(localized: "sort.newest", defaultValue: "Newest", bundle: .module)
+        }
+
+        public static var sort: String {
+            String(localized: "sort", defaultValue: "Sort", bundle: .module)
+        }
+
+        public static var sortReset: String {
+            String(localized: "sort.reset", defaultValue: "Reset sorting", bundle: .module)
         }
     }
 }

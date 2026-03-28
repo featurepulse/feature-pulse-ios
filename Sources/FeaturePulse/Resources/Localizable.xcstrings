@@ -1,40 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        }
-      }
-    },
     "^[%lld vote](inflect: true)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -145,6 +111,12 @@
               }
             }
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 票"
+          }
         }
       }
     },
@@ -185,6 +157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
           }
         }
       }
@@ -227,6 +205,12 @@
             "state" : "translated",
             "value" : "Fechar"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
         }
       }
     },
@@ -267,6 +251,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diga-nos que funcionalidades gostaria de ver"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "告诉我们您希望看到哪些功能"
           }
         }
       }
@@ -309,10 +299,16 @@
             "state" : "translated",
             "value" : "Não encontrou a funcionalidade que procura?"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没找到您想要的功能？"
+          }
         }
       }
     },
-    "cta.request_feature" : {
+    "cta.requestFeature" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -349,6 +345,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solicitar funcionalidade"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请求功能"
           }
         }
       }
@@ -391,6 +393,12 @@
             "state" : "translated",
             "value" : "Descrição"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述"
+          }
         }
       }
     },
@@ -431,6 +439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descreva a sua ideia em detalhe..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "详细描述您的功能想法..."
           }
         }
       }
@@ -473,11 +487,17 @@
             "state" : "translated",
             "value" : "E-mail (opcional)"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邮箱（可选）"
+          }
         }
       }
     },
     "empty.state.message" : {
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -514,11 +534,17 @@
             "state" : "translated",
             "value" : "Seja o primeiro a partilhar as suas ideias!\nDiga-nos que funcionalidades gostaria de ver."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成为第一个分享想法的人！\n告诉我们您希望看到哪些功能。"
+          }
         }
       }
     },
     "empty.state.title" : {
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -554,6 +580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ainda não foram feitos pedidos de funcionalidades."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无功能请求"
           }
         }
       }
@@ -596,6 +628,12 @@
             "state" : "translated",
             "value" : "Erro"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "错误"
+          }
         }
       }
     },
@@ -636,6 +674,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solicitações de funcionalidades"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能请求"
           }
         }
       }
@@ -678,6 +722,12 @@
             "state" : "translated",
             "value" : "Por favor, introduza um endereço de e-mail válido"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入有效的电子邮件地址"
+          }
         }
       }
     },
@@ -718,6 +768,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Falha ao carregar solicitações"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加载功能请求失败"
           }
         }
       }
@@ -760,6 +816,12 @@
             "state" : "translated",
             "value" : "Nova solicitação"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新功能请求"
+          }
         }
       }
     },
@@ -801,39 +863,11 @@
             "state" : "translated",
             "value" : "OK"
           }
-        }
-      }
-    },
-    "OK" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
         },
-        "es" : {
+        "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
+            "value" : "好"
           }
         }
       }
@@ -876,6 +910,12 @@
             "state" : "translated",
             "value" : "Opcional"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可选"
+          }
         }
       }
     },
@@ -916,6 +956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desenvolvido por"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由"
           }
         }
       }
@@ -958,6 +1004,12 @@
             "state" : "translated",
             "value" : "Subscrição necessária"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要订阅"
+          }
         }
       }
     },
@@ -999,10 +1051,16 @@
             "state" : "translated",
             "value" : "Apenas os utilizadores %@ podem adicionar novos pedidos de funcionalidades, mas pode votar nos pedidos já adicionados."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有订阅用户才能添加新功能请求，但您可以为已添加的请求投票。"
+          }
         }
       }
     },
-    "Retry" : {
+    "retry" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1039,6 +1097,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tentar novamente"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试"
           }
         }
       }
@@ -1081,6 +1145,12 @@
             "state" : "translated",
             "value" : "Contacto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系方式"
+          }
         }
       }
     },
@@ -1122,6 +1192,12 @@
             "state" : "translated",
             "value" : "Descrição"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述"
+          }
         }
       }
     },
@@ -1162,6 +1238,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Título"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题"
           }
         }
       }
@@ -1205,6 +1287,200 @@
             "state" : "translated",
             "value" : "Mostrar original"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示原文"
+          }
+        }
+      }
+    },
+    "sort" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排序"
+          }
+        }
+      }
+    },
+    "sort.newest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neueste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newest"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus récents"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più recenti"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais recentes"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新"
+          }
+        }
+      }
+    },
+    "sort.reset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sortierung zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset sorting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restablecer orden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réinitialiser le tri"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Reimposta ordinamento"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Repor ordenação"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重置排序"
+          }
+        }
+      }
+    },
+    "sort.top" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beliebteste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más votados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les plus votés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più votati"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais votados"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多投票"
+          }
         }
       }
     },
@@ -1245,6 +1521,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aprovado"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已批准"
           }
         }
       }
@@ -1287,10 +1569,16 @@
             "state" : "translated",
             "value" : "Concluído"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已完成"
+          }
         }
       }
     },
-    "status.in_progress" : {
+    "status.inProgress" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1327,6 +1615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Em progresso"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "进行中"
           }
         }
       }
@@ -1369,6 +1663,12 @@
             "state" : "translated",
             "value" : "Pendente"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待处理"
+          }
         }
       }
     },
@@ -1409,6 +1709,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planeado"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已计划"
           }
         }
       }
@@ -1451,6 +1757,12 @@
             "state" : "translated",
             "value" : "Rejeitado"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已拒绝"
+          }
         }
       }
     },
@@ -1491,6 +1803,106 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Submeter"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提交"
+          }
+        }
+      }
+    },
+    "tab.completed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completato"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concluído"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已完成"
+          }
+        }
+      }
+    },
+    "tab.requests" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requests"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitudes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demandes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richieste"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedidos"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请求"
           }
         }
       }
@@ -1533,6 +1945,12 @@
             "state" : "translated",
             "value" : "Obrigado pelo seu feedback!"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "感谢您的反馈！"
+          }
         }
       }
     },
@@ -1574,6 +1992,12 @@
             "state" : "translated",
             "value" : "Título"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题"
+          }
         }
       }
     },
@@ -1614,6 +2038,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Que funcionalidade gostaria de ver?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您想看到什么功能？"
           }
         }
       }
@@ -1657,10 +2087,16 @@
             "state" : "translated",
             "value" : "Traduzir tudo"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译全部"
+          }
         }
       }
     },
-    "validation.description.too_long" : {
+    "validation.description.tooLong" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1698,10 +2134,16 @@
             "state" : "translated",
             "value" : "A descrição não deve exceder 500 caracteres"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述不得超过500个字符"
+          }
         }
       }
     },
-    "validation.description.too_short" : {
+    "validation.description.tooShort" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1739,10 +2181,16 @@
             "state" : "translated",
             "value" : "A descrição deve ter pelo menos 10 caracteres"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述至少需要10个字符"
+          }
         }
       }
     },
-    "validation.title.too_long" : {
+    "validation.title.tooLong" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1780,10 +2228,16 @@
             "state" : "translated",
             "value" : "O título não deve exceder 50 caracteres"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题不得超过50个字符"
+          }
         }
       }
     },
-    "validation.title.too_short" : {
+    "validation.title.tooShort" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1820,6 +2274,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O título deve ter pelo menos 3 caracteres"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题至少需要3个字符"
           }
         }
       }
@@ -1861,6 +2321,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erro de votação"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投票错误"
           }
         }
       }
