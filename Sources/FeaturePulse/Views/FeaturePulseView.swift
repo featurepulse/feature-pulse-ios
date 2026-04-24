@@ -1,11 +1,13 @@
 // swiftlint:disable file_length
 import SwiftUI
 #if canImport(Translation)
-    import Translation
+    @preconcurrency import Translation
 #endif
 
 // swiftlint:disable:next type_body_length
 public struct FeaturePulseView: View {
+    @Environment(\.locale) private var locale
+
     @State private var viewModel = FeaturePulseViewModel()
     @State private var showingNewRequest = false
     @State private var selectedRequest: FeatureRequest?
@@ -83,12 +85,17 @@ public struct FeaturePulseView: View {
 
     public init() {}
 
+    init(preloaded: FeaturePulseViewModel) {
+        _viewModel = State(initialValue: preloaded)
+        _configFetched = State(initialValue: true)
+    }
+
     private var shouldShowTranslateButton: Bool {
         guard config.showTranslation else { return false }
 
         if #available(iOS 18.0, macOS 15.0, *) {
-            let deviceLanguage = Locale.current.language.languageCode?.identifier ?? "en"
-            return !deviceLanguage.hasPrefix("en")
+            let languageCode = locale.language.languageCode?.identifier ?? "en"
+            return !languageCode.hasPrefix("en")
         }
         return false
     }
@@ -279,6 +286,7 @@ public struct FeaturePulseView: View {
             )
         }
         .task {
+            guard !configFetched else { return }
             await viewModel.loadFeatureRequests()
             configFetched = true
 
@@ -345,32 +353,34 @@ public struct FeaturePulseView: View {
         }
         .disabled(!configFetched)
 
-        Menu {
-            ForEach(SortOption.allCases, id: \.self) { option in
-                Button {
-                    sortOption = option
-                } label: {
-                    Label(option.label, systemImage: sortOption == option ? "checkmark" : option.systemImage)
+        if selectedTab != .completed {
+            Menu {
+                ForEach(SortOption.allCases, id: \.self) { option in
+                    Button {
+                        sortOption = option
+                    } label: {
+                        Label(option.label, systemImage: sortOption == option ? "checkmark" : option.systemImage)
+                    }
                 }
-            }
-            if sortOption != nil {
-                Divider()
-                Button(L10n.sortReset, role: .destructive) {
-                    sortOption = nil
+                if sortOption != nil {
+                    Divider()
+                    Button(L10n.sortReset, role: .destructive) {
+                        sortOption = nil
+                    }
                 }
-            }
-        } label: {
-            #if os(macOS)
-                HStack(spacing: 4) {
+            } label: {
+                #if os(macOS)
+                    HStack(spacing: 4) {
+                        Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
+                        Text(sortOption?.label ?? L10n.sort)
+                    }
+                    .padding(.horizontal, 4)
+                #else
                     Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
-                    Text(sortOption?.label ?? L10n.sort)
-                }
-                .padding(.horizontal, 4)
-            #else
-                Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
-            #endif
+                #endif
+            }
+            .disabled(!configFetched)
         }
-        .disabled(!configFetched)
     }
 
     private func handleRestriction() {
@@ -649,3 +659,60 @@ private extension View {
 #Preview("Default") {
     FeaturePulseView()
 }
+
+// MARK: - Setting Previews (for dashboard screenshots)
+
+private struct SDKPreview: View {
+    var showStatus: Bool
+    var showTranslation: Bool
+
+    init(showStatus: Bool = true, showTranslation: Bool = true) {
+        self.showStatus = showStatus
+        self.showTranslation = showTranslation
+        FeaturePulse.shared.showStatus = showStatus
+        FeaturePulse.shared.showTranslation = showTranslation
+    }
+
+    var body: some View {
+        NavigationStack {
+            FeaturePulseView(preloaded: FeaturePulseViewModel(preloaded: mockRequests))
+            #if os(iOS)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if #available(iOS 26, *) {
+                            Button(role: .close) {}
+                        } else {
+                            Button {} label: { Label("Close", systemImage: "xmark") }
+                        }
+                    }
+                }
+            #endif
+        }
+        .environment(\.locale, showTranslation ? Locale(identifier: "ar") : .current)
+    }
+}
+
+private let mockRequests: [FeatureRequest] = [
+    FeatureRequest(
+        id: "1", title: "Dark Mode Support", description: "Add dark mode",
+        status: .inProgress, voteCount: 142, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "2", title: "Export to PDF", description: "Export data as PDF",
+        status: .planned, voteCount: 89, hasVoted: true
+    ),
+    FeatureRequest(
+        id: "3", title: "Offline Mode", description: "Work without internet",
+        status: .pending, voteCount: 64, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "4", title: "Push Notifications", description: "Get notified on updates",
+        status: .pending, voteCount: 37, hasVoted: false
+    )
+]
+
+// 4 combinations: s=status, tr=translation (1=ON, 0=OFF)
+#Preview("s1-tr1") { SDKPreview(showStatus: true, showTranslation: true) }
+#Preview("s1-tr0") { SDKPreview(showStatus: true, showTranslation: false) }
+#Preview("s0-tr1") { SDKPreview(showStatus: false, showTranslation: true) }
+#Preview("s0-tr0") { SDKPreview(showStatus: false, showTranslation: false) }

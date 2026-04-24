@@ -14,6 +14,13 @@ final class FeaturePulseViewModel: @unchecked Sendable {
     var showVoteError = false
     var previousRequestCount: Int = 0
 
+    init() {}
+
+    init(preloaded: [FeatureRequest]) {
+        featureRequests = preloaded
+        votedRequestIds = Set(preloaded.filter(\.hasVoted).map(\.id))
+    }
+
     func loadFeatureRequests(isRefresh: Bool = false) async {
         // Only show loading spinner on initial load, not on refresh
         if !isRefresh {
