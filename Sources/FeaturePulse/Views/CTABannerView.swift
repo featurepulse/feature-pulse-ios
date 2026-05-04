@@ -89,11 +89,17 @@ struct CTABannerView: View {
             NavigationStack {
                 FeaturePulse.shared.view()
                     .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button {
-                                showFeaturePulse = false
-                            } label: {
-                                Label("Close", systemImage: "xmark")
+                        ToolbarItem(placement: .topBarLeading) {
+                            if #available(iOS 26, *) {
+                                Button(role: .close) {
+                                    showFeaturePulse = false
+                                }
+                            } else {
+                                Button {
+                                    showFeaturePulse = false
+                                } label: {
+                                    Label("Close", systemImage: "xmark")
+                                }
                             }
                         }
                     }
