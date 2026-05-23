@@ -29,7 +29,7 @@ public extension View {
 
 public extension View {
     /// Automatically track app sessions when the view becomes active
-    /// Tracks app opens with a 30-minute timeout (Firebase-style)
+    /// Tracks app opens with a 30-minute timeout
     ///
     /// Simply add this modifier to your root view inside `WindowGroup` to enable session tracking.
     ///
@@ -52,8 +52,8 @@ public extension View {
     /// ```
     ///
     /// # How It Works:
-    /// - Tracks when app becomes active (foreground)
-    /// - Uses 30-minute timeout (same as Firebase Analytics)
+    /// - Only tracks sessions for users who have voted or submitted a feature request
+    /// - Uses 30-minute timeout
     /// - Stores last session time in UserDefaults
     /// - Automatically calculates engagement weight for votes
     /// - Shows engagement badges in dashboard (🔥 Power, ⚡ Active, etc.)
@@ -116,21 +116,20 @@ public final class FeaturePulse: @unchecked Sendable {
     /// Track app open for engagement metrics (with 30-minute timeout)
     /// Called automatically by the featurePulseSessionTracking() modifier
     func trackAppOpenIfNewSession() {
+        guard UserDefaultsManager.isUserActive else { return }
+
         let lastSessionTime = UserDefaultsManager.lastSessionTime
         let now = Date().timeIntervalSince1970
 
-        // 30 minutes timeout (1800 seconds)
-        if lastSessionTime == 0 || (now - lastSessionTime) > 1800 {
-            Task {
-                do {
-                    try await FeaturePulseAPI.shared.trackActivity(type: "app_open")
-                    // Only update UserDefaults if API call succeeds
-                    UserDefaultsManager.lastSessionTime = now
-                    UserDefaultsManager.sessionCount += 1
-                } catch {
-                    // Silently fail - don't block app, but don't mark as tracked if it failed
-                    // Will retry on next app open (after 30 min)
-                }
+        guard lastSessionTime == 0 || (now - lastSessionTime) > 1800 else { return }
+
+        Task {
+            do {
+                try await FeaturePulseAPI.shared.trackActivity(type: "app_open")
+                UserDefaultsManager.lastSessionTime = now
+                UserDefaultsManager.sessionCount += 1
+            } catch {
+                // Don't update lastSessionTime — retry on next session
             }
         }
     }
@@ -145,9 +144,7 @@ public final class FeaturePulse: @unchecked Sendable {
     /// ```
     public func updateUser(customID: String?) {
         user.customID = customID
-        Task {
-            try? await FeaturePulseAPI.shared.syncUser()
-        }
+        syncUserIfNeeded()
     }
 
     /// Update user with payment information for MRR tracking
@@ -176,8 +173,33 @@ public final class FeaturePulse: @unchecked Sendable {
     /// ```
     public func updateUser(payment: Payment) {
         user.payment = payment
+        syncUserIfNeeded()
+    }
+
+    func markUserActiveIfNeeded() async {
+        guard !UserDefaultsManager.isUserActive else { return }
+        UserDefaultsManager.isUserActive = true
+        try? await FeaturePulseAPI.shared.trackActivity(type: "app_open")
+        UserDefaultsManager.lastSessionTime = Date().timeIntervalSince1970
+        UserDefaultsManager.sessionCount += 1
+    }
+
+    private func syncUserIfNeeded() {
+        let cachedCustomID = UserDefaultsManager.lastSyncedCustomID
+        let cachedPayment = UserDefaultsManager.lastSyncedPayment
+
+        guard user.customID != cachedCustomID || user.payment != cachedPayment else { return }
+
+        UserDefaultsManager.lastSyncedCustomID = user.customID
+        UserDefaultsManager.lastSyncedPayment = user.payment
+
         Task {
-            try? await FeaturePulseAPI.shared.syncUser()
+            do {
+                try await FeaturePulseAPI.shared.syncUser()
+            } catch {
+                UserDefaultsManager.lastSyncedCustomID = cachedCustomID
+                UserDefaultsManager.lastSyncedPayment = cachedPayment
+            }
         }
     }
 

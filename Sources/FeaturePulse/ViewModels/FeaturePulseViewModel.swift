@@ -47,6 +47,11 @@ final class FeaturePulseViewModel: @unchecked Sendable {
             // Sync voted state from API
             votedRequestIds = Set(featureRequests.filter(\.hasVoted).map(\.id))
 
+            // Mark user as active if they have any existing votes
+            if !votedRequestIds.isEmpty {
+                UserDefaultsManager.isUserActive = true
+            }
+
             isLoading = false
         } catch {
             self.error = error
@@ -92,6 +97,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
                 try await FeaturePulseAPI.shared.unvoteForFeatureRequest(id: id)
             } else {
                 try await FeaturePulseAPI.shared.voteForFeatureRequest(id: id)
+                await FeaturePulse.shared.markUserActiveIfNeeded()
             }
             return true
         } catch let error as FeaturePulseError where error == .alreadyVoted {

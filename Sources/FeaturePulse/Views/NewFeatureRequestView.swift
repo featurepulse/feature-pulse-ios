@@ -194,6 +194,7 @@ public struct NewFeatureRequestView: View {
                     title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                     description: description.trimmingCharacters(in: .whitespacesAndNewlines)
                 )
+                await FeaturePulse.shared.markUserActiveIfNeeded()
                 await MainActor.run { onSubmit?(); dismiss() }
             } catch {
                 await MainActor.run {

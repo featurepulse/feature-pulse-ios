@@ -5,6 +5,21 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.4] - 2026-05-23
+
+### ⚡ Performance
+
+- **Zero API calls on boot for non-engaged users** — `updateUser` now caches the last synced payload in UserDefaults and skips the network request entirely if nothing changed
+- **Session tracking only for active users** — `featurePulseSessionTracking()` no longer fires for users who have never voted or submitted a feature request, eliminating unnecessary activity calls at scale
+- **First-time engagement session** — when a user votes or submits for the first time, their boot session is sent immediately so no session data is lost
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.10.3] - 2026-05-04
 
 ### 🐛 Bug Fixes
