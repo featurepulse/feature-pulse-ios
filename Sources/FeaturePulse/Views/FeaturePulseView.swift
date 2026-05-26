@@ -21,6 +21,7 @@ public struct FeaturePulseView: View {
     @State private var translationConfig: Any?
     @State private var isLanguageInstalled = false
     @State private var isCheckingLanguage = false
+    @State private var isTranslating = false
     @State private var showThankYouToast = false
     @State private var selectedTab: FeatureTab = .requests
     @State private var sortOption: SortOption?
@@ -138,12 +139,11 @@ public struct FeaturePulseView: View {
                         } else {
                             if #available(iOS 18.0, macOS 15.0, *) {
                                 #if canImport(Translation)
-                                    if var config = translationConfig as? TranslationSession.Configuration {
-                                        config.invalidate()
-                                    }
-                                    translationConfig = nil
-                                    Task { @MainActor in
-                                        try? await Task.sleep(for: .milliseconds(100))
+                                    isTranslating = true
+                                    if var configuration = translationConfig as? TranslationSession.Configuration {
+                                        configuration.invalidate()
+                                        translationConfig = configuration
+                                    } else {
                                         translationConfig = TranslationSession.Configuration(
                                             source: Locale.Language(identifier: "en"),
                                             target: Locale.current.language
@@ -156,9 +156,12 @@ public struct FeaturePulseView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "translate")
-                        if isCheckingLanguage {
+                        if isCheckingLanguage || isTranslating {
                             ProgressView()
                                 .controlSize(.small)
+                            if isTranslating {
+                                Text("Translating...")
+                            }
                         } else {
                             Text(translateButtonLabel)
                         }
@@ -170,6 +173,7 @@ public struct FeaturePulseView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
+                .disabled(isTranslating)
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -520,9 +524,12 @@ public struct FeaturePulseView: View {
         .applyBatchTranslation(
             config: translationConfig,
             requests: viewModel.featureRequests,
-            translations: $translations,
-            enableTranslations: $enableTranslations,
-            isLanguageInstalled: $isLanguageInstalled
+            state: TranslationState(
+                translations: $translations,
+                enableTranslations: $enableTranslations,
+                isLanguageInstalled: $isLanguageInstalled,
+                isTranslating: $isTranslating
+            )
         )
     }
 
@@ -594,55 +601,24 @@ public struct FeaturePulseView: View {
 
 // MARK: - Batch Translation
 
+private struct TranslationState {
+    var translations: Binding<[String: (title: String, description: String)]>
+    var enableTranslations: Binding<Bool>
+    var isLanguageInstalled: Binding<Bool>
+    var isTranslating: Binding<Bool>
+}
+
 private extension View {
     @ViewBuilder
     func applyBatchTranslation(
         config: Any?,
         requests: [FeatureRequest],
-        translations: Binding<[String: (title: String, description: String)]>,
-        enableTranslations: Binding<Bool>,
-        isLanguageInstalled: Binding<Bool>
+        state: TranslationState
     ) -> some View {
         if #available(iOS 18.0, macOS 15.0, *) {
             #if canImport(Translation)
                 translationTask(config as? TranslationSession.Configuration) { session in
-                    do {
-                        var translatedAny = false
-
-                        for request in requests {
-                            guard translations.wrappedValue[request.id] == nil else { continue }
-
-                            let titleToTranslate = request.title
-                            let descToTranslate = request.description
-
-                            let titleResponse = try await Task { @MainActor in
-                                try await session.translate(titleToTranslate)
-                            }.value
-
-                            let descResponse = try await Task { @MainActor in
-                                try await session.translate(descToTranslate)
-                            }.value
-
-                            await MainActor.run {
-                                translations.wrappedValue[request.id] = (
-                                    title: titleResponse.targetText,
-                                    description: descResponse.targetText
-                                )
-                                translatedAny = true
-                            }
-                        }
-
-                        if translatedAny {
-                            await MainActor.run {
-                                enableTranslations.wrappedValue = true
-                            }
-                        }
-                    } catch {
-                        await MainActor.run {
-                            enableTranslations.wrappedValue = false
-                            isLanguageInstalled.wrappedValue = false
-                        }
-                    }
+                    await runBatchTranslation(session: session, requests: requests, state: state)
                 }
                 .id((config as? TranslationSession.Configuration).debugDescription)
             #else
@@ -653,6 +629,82 @@ private extension View {
         }
     }
 }
+
+#if canImport(Translation)
+    @available(iOS 18.0, macOS 15.0, *)
+    private func runBatchTranslation(
+        session: TranslationSession,
+        requests: [FeatureRequest],
+        state: TranslationState
+    ) async {
+        do {
+            var translatedAny = false
+            var partialTranslations: [String: (title: String?, description: String?)] = [:]
+
+            let batchRequests = await MainActor.run {
+                requests
+                    .filter { state.translations.wrappedValue[$0.id] == nil }
+                    .flatMap { request in
+                        [
+                            TranslationSession.Request(
+                                sourceText: request.title,
+                                clientIdentifier: "title:\(request.id)"
+                            ),
+                            TranslationSession.Request(
+                                sourceText: request.description,
+                                clientIdentifier: "description:\(request.id)"
+                            )
+                        ]
+                    }
+            }
+
+            guard !batchRequests.isEmpty else {
+                await MainActor.run { state.isTranslating.wrappedValue = false }
+                return
+            }
+
+            await MainActor.run { state.isTranslating.wrappedValue = true }
+
+            for try await response in session.translate(batch: batchRequests) {
+                translatedAny = await applyResponse(response, into: &partialTranslations, state: state) || translatedAny
+            }
+
+            await MainActor.run {
+                if translatedAny { state.enableTranslations.wrappedValue = true }
+                state.isTranslating.wrappedValue = false
+            }
+        } catch {
+            await MainActor.run {
+                state.enableTranslations.wrappedValue = false
+                state.isLanguageInstalled.wrappedValue = false
+                state.isTranslating.wrappedValue = false
+            }
+        }
+    }
+
+    @available(iOS 18.0, macOS 15.0, *)
+    @discardableResult
+    private func applyResponse(
+        _ response: TranslationSession.Response,
+        into partialTranslations: inout [String: (title: String?, description: String?)],
+        state: TranslationState
+    ) async -> Bool {
+        guard let clientID = response.clientIdentifier else { return false }
+        let isTitle = clientID.hasPrefix("title:")
+        guard isTitle || clientID.hasPrefix("description:") else { return false }
+        let requestID = String(clientID.dropFirst(isTitle ? "title:".count : "description:".count))
+
+        var partial = partialTranslations[requestID] ?? (title: nil, description: nil)
+        if isTitle { partial.title = response.targetText } else { partial.description = response.targetText }
+        partialTranslations[requestID] = partial
+
+        guard let title = partial.title, let description = partial.description else { return false }
+        await MainActor.run {
+            state.translations.wrappedValue[requestID] = (title: title, description: description)
+        }
+        return true
+    }
+#endif
 
 #Preview("Default") {
     FeaturePulseView()
@@ -686,7 +738,9 @@ private struct SDKPreview: View {
                 }
             #endif
         }
-        .environment(\.locale, showTranslation ? Locale(identifier: "ar") : .current)
+        .transformEnvironment(\.locale) { locale in
+            if showTranslation { locale = Locale(identifier: "ar") }
+        }
     }
 }
 

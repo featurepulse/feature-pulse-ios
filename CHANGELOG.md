@@ -5,6 +5,29 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.1] - 2026-05-26
+
+### ⚡ Performance
+
+- **Batch translation** — translations now sent in a single batch request instead of sequentially, significantly faster for long lists
+
+### ✨ Improvements
+
+- **Translation UX** — button shows a loading indicator and is disabled while translation is in progress
+
+### 📦 Installation
+
+```swift
+.package(url: "https://github.com/featurepulse/feature-pulse-ios.git", from: "1.11.1")
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.11.0] - 2026-05-26
 
 ### ✨ New Features

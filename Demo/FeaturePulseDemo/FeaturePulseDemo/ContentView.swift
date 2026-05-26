@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var textColor: Color = .white
     @State private var ctaBannerResetID = UUID()
     @State private var featurePulseViewID = UUID()
+    @State private var tabViewID = UUID()
 
     init() {
         let startOnFeedback = ProcessInfo.processInfo.environment["FEATUREPULSE_DEMO_START_FEEDBACK"] == "1"
@@ -28,64 +29,24 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                List {
-                    Section {
-                        FeaturePulse.shared.ctaBanner(trigger: .manual { true })
-                            .id(ctaBannerResetID)
-                            .listRowInsets(EdgeInsets(.zero))
-                            .listRowBackground(Color.clear)
-                            .padding(.top)
-                    }
-
-                    Section("Demo user") {
-                        LabeledContent("Plan", value: "Monthly")
-                        LabeledContent("MRR", value: "$9.99")
-                        LabeledContent("Custom ID", value: "demo-user")
-                    }
-
-                    Section {
-                        Toggle("Show Status Badges", isOn: $showStatusBadges)
-
-                        if #available(iOS 18.0, *) {
-                            Toggle("Show Translation Button", isOn: $showTranslationButton)
-                        }
-
-                        ColorPicker("Tint Color", selection: $tintColor, supportsOpacity: false)
-
-                        ColorPicker("Text Color", selection: $textColor, supportsOpacity: false)
-                    } header: {
-                        Text("SwiftUI native components")
-                    } footer: {
-                        if showTranslationButton, shouldShowTranslationFallbackNote {
-                            Text("""
-                            Translation is available on iOS 18+ for non-English locales. \
-                            On Simulator, the native translation UI may not appear until \
-                            language support is available.
-                            """)
-                        }
-                    }
-
-                    Section {
-                        Button {
-                            showFeedback = true
-                        } label: {
-                            Label("Open FeaturePulse", systemImage: "lightbulb")
-                        }
-
-                        Button {
-                            resetCTABannerDismissal()
-                            withAnimation {
-                                ctaBannerResetID = UUID()
-                            }
-                        } label: {
-                            Label("Reset CTA Banner", systemImage: "arrow.counterclockwise")
-                        }
+                DemoHomeView(
+                    ctaBannerResetID: ctaBannerResetID,
+                    showStatusBadges: $showStatusBadges,
+                    showTranslationButton: $showTranslationButton,
+                    tintColor: $tintColor,
+                    textColor: $textColor,
+                    showsTranslationFallbackNote: shouldShowTranslationFallbackNote,
+                    openFeaturePulse: { showFeedback = true },
+                    resetCTABanner: resetCTABanner
+                )
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        DemoPackageTitleView()
                     }
                 }
-                .navigationTitle("FeaturePulse Demo")
-                .tint(tintColor)
                 .onChange(of: tintColor) { newValue in
                     FeaturePulse.shared.primaryColor = newValue
+                    tabViewID = UUID()
                     refreshFeaturePulseViews()
                 }
                 .onChange(of: textColor) { newValue in
@@ -103,20 +64,11 @@ struct ContentView: View {
                 }
                 .sheet(isPresented: $showFeedback) {
                     NavigationStack {
-                        FeaturePulse.shared.view()
-                            .id(featurePulseViewID)
-                            .environment(\.locale, featurePulseLocale)
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    if #available(iOS 26, *) {
-                                        Button(role: .close) { showFeedback = false }
-                                    } else {
-                                        Button { showFeedback = false } label: {
-                                            Label("Close", systemImage: "xmark")
-                                        }
-                                    }
-                                }
-                            }
+                        FeaturePulseEmbeddedView(
+                            featurePulseViewID: featurePulseViewID,
+                            locale: featurePulseLocale,
+                            onClose: { showFeedback = false }
+                        )
                     }
                 }
             }
@@ -126,20 +78,26 @@ struct ContentView: View {
             .tag(DemoTab.home)
 
             NavigationStack {
-                FeaturePulse.shared.view()
-                    .id(featurePulseViewID)
-                    .environment(\.locale, featurePulseLocale)
-                    .navigationTitle("Feedback")
+                FeaturePulseEmbeddedView(
+                    featurePulseViewID: featurePulseViewID,
+                    locale: featurePulseLocale,
+                    navigationTitle: "Feedback"
+                )
             }
             .tabItem {
                 Label("Feedback", systemImage: "lightbulb")
             }
             .tag(DemoTab.feedback)
         }
+        .id(tabViewID)
+        .tint(tintColor)
     }
 
-    private func resetCTABannerDismissal() {
+    private func resetCTABanner() {
         UserDefaults.standard.set(false, forKey: DemoStorageKey.ctaBannerDismissed)
+        withAnimation {
+            ctaBannerResetID = UUID()
+        }
     }
 
     private var mockSettingsURL: URL? {
