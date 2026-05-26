@@ -38,7 +38,7 @@ public final class FeaturePulseAPI: Sendable {
         )
 
         // Update configuration with settings from server
-        applyServerSettings(from: response)
+        await applyServerSettings(from: response)
 
         return response.data
     }
@@ -114,6 +114,7 @@ public final class FeaturePulseAPI: Sendable {
         try await client.requestVoid(.syncUser, body: request)
     }
 
+    @MainActor
     private func applyServerSettings(from response: FeatureRequestsResponse) {
         let config = FeaturePulse.shared
 

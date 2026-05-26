@@ -45,7 +45,7 @@ public struct NewFeatureRequestView: View {
             Text(verbatim: "\(count)/\(limit)")
                 .font(.caption)
                 .foregroundStyle(count >= threshold ? (count == limit ? .red : .orange) : .secondary)
-                .contentTransition(.numericText())
+                .backport.contentTransition(.numericText())
                 .animation(.default, value: count)
         }
     }
@@ -78,7 +78,7 @@ public struct NewFeatureRequestView: View {
                         .textFieldStyle(.roundedBorder)
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
-                        .onChange(of: title) { _, newValue in
+                        .onChange(of: title) { newValue in
                             if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
                         }
                     charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
@@ -92,7 +92,7 @@ public struct NewFeatureRequestView: View {
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
-                        .onChange(of: description) { _, newValue in
+                        .onChange(of: description) { newValue in
                             if newValue.count > Limits.descriptionMax {
                                 description = String(newValue.prefix(Limits.descriptionMax))
                             }
@@ -129,7 +129,7 @@ public struct NewFeatureRequestView: View {
                         .onSubmit { focusedField = .description }
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
-                        .onChange(of: title) { _, newValue in
+                        .onChange(of: title) { newValue in
                             if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
                         }
                     charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
@@ -148,7 +148,7 @@ public struct NewFeatureRequestView: View {
                     .tint(FeaturePulse.shared.primaryColor)
                     .lineLimit(5 ... 10)
                     .disabled(isSubmitting)
-                    .onChange(of: description) { _, newValue in
+                    .onChange(of: description) { newValue in
                         if newValue.count > Limits.descriptionMax {
                             description = String(newValue.prefix(Limits.descriptionMax))
                         }
@@ -186,7 +186,7 @@ public struct NewFeatureRequestView: View {
         }
 
         focusedField = nil
-        withAnimation(.smooth(duration: 0.3)) { isSubmitting = true }
+        withBackportAnimation(.smooth(duration: 0.3)) { isSubmitting = true }
 
         Task {
             do {
@@ -225,7 +225,7 @@ extension NewFeatureRequestView {
                     .scaleEffect(isSubmitting ? 1 : 0)
                     .opacity(isSubmitting ? 1 : 0)
             }
-            .animation(.smooth(duration: 0.4), value: isSubmitting)
+            .backport.animation(.smooth(duration: 0.4), value: isSubmitting)
         }
         .foregroundStyle(FeaturePulse.shared.foregroundColor)
         .tint(tint)

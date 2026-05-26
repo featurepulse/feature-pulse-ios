@@ -39,13 +39,18 @@ REQUESTS = [
     },
 ]
 
+SETTINGS = {
+    "show_status": True,
+    "show_translation": False,
+}
+
 
 def feature_requests_payload(requests=None):
     return {
         "success": True,
         "data": requests or list(REQUESTS),
-        "show_status": True,
-        "show_translation": False,
+        "show_status": SETTINGS["show_status"],
+        "show_translation": SETTINGS["show_translation"],
         "show_watermark": False,
         "permissions": {"can_create_feature_request": True},
         "status_config": {
@@ -90,6 +95,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         if url.path == "/api/sdk/feature-requests":
             self.respond(feature_requests_payload(sorted_feature_requests(url.query)))
+        elif url.path == "/api/mock/settings":
+            self.respond({"success": True, **SETTINGS})
         else:
             self.respond({"success": False, "message": f"No mock for GET {url.path}"}, status=404)
 
@@ -97,7 +104,13 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         body = self.read_json_body()
 
-        if path == "/api/sdk/feature-requests":
+        if path == "/api/mock/settings":
+            if "show_status" in body:
+                SETTINGS["show_status"] = bool(body["show_status"])
+            if "show_translation" in body:
+                SETTINGS["show_translation"] = bool(body["show_translation"])
+            self.respond({"success": True, **SETTINGS})
+        elif path == "/api/sdk/feature-requests":
             REQUESTS.insert(
                 0,
                 {

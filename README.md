@@ -1,6 +1,6 @@
 # FeaturePulse iOS SDK
 
-![iOS](https://img.shields.io/badge/iOS-17%2B-blue?logo=apple)
+![iOS](https://img.shields.io/badge/iOS-16%2B-blue?logo=apple)
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange?logo=swift)
 ![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen)
@@ -18,7 +18,7 @@ A SwiftUI SDK for collecting and managing feature requests from your app users.
 
 ## Demo App
 
-Open `Demo/FeaturePulseDemo/FeaturePulseDemo.xcodeproj` in Xcode and run the `FeaturePulseDemo` scheme on an iOS 17+ simulator. The demo target starts its local mock server automatically during Debug builds.
+Open `Demo/FeaturePulseDemo/FeaturePulseDemo.xcodeproj` in Xcode and run the `FeaturePulseDemo` scheme on an iOS 16+ simulator. The demo target starts its local mock server automatically during Debug builds.
 
 The demo app uses the local SDK package and shows FeaturePulse as a tab, modal sheet, and CTA banner. Set `FEATUREPULSE_USE_MOCKS=0` and `FEATUREPULSE_API_KEY` in the scheme environment variables to connect it to a real project.
 

@@ -30,7 +30,7 @@ struct FeatureRequestRow: View {
                     Image(systemName: "triangle.fill")
                         .font(.caption2.weight(.semibold))
                         .opacity(isVoting ? 0 : 1)
-                        .symbolEffect(.bounce, value: justVoted)
+                        .backport.symbolEffect(.bounce, value: justVoted)
                         .scaleEffect(isPressing ? 1.2 : 1)
 
                     ProgressView()
@@ -41,7 +41,7 @@ struct FeatureRequestRow: View {
                 Text(verbatim: "\(request.voteCount)")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .contentTransition(.numericText(value: Double(request.voteCount)))
+                    .backport.contentTransition(.numericText(value: Double(request.voteCount)))
             }
             .frame(width: 56, height: 60)
             .background(hasVoted ? voteColor : voteColor.opacity(0.1))
@@ -60,12 +60,12 @@ struct FeatureRequestRow: View {
                 DragGesture(minimumDistance: 0)
                     .onChanged { _ in
                         guard !isVoting else { return }
-                        withAnimation(.smooth(duration: 0.2)) {
+                        withBackportAnimation(.smooth(duration: 0.2)) {
                             isPressing = true
                         }
                     }
                     .onEnded { _ in
-                        withAnimation(.bouncy(duration: 0.5)) {
+                        withBackportAnimation(.bouncy(duration: 0.5)) {
                             isPressing = false
                         }
                         guard !isVoting else { return }
@@ -119,12 +119,7 @@ struct FeatureRequestRow: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-        .scrollTransition(.animated.threshold(.visible(0.1))) { content, phase in
-            content
-                .opacity(phase.isIdentity ? 1 : 0.2)
-                .scaleEffect(phase.isIdentity ? 1 : 0.9)
-                .blur(radius: phase.isIdentity ? 0 : 10)
-        }
+        .backport.scrollTransition()
     }
 
     private var voteColor: Color {

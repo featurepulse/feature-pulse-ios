@@ -8,7 +8,7 @@ import SwiftUI
 public struct FeaturePulseView: View {
     @Environment(\.locale) private var locale
 
-    @State private var viewModel = FeaturePulseViewModel()
+    @StateObject private var viewModel = FeaturePulseViewModel()
     @State private var showingNewRequest = false
     @State private var selectedRequest: FeatureRequest?
     @State private var scrollToRequestID: String?
@@ -86,7 +86,7 @@ public struct FeaturePulseView: View {
     public init() {}
 
     init(preloaded: FeaturePulseViewModel) {
-        _viewModel = State(initialValue: preloaded)
+        _viewModel = StateObject(wrappedValue: preloaded)
         _configFetched = State(initialValue: true)
     }
 
@@ -185,17 +185,15 @@ public struct FeaturePulseView: View {
     public var body: some View {
         Group {
             if let error = viewModel.error {
-                ContentUnavailableView {
-                    Label(L10n.loadingError, systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(error.localizedDescription)
-                } actions: {
-                    Button(L10n.retry) {
-                        Task {
-                            await viewModel.loadFeatureRequests()
-                        }
+                BackportContentUnavailableView(
+                    L10n.loadingError,
+                    systemImage: "exclamationmark.triangle",
+                    description: error.localizedDescription,
+                    actionTitle: L10n.retry
+                ) {
+                    Task {
+                        await viewModel.loadFeatureRequests()
                     }
-                    .buttonStyle(.borderedProminent)
                 }
             } else {
                 featureRequestsList
@@ -231,13 +229,13 @@ public struct FeaturePulseView: View {
                 Task {
                     await viewModel.loadFeatureRequests()
                     await MainActor.run {
-                        withAnimation(.smooth) { selectedTab = .requests }
+                        withBackportAnimation(.smooth) { selectedTab = .requests }
                     }
 
                     let newRequest = viewModel.featureRequests.first { !existingRequestIDs.contains($0.id) }
                     if let newRequest {
                         await MainActor.run {
-                            withAnimation(.smooth) {
+                            withBackportAnimation(.smooth) {
                                 showThankYouToast = true
                             }
                         }
@@ -249,21 +247,21 @@ public struct FeaturePulseView: View {
 
                         try? await Task.sleep(for: .milliseconds(400))
                         await MainActor.run {
-                            withAnimation(.smooth(duration: 0.3)) {
+                            withBackportAnimation(.smooth(duration: 0.3)) {
                                 highlightedRequestID = newRequest.id
                             }
                         }
 
                         try? await Task.sleep(for: .seconds(2))
                         await MainActor.run {
-                            withAnimation(.smooth(duration: 0.5)) {
+                            withBackportAnimation(.smooth(duration: 0.5)) {
                                 highlightedRequestID = nil
                             }
                         }
 
                         try? await Task.sleep(for: .milliseconds(300))
                         await MainActor.run {
-                            withAnimation(.smooth) {
+                            withBackportAnimation(.smooth) {
                                 showThankYouToast = false
                             }
                         }
@@ -496,9 +494,9 @@ public struct FeaturePulseView: View {
                             await viewModel.loadFeatureRequests(isRefresh: true)
                         }
                     }
-                    .onChange(of: scrollToRequestID) { _, newID in
+                    .onChange(of: scrollToRequestID) { newID in
                         if let id = newID {
-                            withAnimation(.smooth(duration: 0.5)) {
+                            withBackportAnimation(.smooth(duration: 0.5)) {
                                 proxy.scrollTo(id, anchor: .center)
                             }
                             scrollToRequestID = nil
@@ -557,7 +555,7 @@ public struct FeaturePulseView: View {
             Image(systemName: selectedTab == .completed ? "checkmark.circle" : "lightbulb.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(FeaturePulse.shared.primaryColor)
-                .symbolEffect(.pulse)
+                .backport.symbolEffect(.pulse)
 
             VStack(spacing: 8) {
                 Text(selectedTab == .completed ? L10n.emptyStateCompletedTitle : L10n.emptyStateTitle)

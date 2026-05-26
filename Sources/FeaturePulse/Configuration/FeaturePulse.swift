@@ -5,7 +5,7 @@ public struct FeaturePulseSessionTracker: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .onChange(of: scenePhase) { _, newPhase in
+            .onChange(of: scenePhase) { newPhase in
                 if newPhase == .active {
                     FeaturePulse.shared.trackAppOpenIfNewSession()
                 }
@@ -69,47 +69,46 @@ public extension View {
     }
 }
 
-@Observable
-public final class FeaturePulse: @unchecked Sendable {
+public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     public static let shared = FeaturePulse()
 
     /// Your FeaturePulse API key (required)
-    public var apiKey: String = ""
+    @Published public var apiKey: String = ""
 
     /// Base URL for FeaturePulse API
-    public var baseURL: String = "https://featurepul.se"
+    @Published public var baseURL: String = "https://featurepul.se"
 
     /// Current user information
     let user = User()
 
     /// Primary brand color used for vote and submit buttons (defaults to primary blue: #570df8)
-    public var primaryColor: Color = .init(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
+    @Published public var primaryColor: Color = .init(red: 87 / 255, green: 13 / 255, blue: 248 / 255)
 
     /// Foreground color for vote title and icons and new feature request button CTA
-    public var foregroundColor: Color = .white
+    @Published public var foregroundColor: Color = .white
 
     /// Whether to show status badges on feature requests (controlled from dashboard, default: false)
     /// This value is set automatically by the API and cannot be changed by the client
-    public internal(set) var showStatus: Bool = false
+    @Published public internal(set) var showStatus: Bool = false
 
     /// Whether to show translation button for non-English users (controlled from dashboard, default: true)
     /// This value is set automatically by the API and cannot be changed by the client
     /// Requires iOS 18.0+ to work
-    public internal(set) var showTranslation: Bool = true
+    @Published public internal(set) var showTranslation: Bool = true
 
     /// User permissions (fetched from API)
     /// This value is set automatically by the API and cannot be changed by the client
-    public internal(set) var permissions: Permissions = .init(canCreateFeatureRequest: true)
+    @Published public internal(set) var permissions: Permissions = .init(canCreateFeatureRequest: true)
 
     /// Status appearance configuration (color hex + SF Symbol) from API
     /// This value is set automatically by the API and cannot be changed by the client
-    public internal(set) var statusConfig: StatusConfig?
+    @Published public internal(set) var statusConfig: StatusConfig?
 
     /// Whether to show watermark branding (controlled from API based on subscription)
-    public internal(set) var showWatermark: Bool = true
+    @Published public internal(set) var showWatermark: Bool = true
 
     /// How to handle feature request restrictions (nil = default alert with "Pro")
-    public var restrictionMode: RestrictionMode?
+    @Published public var restrictionMode: RestrictionMode?
 
     private init() {}
 

@@ -127,11 +127,11 @@ struct FeatureRequestDetailView: View {
                     } else {
                         Image(systemName: "triangle.fill")
                             .font(.caption2.weight(.semibold))
-                            .symbolEffect(.bounce, value: request.hasVoted)
+                            .backport.symbolEffect(.bounce, value: request.hasVoted)
                     }
                     Text(verbatim: "\(request.voteCount)")
                         .font(.subheadline.weight(.semibold))
-                        .contentTransition(.numericText(value: Double(request.voteCount)))
+                        .backport.contentTransition(.numericText(value: Double(request.voteCount)))
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)

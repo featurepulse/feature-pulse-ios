@@ -4,15 +4,15 @@ import SwiftUI
 #endif
 
 /// ViewModel managing feature requests state and operations
-@Observable
-final class FeaturePulseViewModel: @unchecked Sendable {
-    var featureRequests: [FeatureRequest] = []
-    var isLoading = false
-    var error: Error?
-    var votedRequestIds: Set<String> = []
-    var voteErrorMessage: String?
-    var showVoteError = false
-    var previousRequestCount: Int = 0
+@MainActor
+final class FeaturePulseViewModel: ObservableObject, @unchecked Sendable {
+    @Published var featureRequests: [FeatureRequest] = []
+    @Published var isLoading = false
+    @Published var error: Error?
+    @Published var votedRequestIds: Set<String> = []
+    @Published var voteErrorMessage: String?
+    @Published var showVoteError = false
+    @Published var previousRequestCount: Int = 0
 
     init() {}
 
@@ -90,7 +90,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
     func toggleVote(for id: String) async -> Bool {
         let wasVoted = votedRequestIds.contains(id)
 
-        await applyVoteUpdate(for: id, voted: !wasVoted)
+        applyVoteUpdate(for: id, voted: !wasVoted)
 
         do {
             if wasVoted {
@@ -101,15 +101,14 @@ final class FeaturePulseViewModel: @unchecked Sendable {
             }
             return true
         } catch let error as FeaturePulseError where error == .alreadyVoted {
-            await MainActor.run { _ = votedRequestIds.insert(id) }
+            _ = votedRequestIds.insert(id)
             return false
         } catch {
-            await applyVoteUpdate(for: id, voted: wasVoted, error: error)
+            applyVoteUpdate(for: id, voted: wasVoted, error: error)
             return false
         }
     }
 
-    @MainActor
     private func applyVoteUpdate(for id: String, voted: Bool, error: Error? = nil) {
         #if os(iOS)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()

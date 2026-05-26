@@ -2,6 +2,7 @@
 @testable import FeaturePulse
 import Testing
 
+@MainActor
 @Suite(.tags(.viewModels))
 struct FeaturePulseViewModelTests {
     @Test
