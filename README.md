@@ -16,6 +16,26 @@ A SwiftUI SDK for collecting and managing feature requests from your app users.
   <img src="Screenshots/feature-pulse-screenshot-new-blue.png" width="250" alt="Submit New Feature">
 </p>
 
+## Demo App
+
+Open `Demo/FeaturePulseDemo/FeaturePulseDemo.xcodeproj` in Xcode and run the `FeaturePulseDemo` scheme on an iOS 17+ simulator. The demo target starts its local mock server automatically during Debug builds.
+
+The demo app uses the local SDK package and shows FeaturePulse as a tab, modal sheet, and CTA banner. Set `FEATUREPULSE_USE_MOCKS=0` and `FEATUREPULSE_API_KEY` in the scheme environment variables to connect it to a real project.
+
+## Tests and Coverage
+
+Run the Swift Testing suite with coverage:
+
+```bash
+swift test --enable-code-coverage
+```
+
+Show the generated coverage JSON path:
+
+```bash
+swift test --show-codecov-path
+```
+
 ## Installation
 
 ### Swift Package Manager

@@ -89,8 +89,8 @@ struct CTABannerView: View {
             NavigationStack {
                 FeaturePulse.shared.view()
                     .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
-                            if #available(iOS 26, *) {
+                        ToolbarItem(placement: closeToolbarPlacement) {
+                            if #available(iOS 26.0, macOS 26.0, *) {
                                 Button(role: .close) {
                                     showFeaturePulse = false
                                 }
@@ -105,6 +105,14 @@ struct CTABannerView: View {
                     }
             }
         }
+    }
+
+    private var closeToolbarPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            .topBarLeading
+        #else
+            .cancellationAction
+        #endif
     }
 }
 

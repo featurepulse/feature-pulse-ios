@@ -27,6 +27,10 @@ let package = Package(
                 .process("Resources"),
                 .process("PrivacyInfo.xcprivacy")
             ]
+        ),
+        .testTarget(
+            name: "FeaturePulseTests",
+            dependencies: ["FeaturePulse"]
         )
     ]
 )

@@ -8,11 +8,8 @@ final class NetworkClient: Sendable {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 
-    private init() {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
-        session = URLSession(configuration: configuration)
+    init(session: URLSession = URLSession(configuration: .featurePulseDefault)) {
+        self.session = session
 
         encoder = JSONEncoder()
 
@@ -123,3 +120,12 @@ final class NetworkClient: Sendable {
 
 /// Placeholder type for requests without a body
 struct Empty: Encodable {}
+
+private extension URLSessionConfiguration {
+    static var featurePulseDefault: URLSessionConfiguration {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 60
+        return configuration
+    }
+}

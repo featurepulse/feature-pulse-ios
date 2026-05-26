@@ -49,7 +49,22 @@ playground.xcworkspace
 .build/
 .swiftpm/config/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.swiftpm/xcode/xcshareddata/xcschemes/
 .netrc
+
+# Demo Xcode local state
+Demo/**/xcuserdata/
+Demo/**/*.xcuserstate
+Demo/**/build/
+Demo/**/DerivedData/
+
+# Demo mock server runtime files
+Demo/FeaturePulseDemo/MockServer/__pycache__/
+Demo/FeaturePulseDemo/MockServer/*.py[cod]
+Demo/FeaturePulseDemo/MockServer/*.log
+Demo/FeaturePulseDemo/MockServer/*.pid
+Demo/FeaturePulseDemo/MockServer/.env
+Demo/FeaturePulseDemo/MockServer/.env.*
 
 # CocoaPods
 #

@@ -1,0 +1,15 @@
+{
+  "originHash" : "78e6d3a03d30ed04a6032ff8331f8fb26a44dbae73a39950e46be22b0e721c82",
+  "pins" : [
+    {
+      "identity" : "stableid",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/codykerns/StableID",
+      "state" : {
+        "revision" : "926428ac523e9ee4b5839fe7343e944f5deebee3",
+        "version" : "0.4.1"
+      }
+    }
+  ],
+  "version" : 3
+}

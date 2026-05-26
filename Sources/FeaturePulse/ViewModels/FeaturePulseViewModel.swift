@@ -101,7 +101,7 @@ final class FeaturePulseViewModel: @unchecked Sendable {
             }
             return true
         } catch let error as FeaturePulseError where error == .alreadyVoted {
-            await MainActor.run { votedRequestIds.insert(id) }
+            await MainActor.run { _ = votedRequestIds.insert(id) }
             return false
         } catch {
             await applyVoteUpdate(for: id, voted: wasVoted, error: error)
