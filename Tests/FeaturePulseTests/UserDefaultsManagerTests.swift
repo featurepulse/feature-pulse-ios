@@ -49,7 +49,68 @@ final class UserDefaultsManagerTests {
         #expect(!UserDefaultsManager.ctaBannerDismissed)
     }
 
+    @Test
+    func `user creates and reuses local device ID`() throws {
+        let firstUser = User()
+        let firstID = firstUser.deviceID
+
+        #expect(!firstID.isEmpty)
+        #expect(UUID(uuidString: firstID) != nil)
+        #expect(UserDefaultsManager.deviceID == firstID)
+
+        let secondUser = User()
+        #expect(secondUser.deviceID == firstID)
+    }
+
+    @Test
+    func `user migrates legacy StableID device ID`() throws {
+        let legacyID = "legacy-stable-id"
+        UserDefaults(suiteName: "_StableID_DefaultsSuiteName")?.set(legacyID, forKey: "_StableID_Identifier")
+
+        let user = User()
+
+        #expect(user.deviceID == legacyID)
+        #expect(UserDefaultsManager.deviceID == legacyID)
+        #expect(DeviceIDMigration.isCompleted)
+    }
+
+    @Test
+    func `user migrates legacy StableID before trusting generated FeaturePulse ID`() throws {
+        let legacyID = "legacy-stable-id"
+        UserDefaultsManager.deviceID = "generated-before-migration"
+        UserDefaults(suiteName: "_StableID_DefaultsSuiteName")?.set(legacyID, forKey: "_StableID_Identifier")
+
+        let user = User()
+
+        #expect(user.deviceID == legacyID)
+        #expect(UserDefaultsManager.deviceID == legacyID)
+        #expect(DeviceIDMigration.isCompleted)
+    }
+
+    @Test
+    func `user migrates legacy standard FeaturePulse device ID before generated ID`() throws {
+        let legacyID = "legacy-standard-featurepulse-id"
+        UserDefaultsManager.deviceID = "generated-before-migration"
+        UserDefaults.standard.set(legacyID, forKey: "se.featurepul.deviceID")
+
+        let user = User()
+
+        #expect(user.deviceID == legacyID)
+        #expect(UserDefaultsManager.deviceID == legacyID)
+        #expect(DeviceIDMigration.isCompleted)
+    }
+
     private func resetFeaturePulseDefaults() {
+        [
+            "se.featurepul.deviceID",
+            "se.featurepul.legacyDeviceIDMigrationCompleted",
+            "se.featurepul.lastSessionTime",
+            "se.featurepul.sessionCount",
+            "se.featurepul.ctaDismissed",
+            "se.featurepul.lastSyncedCustomID",
+            "se.featurepul.lastSyncedPayment",
+            "se.featurepul.isUserActive"
+        ].forEach(UserDefaults.standard.removeObject)
         [
             "se.featurepul.deviceID",
             "se.featurepul.lastSessionTime",
@@ -58,7 +119,8 @@ final class UserDefaultsManagerTests {
             "se.featurepul.lastSyncedCustomID",
             "se.featurepul.lastSyncedPayment",
             "se.featurepul.isUserActive"
-        ].forEach(UserDefaults.standard.removeObject)
+        ].forEach(UserDefaultsManager.removeObject)
+        DeviceIDMigration.resetForTests()
     }
 }
 

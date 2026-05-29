@@ -32,7 +32,7 @@ final class NetworkClient: Sendable {
     ) async throws -> T {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
+        guard config.isConfigured else {
             throw FeaturePulseError.missingAPIKey
         }
 
@@ -69,7 +69,7 @@ final class NetworkClient: Sendable {
     ) async throws {
         let config = FeaturePulse.shared
 
-        guard !config.apiKey.isEmpty else {
+        guard config.isConfigured else {
             throw FeaturePulseError.missingAPIKey
         }
 

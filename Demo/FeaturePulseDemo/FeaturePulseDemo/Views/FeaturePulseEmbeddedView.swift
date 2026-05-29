@@ -10,7 +10,6 @@ struct FeaturePulseEmbeddedView: View {
     var body: some View {
         FeaturePulse.shared.view()
             .id(featurePulseViewID)
-            .environment(\.locale, locale)
             .modifier(NavigationTitleModifier(title: navigationTitle))
             .toolbar {
                 if let onClose {

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3FFF514E2FCA355400BE450E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 3FFF514D2FCA355400BE450E /* Localizable.xcstrings */; };
 		A10000000000000000000001 /* FeaturePulseDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* FeaturePulseDemoApp.swift */; };
 		A10000000000000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* ContentView.swift */; };
 		A10000000000000000000005 /* FeaturePulse in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000021 /* FeaturePulse */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3FFF514D2FCA355400BE450E /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A10000000000000000000002 /* FeaturePulseDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturePulseDemoApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A10000000000000000000007 /* FeaturePulseDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FeaturePulseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,6 +43,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3FFF514C2FCA354300BE450E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3FFF514D2FCA355400BE450E /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		A1000000000000000000000A = {
 			isa = PBXGroup;
 			children = (
@@ -52,12 +62,21 @@
 		A1000000000000000000000B /* FeaturePulseDemo */ = {
 			isa = PBXGroup;
 			children = (
+				3FFF514C2FCA354300BE450E /* Resources */,
 				A10000000000000000000002 /* FeaturePulseDemoApp.swift */,
 				A10000000000000000000004 /* ContentView.swift */,
 				A10000000000000000000038 /* Views */,
 				A10000000000000000000008 /* Info.plist */,
 			);
 			path = FeaturePulseDemo;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000007 /* FeaturePulseDemo.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000038 /* Views */ = {
@@ -70,14 +89,6 @@
 				A10000000000000000000037 /* FeaturePulseEmbeddedView.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		A1000000000000000000000C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A10000000000000000000007 /* FeaturePulseDemo.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -125,6 +136,12 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				es,
+				fr,
+				it,
+				"pt-PT",
+				"zh-Hans",
 			);
 			mainGroup = A1000000000000000000000A;
 			minimizedProjectReferenceProxies = 1;
@@ -146,27 +163,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FFF514E2FCA355400BE450E /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		A1000000000000000000000E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A10000000000000000000003 /* ContentView.swift in Sources */,
-				A10000000000000000000030 /* DemoHomeView.swift in Sources */,
-				A10000000000000000000039 /* DemoPackageTitleView.swift in Sources */,
-				A10000000000000000000032 /* DemoSettingsSection.swift in Sources */,
-				A10000000000000000000034 /* DemoUserSection.swift in Sources */,
-				A10000000000000000000036 /* FeaturePulseEmbeddedView.swift in Sources */,
-				A10000000000000000000001 /* FeaturePulseDemoApp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		A10000000000000000000025 /* Start Mock Server */ = {
@@ -190,6 +191,23 @@
 			shellScript = "if [ \"$CONFIGURATION\" != \"Debug\" ]; then\n  exit 0\nfi\n\nPORT=\"${FEATUREPULSE_MOCK_SERVER_PORT:-8765}\"\nSERVER_SCRIPT=\"$PROJECT_DIR/MockServer/server.py\"\nLOG_FILE=\"${TMPDIR:-/tmp}/featurepulse-demo-mock-server.log\"\n\nif [ ! -f \"$SERVER_SCRIPT\" ]; then\n  echo \"warning: FeaturePulse mock server script not found at $SERVER_SCRIPT\"\n  exit 0\nfi\n\nif /usr/sbin/lsof -nP -iTCP:\"$PORT\" -sTCP:LISTEN >/dev/null 2>&1; then\n  echo \"FeaturePulse mock server already running on port $PORT\"\n  exit 0\nfi\n\necho \"Starting FeaturePulse mock server on http://127.0.0.1:$PORT\"\nnohup /usr/bin/env python3 \"$SERVER_SCRIPT\" \"$PORT\" > \"$LOG_FILE\" 2>&1 &\n";
 		};
 /* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1000000000000000000000E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000003 /* ContentView.swift in Sources */,
+				A10000000000000000000030 /* DemoHomeView.swift in Sources */,
+				A10000000000000000000039 /* DemoPackageTitleView.swift in Sources */,
+				A10000000000000000000032 /* DemoSettingsSection.swift in Sources */,
+				A10000000000000000000034 /* DemoUserSection.swift in Sources */,
+				A10000000000000000000036 /* FeaturePulseEmbeddedView.swift in Sources */,
+				A10000000000000000000001 /* FeaturePulseDemoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		A10000000000000000000012 /* Debug */ = {
@@ -250,6 +268,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -305,6 +324,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

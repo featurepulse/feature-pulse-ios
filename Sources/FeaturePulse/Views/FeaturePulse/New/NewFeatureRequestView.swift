@@ -78,7 +78,7 @@ public struct NewFeatureRequestView: View {
                         .textFieldStyle(.roundedBorder)
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
-                        .onChange(of: title) { newValue in
+                        .onChangeBackport(of: title) { newValue in
                             if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
                         }
                     charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
@@ -92,7 +92,7 @@ public struct NewFeatureRequestView: View {
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3), lineWidth: 1))
-                        .onChange(of: description) { newValue in
+                        .onChangeBackport(of: description) { newValue in
                             if newValue.count > Limits.descriptionMax {
                                 description = String(newValue.prefix(Limits.descriptionMax))
                             }
@@ -129,7 +129,7 @@ public struct NewFeatureRequestView: View {
                         .onSubmit { focusedField = .description }
                         .tint(FeaturePulse.shared.primaryColor)
                         .disabled(isSubmitting)
-                        .onChange(of: title) { newValue in
+                        .onChangeBackport(of: title) { newValue in
                             if newValue.count > Limits.titleMax { title = String(newValue.prefix(Limits.titleMax)) }
                         }
                     charCounter(count: title.count, limit: Limits.titleMax, threshold: Limits.titleWarning)
@@ -148,7 +148,7 @@ public struct NewFeatureRequestView: View {
                     .tint(FeaturePulse.shared.primaryColor)
                     .lineLimit(5 ... 10)
                     .disabled(isSubmitting)
-                    .onChange(of: description) { newValue in
+                    .onChangeBackport(of: description) { newValue in
                         if newValue.count > Limits.descriptionMax {
                             description = String(newValue.prefix(Limits.descriptionMax))
                         }
