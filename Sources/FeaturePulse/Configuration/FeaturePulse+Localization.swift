@@ -40,6 +40,7 @@ public extension FeaturePulse {
         public var emptyStateCompletedMessage: LocalizedStringResource?
         public var restrictionAlertTitle: LocalizedStringResource?
         public var restrictionMessage: LocalizedStringResource?
+        public var translating: LocalizedStringResource?
         public var translateAll: LocalizedStringResource?
         public var showOriginal: LocalizedStringResource?
         public var poweredBy: LocalizedStringResource?
@@ -89,6 +90,7 @@ public extension FeaturePulse {
             emptyStateCompletedMessage: LocalizedStringResource? = nil,
             restrictionAlertTitle: LocalizedStringResource? = nil,
             restrictionMessage: LocalizedStringResource? = nil,
+            translating: LocalizedStringResource? = nil,
             translateAll: LocalizedStringResource? = nil,
             showOriginal: LocalizedStringResource? = nil,
             poweredBy: LocalizedStringResource? = nil,
@@ -137,6 +139,7 @@ public extension FeaturePulse {
             self.emptyStateCompletedMessage = emptyStateCompletedMessage
             self.restrictionAlertTitle = restrictionAlertTitle
             self.restrictionMessage = restrictionMessage
+            self.translating = translating
             self.translateAll = translateAll
             self.showOriginal = showOriginal
             self.poweredBy = poweredBy

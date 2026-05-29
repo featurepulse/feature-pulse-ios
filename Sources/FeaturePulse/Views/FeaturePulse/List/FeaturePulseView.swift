@@ -104,7 +104,7 @@ public struct FeaturePulseView: View {
                             ProgressView()
                                 .controlSize(.small)
                             if isTranslating {
-                                Text("Translating...")
+                                Text(L10n.translating)
                             }
                         } else {
                             Text(translateButtonLabel)

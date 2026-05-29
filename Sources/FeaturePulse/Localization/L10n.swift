@@ -183,6 +183,10 @@ public extension FeaturePulse {
         }
 
         // MARK: - Translation
+        public static var translating: String {
+            text(\.translating, key: "translating", defaultValue: "Translating...")
+        }
+
         public static var translateAll: String {
             text(\.translateAll, key: "Translate All", defaultValue: "Translate All")
         }

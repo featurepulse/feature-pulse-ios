@@ -3,7 +3,7 @@ import Foundation
 /// Centralized UserDefaults management for FeaturePulse SDK
 enum UserDefaultsManager {
     private static var defaults: UserDefaults {
-        UserDefaults(suiteName: "se.featurepul.defaults") ?? .standard
+        .standard
     }
 
     // MARK: - Keys
@@ -67,7 +67,6 @@ enum UserDefaultsManager {
 
     static func removeObject(forKey key: String) {
         defaults.removeObject(forKey: key)
-        UserDefaults.standard.removeObject(forKey: key)
     }
 
     private static func set(_ value: String?, forKey key: String) {
@@ -93,12 +92,12 @@ enum DeviceIDMigration {
     }
 
     static var legacyDeviceID: String? {
-        if let cachedID = UserDefaults.standard.string(forKey: UserDefaultsManager.Keys.deviceID), !cachedID.isEmpty {
-            return cachedID
-        }
-
         if let stableID = legacyStableIDDefaults?.string(forKey: legacyStableIDKey), !stableID.isEmpty {
             return stableID
+        }
+
+        if let cachedID = UserDefaults.standard.string(forKey: UserDefaultsManager.Keys.deviceID), !cachedID.isEmpty {
+            return cachedID
         }
 
         return nil
