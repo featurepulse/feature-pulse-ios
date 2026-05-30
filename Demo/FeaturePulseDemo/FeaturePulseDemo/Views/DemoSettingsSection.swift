@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct DemoSettingsSection: View {
     @Binding var showStatusBadges: Bool
@@ -15,11 +16,17 @@ struct DemoSettingsSection: View {
                 Toggle("Show Translation Button", isOn: $showTranslationButton)
             }
 
+            Button {
+                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+            } label: {
+                Label("App Language Settings", systemImage: "globe")
+            }
+
             ColorPicker("Tint Color", selection: $tintColor, supportsOpacity: false)
 
             ColorPicker("Text Color", selection: $textColor, supportsOpacity: false)
         } header: {
-            Text("SwiftUI native components")
+            Text("SDK Settings")
         } footer: {
             if showTranslationButton, showsTranslationFallbackNote {
                 Text("""

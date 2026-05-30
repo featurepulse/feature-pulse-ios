@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 struct Backport<Content: View> {
@@ -127,6 +128,33 @@ struct BackportContentUnavailableView: View {
 extension View {
     var backport: Backport<Self> {
         Backport(content: self)
+    }
+
+    func onChangeBackport<Value: Equatable>(
+        of value: Value,
+        perform action: @escaping (Value) -> Void
+    ) -> some View {
+        modifier(OnChangeBackportModifier(value: value, action: action))
+    }
+}
+
+private struct OnChangeBackportModifier<Value: Equatable>: ViewModifier {
+    let value: Value
+    let action: (Value) -> Void
+    @State private var previousValue: Value
+
+    init(value: Value, action: @escaping (Value) -> Void) {
+        self.value = value
+        self.action = action
+        _previousValue = State(initialValue: value)
+    }
+
+    func body(content: Content) -> some View {
+        content.onReceive(Just(value)) { newValue in
+            guard newValue != previousValue else { return }
+            previousValue = newValue
+            action(newValue)
+        }
     }
 }
 

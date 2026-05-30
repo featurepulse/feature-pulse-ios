@@ -4,6 +4,7 @@ struct SubmitFeatureRequest: Encodable {
     let title: String
     let description: String
     let deviceInfo: DeviceInfo
+    let customID: String?
     let paymentType: String?
     let monthlyValueCents: Int?
     let originalAmountCents: Int?
@@ -12,6 +13,7 @@ struct SubmitFeatureRequest: Encodable {
     enum CodingKeys: String, CodingKey {
         case title, description, currency
         case deviceInfo = "device_info"
+        case customID = "custom_id"
         case paymentType = "payment_type"
         case monthlyValueCents = "monthly_value_cents"
         case originalAmountCents = "original_amount_cents"

@@ -26,62 +26,6 @@ public struct FeaturePulseView: View {
     @State private var selectedTab: FeatureTab = .requests
     @State private var sortOption: SortOption?
 
-    enum FeatureTab: CaseIterable {
-        case requests, completed
-        var label: String {
-            switch self {
-            case .requests: L10n.tabRequests
-            case .completed: L10n.tabCompleted
-            }
-        }
-
-        var systemImage: String {
-            switch self {
-            case .requests: "list.bullet"
-            case .completed: "checkmark.circle.fill"
-            }
-        }
-
-        func filter(_ requests: [FeatureRequest]) -> [FeatureRequest] {
-            switch self {
-            case .requests:
-                requests.filter { $0.status != .completed && $0.status != .rejected }
-            case .completed:
-                requests.filter { $0.status == .completed }
-            }
-        }
-    }
-
-    enum SortOption: CaseIterable {
-        case top, newest
-        var label: String {
-            switch self {
-            case .top: L10n.sortTop
-            case .newest: L10n.sortNewest
-            }
-        }
-
-        var systemImage: String {
-            switch self {
-            case .top: "arrow.up"
-            case .newest: "clock"
-            }
-        }
-
-        func sort(_ requests: [FeatureRequest]) -> [FeatureRequest] {
-            switch self {
-            case .top:
-                requests.sorted {
-                    $0.voteCount != $1.voteCount
-                        ? $0.voteCount > $1.voteCount
-                        : ($0.createdAt ?? "") > ($1.createdAt ?? "")
-                }
-            case .newest:
-                requests.sorted { ($0.createdAt ?? "") > ($1.createdAt ?? "") }
-            }
-        }
-    }
-
     private let config = FeaturePulse.shared
 
     public init() {}
@@ -160,7 +104,7 @@ public struct FeaturePulseView: View {
                             ProgressView()
                                 .controlSize(.small)
                             if isTranslating {
-                                Text("Translating...")
+                                Text(L10n.translating)
                             }
                         } else {
                             Text(translateButtonLabel)
@@ -300,18 +244,7 @@ public struct FeaturePulseView: View {
         }
         .overlay(alignment: .top) {
             if showThankYouToast {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                    Text(L10n.thankYou)
-                        .font(.subheadline.weight(.medium))
-                }
-                .foregroundStyle(Color.systemBackground)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color.label, in: Capsule())
-                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
-                .padding(.top, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
+                FeaturePulseThankYouToast()
             }
         }
     }
@@ -327,62 +260,11 @@ public struct FeaturePulseView: View {
 
     @ViewBuilder
     private var tabAndSortMenus: some View {
-        Menu {
-            ForEach(FeatureTab.allCases, id: \.self) { tab in
-                Button {
-                    selectedTab = tab
-                } label: {
-                    Label(
-                        title: { Text(tab.label) },
-                        icon: {
-                            if selectedTab == tab {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    )
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Text(selectedTab.label)
-                #if os(iOS)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 8))
-                        .opacity(0.5)
-                #endif
-            }
-            .padding(.horizontal, 4)
-        }
-        .disabled(!configFetched)
-
-        if selectedTab != .completed {
-            Menu {
-                ForEach(SortOption.allCases, id: \.self) { option in
-                    Button {
-                        sortOption = option
-                    } label: {
-                        Label(option.label, systemImage: sortOption == option ? "checkmark" : option.systemImage)
-                    }
-                }
-                if sortOption != nil {
-                    Divider()
-                    Button(L10n.sortReset, role: .destructive) {
-                        sortOption = nil
-                    }
-                }
-            } label: {
-                #if os(macOS)
-                    HStack(spacing: 4) {
-                        Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
-                        Text(sortOption?.label ?? L10n.sort)
-                    }
-                    .padding(.horizontal, 4)
-                #else
-                    Image(systemName: sortOption?.systemImage ?? "arrow.up.arrow.down")
-                #endif
-            }
-            .disabled(!configFetched)
-        }
+        FeaturePulseToolbarMenus(
+            selectedTab: $selectedTab,
+            sortOption: $sortOption,
+            configFetched: configFetched
+        )
     }
 
     private func handleRestriction() {
@@ -412,7 +294,9 @@ public struct FeaturePulseView: View {
     private var featureRequestsList: some View {
         Group {
             if displayedRequests.isEmpty, !viewModel.isLoading, configFetched {
-                emptyStateView
+                FeaturePulseEmptyStateView(selectedTab: selectedTab) {
+                    handleFeatureRequestTap()
+                }
             } else {
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
@@ -452,43 +336,8 @@ public struct FeaturePulseView: View {
                             .padding(.top, shouldShowTranslateButton ? 16 : 24)
 
                             if configFetched {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    Text(L10n.ctaMessage)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .multilineTextAlignment(.leading)
-
-                                    Button {
-                                        handleFeatureRequestTap()
-                                    } label: {
-                                        HStack(spacing: 8) {
-                                            Image(systemName: "plus")
-                                                .font(.body.weight(.semibold))
-                                            Text(L10n.requestFeature)
-                                                .font(.body.weight(.semibold))
-                                        }
-                                        .frame(minHeight: 32)
-                                        .frame(maxWidth: .infinity)
-                                    }
-                                    .primaryGlassEffect()
-                                    .tint(Color.label)
-                                    .foregroundStyle(Color.systemBackground)
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 32)
-
-                                if config.showWatermark {
-                                    HStack(spacing: 6) {
-                                        Text(L10n.poweredBy)
-                                            .font(.footnote)
-                                            .foregroundStyle(.tertiary)
-                                        Image("Logo", bundle: .module)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 24)
-                                    }
-                                    .padding(.bottom, 24)
-                                    .unredacted()
+                                FeaturePulseListFooter(showWatermark: config.showWatermark) {
+                                    handleFeatureRequestTap()
                                 }
                             }
                         }
@@ -498,7 +347,7 @@ public struct FeaturePulseView: View {
                             await viewModel.loadFeatureRequests(isRefresh: true)
                         }
                     }
-                    .onChange(of: scrollToRequestID) { newID in
+                    .onChangeBackport(of: scrollToRequestID) { newID in
                         if let id = newID {
                             withBackportAnimation(.smooth(duration: 0.5)) {
                                 proxy.scrollTo(id, anchor: .center)
@@ -556,155 +405,7 @@ public struct FeaturePulseView: View {
 
         return sortOption?.sort(filtered) ?? filtered
     }
-
-    private var emptyStateView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: selectedTab == .completed ? "checkmark.circle" : "lightbulb.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(FeaturePulse.shared.primaryColor)
-                .backport.symbolEffect(.pulse)
-
-            VStack(spacing: 8) {
-                Text(selectedTab == .completed ? L10n.emptyStateCompletedTitle : L10n.emptyStateTitle)
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.primary)
-
-                Text(selectedTab == .completed ? L10n.emptyStateCompletedMessage : L10n.emptyStateMessage)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-
-            if selectedTab == .requests {
-                Button {
-                    handleFeatureRequestTap()
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus")
-                            .font(.body.weight(.semibold))
-                        Text(L10n.requestFeature)
-                            .font(.body.weight(.semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.label)
-                    .foregroundStyle(Color.systemBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 12)
-            }
-        }
-        .padding(.horizontal, 40)
-    }
 }
-
-// MARK: - Batch Translation
-
-private struct TranslationState {
-    var translations: Binding<[String: (title: String, description: String)]>
-    var enableTranslations: Binding<Bool>
-    var isLanguageInstalled: Binding<Bool>
-    var isTranslating: Binding<Bool>
-}
-
-private extension View {
-    @ViewBuilder
-    func applyBatchTranslation(
-        config: Any?,
-        requests: [FeatureRequest],
-        state: TranslationState
-    ) -> some View {
-        if #available(iOS 18.0, macOS 15.0, *) {
-            #if canImport(Translation)
-                translationTask(config as? TranslationSession.Configuration) { session in
-                    await runBatchTranslation(session: session, requests: requests, state: state)
-                }
-                .id((config as? TranslationSession.Configuration).debugDescription)
-            #else
-                self
-            #endif
-        } else {
-            self
-        }
-    }
-}
-
-#if canImport(Translation)
-    @available(iOS 18.0, macOS 15.0, *)
-    private func runBatchTranslation(
-        session: TranslationSession,
-        requests: [FeatureRequest],
-        state: TranslationState
-    ) async {
-        do {
-            var translatedAny = false
-            var partialTranslations: [String: (title: String?, description: String?)] = [:]
-
-            let batchRequests = await MainActor.run {
-                requests
-                    .filter { state.translations.wrappedValue[$0.id] == nil }
-                    .flatMap { request in
-                        [
-                            TranslationSession.Request(
-                                sourceText: request.title,
-                                clientIdentifier: "title:\(request.id)"
-                            ),
-                            TranslationSession.Request(
-                                sourceText: request.description,
-                                clientIdentifier: "description:\(request.id)"
-                            )
-                        ]
-                    }
-            }
-
-            guard !batchRequests.isEmpty else {
-                await MainActor.run { state.isTranslating.wrappedValue = false }
-                return
-            }
-
-            await MainActor.run { state.isTranslating.wrappedValue = true }
-
-            for try await response in session.translate(batch: batchRequests) {
-                translatedAny = await applyResponse(response, into: &partialTranslations, state: state) || translatedAny
-            }
-
-            await MainActor.run {
-                if translatedAny { state.enableTranslations.wrappedValue = true }
-                state.isTranslating.wrappedValue = false
-            }
-        } catch {
-            await MainActor.run {
-                state.enableTranslations.wrappedValue = false
-                state.isLanguageInstalled.wrappedValue = false
-                state.isTranslating.wrappedValue = false
-            }
-        }
-    }
-
-    @available(iOS 18.0, macOS 15.0, *)
-    @discardableResult
-    private func applyResponse(
-        _ response: TranslationSession.Response,
-        into partialTranslations: inout [String: (title: String?, description: String?)],
-        state: TranslationState
-    ) async -> Bool {
-        guard let clientID = response.clientIdentifier else { return false }
-        let isTitle = clientID.hasPrefix("title:")
-        guard isTitle || clientID.hasPrefix("description:") else { return false }
-        let requestID = String(clientID.dropFirst(isTitle ? "title:".count : "description:".count))
-
-        var partial = partialTranslations[requestID] ?? (title: nil, description: nil)
-        if isTitle { partial.title = response.targetText } else { partial.description = response.targetText }
-        partialTranslations[requestID] = partial
-
-        guard let title = partial.title, let description = partial.description else { return false }
-        await MainActor.run {
-            state.translations.wrappedValue[requestID] = (title: title, description: description)
-        }
-        return true
-    }
-#endif
 
 #Preview("Default") {
     FeaturePulseView()

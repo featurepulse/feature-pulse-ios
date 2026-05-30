@@ -5,7 +5,7 @@ public struct FeaturePulseSessionTracker: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .onChange(of: scenePhase) { newPhase in
+            .onChangeBackport(of: scenePhase) { newPhase in
                 if newPhase == .active {
                     FeaturePulse.shared.trackAppOpenIfNewSession()
                 }
@@ -75,6 +75,11 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     /// Your FeaturePulse API key (required)
     @Published public var apiKey: String = ""
 
+    /// Whether the SDK has the minimum required configuration.
+    public var isConfigured: Bool {
+        Self.apiKeyIsConfigured(apiKey)
+    }
+
     /// Base URL for FeaturePulse API
     @Published public var baseURL: String = "https://featurepul.se"
 
@@ -110,7 +115,19 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     /// How to handle feature request restrictions (nil = default alert with "Pro")
     @Published public var restrictionMode: RestrictionMode?
 
+    /// Override built-in localized strings.
+    ///
+    /// # Example:
+    /// ```swift
+    /// FeaturePulse.shared.localization.requestFeature = LocalizedStringResource("feedback.requestFeature")
+    /// ```
+    @Published public var localization = Localization()
+
     private init() {}
+
+    static func apiKeyIsConfigured(_ apiKey: String) -> Bool {
+        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     /// Track app open for engagement metrics (with 30-minute timeout)
     /// Called automatically by the featurePulseSessionTracking() modifier

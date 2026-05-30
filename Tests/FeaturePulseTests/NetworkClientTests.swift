@@ -13,14 +13,17 @@ struct NetworkClientTests {
 
     @Test
     func `request throws when API key is missing`() async throws {
-        FeaturePulse.shared.apiKey = ""
         let client = makeClient()
 
-        do {
-            let _: EmptyResponse = try await client.request(.activity)
-            Issue.record("Expected missing API key error")
-        } catch {
-            #expect(error as? FeaturePulseError == .missingAPIKey)
+        for apiKey in ["", "   "] {
+            FeaturePulse.shared.apiKey = apiKey
+
+            do {
+                let _: EmptyResponse = try await client.request(.activity)
+                Issue.record("Expected missing API key error")
+            } catch {
+                #expect(error as? FeaturePulseError == .missingAPIKey)
+            }
         }
 
         resetSharedConfiguration()
@@ -53,6 +56,7 @@ struct NetworkClientTests {
             )
         }
 
+        configureSharedForRequest()
         let response: ActivityResponse = try await client.request(.activity, body: requestBody)
 
         #expect(response.success)
@@ -88,6 +92,7 @@ struct NetworkClientTests {
             )
         }
 
+        configureSharedForRequest()
         do {
             let _: ActivityResponse = try await client.request(.activity)
             Issue.record("Expected decoding error")
@@ -116,6 +121,7 @@ struct NetworkClientTests {
         }
 
         do {
+            configureSharedForRequest()
             try await client.requestVoid(.submitFeatureRequest)
             Issue.record("Expected \(expectedError)")
         } catch {
@@ -124,9 +130,15 @@ struct NetworkClientTests {
     }
 
     private func makeClient() -> NetworkClient {
+        configureSharedForRequest()
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         return NetworkClient(session: URLSession(configuration: configuration))
+    }
+
+    private func configureSharedForRequest() {
+        FeaturePulse.shared.apiKey = "test-api-key"
+        FeaturePulse.shared.baseURL = "https://api.example.com"
     }
 
     private func resetSharedConfiguration() {

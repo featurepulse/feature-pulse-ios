@@ -4,251 +4,226 @@ public extension FeaturePulse {
     enum L10n {
         // MARK: - Feature Requests
         public static var featureRequests: String {
-            String(localized: "feature.requests", defaultValue: "Feature Requests", bundle: .module)
+            text(\.featureRequests, key: "feature.requests", defaultValue: "Feature Requests")
         }
 
         public static var newFeatureRequest: String {
-            String(localized: "new.feature.request", defaultValue: "New Feature Request", bundle: .module)
+            text(\.newFeatureRequest, key: "new.feature.request", defaultValue: "New Feature Request")
         }
 
         // MARK: - Form Fields
         public static var title: String {
-            String(localized: "title", defaultValue: "Title", bundle: .module)
+            text(\.title, key: "title", defaultValue: "Title")
         }
 
         public static var titlePlaceholder: String {
-            String(
-                localized: "title.placeholder", defaultValue: "What feature would you like to see?",
-                bundle: .module
-            )
+            text(\.titlePlaceholder, key: "title.placeholder", defaultValue: "What feature would you like to see?")
         }
 
         public static var description: String {
-            String(localized: "description", defaultValue: "Description", bundle: .module)
+            text(\.description, key: "description", defaultValue: "Description")
         }
 
         public static var descriptionPlaceholder: String {
-            String(
-                localized: "description.placeholder",
-                defaultValue: "Describe your feature idea in detail...",
-                bundle: .module
-            )
+            text(\.descriptionPlaceholder, key: "description.placeholder",
+                 defaultValue: "Describe your feature idea in detail...")
         }
 
         public static var emailOptional: String {
-            String(localized: "email.optional", defaultValue: "Email (optional)", bundle: .module)
+            text(\.emailOptional, key: "email.optional", defaultValue: "Email (optional)")
         }
 
         // MARK: - Actions
         public static var submit: String {
-            String(localized: "submit", defaultValue: "Submit", bundle: .module)
+            text(\.submit, key: "submit", defaultValue: "Submit")
         }
 
         public static var cancel: String {
-            String(localized: "cancel", defaultValue: "Cancel", bundle: .module)
+            text(\.cancel, key: "cancel", defaultValue: "Cancel")
         }
 
         public static var retry: String {
-            String(localized: "retry", defaultValue: "Retry", bundle: .module)
+            text(\.retry, key: "retry", defaultValue: "Retry")
         }
 
         // MARK: - Status
         public enum Status {
             public static var pending: String {
-                String(localized: "status.pending", defaultValue: "Pending", bundle: .module)
+                text(\.statusPending, key: "status.pending", defaultValue: "Pending")
             }
 
             public static var approved: String {
-                String(localized: "status.approved", defaultValue: "Approved", bundle: .module)
+                text(\.statusApproved, key: "status.approved", defaultValue: "Approved")
             }
 
             public static var planned: String {
-                String(localized: "status.planned", defaultValue: "Planned", bundle: .module)
+                text(\.statusPlanned, key: "status.planned", defaultValue: "Planned")
             }
 
             public static var inProgress: String {
-                String(localized: "status.inProgress", defaultValue: "In Progress", bundle: .module)
+                text(\.statusInProgress, key: "status.inProgress", defaultValue: "In Progress")
             }
 
             public static var completed: String {
-                String(localized: "status.completed", defaultValue: "Completed", bundle: .module)
+                text(\.statusCompleted, key: "status.completed", defaultValue: "Completed")
             }
 
             public static var rejected: String {
-                String(localized: "status.rejected", defaultValue: "Rejected", bundle: .module)
+                text(\.statusRejected, key: "status.rejected", defaultValue: "Rejected")
             }
         }
 
         // MARK: - Messages
         public static var loadingError: String {
-            String(
-                localized: "loading.error", defaultValue: "Failed to load feature requests", bundle: .module
-            )
+            text(\.loadingError, key: "loading.error", defaultValue: "Failed to load feature requests")
         }
 
         public static var error: String {
-            String(localized: "error", defaultValue: "Error", bundle: .module)
+            text(\.error, key: "error", defaultValue: "Error")
         }
 
         public static var ok: String {
-            String(localized: "ok", defaultValue: "OK", bundle: .module)
+            text(\.ok, key: "ok", defaultValue: "OK")
         }
 
         public static var thankYou: String {
-            String(localized: "thank.you", defaultValue: "Thanks for your feedback!", bundle: .module)
+            text(\.thankYou, key: "thank.you", defaultValue: "Thanks for your feedback!")
         }
 
         public static var invalidEmail: String {
-            String(
-                localized: "invalid.email", defaultValue: "Please enter a valid email address",
-                bundle: .module
-            )
+            text(\.invalidEmail, key: "invalid.email", defaultValue: "Please enter a valid email address")
         }
 
         // MARK: - Validation
         public static var titleTooShort: String {
-            String(
-                localized: "validation.title.tooShort",
-                defaultValue: "Title must be at least 3 characters",
-                bundle: .module
-            )
+            text(\.titleTooShort, key: "validation.title.tooShort", defaultValue: "Title must be at least 3 characters")
         }
 
         public static var titleTooLong: String {
-            String(
-                localized: "validation.title.tooLong",
-                defaultValue: "Title must not exceed 50 characters",
-                bundle: .module
-            )
+            text(\.titleTooLong, key: "validation.title.tooLong", defaultValue: "Title must not exceed 50 characters")
         }
 
         public static var descriptionTooShort: String {
-            String(
-                localized: "validation.description.tooShort",
-                defaultValue: "Description must be at least 10 characters",
-                bundle: .module
-            )
+            text(\.descriptionTooShort, key: "validation.description.tooShort",
+                 defaultValue: "Description must be at least 10 characters")
         }
 
         public static var descriptionTooLong: String {
-            String(
-                localized: "validation.description.tooLong",
-                defaultValue: "Description must not exceed 500 characters",
-                bundle: .module
-            )
+            text(\.descriptionTooLong, key: "validation.description.tooLong",
+                 defaultValue: "Description must not exceed 500 characters")
         }
 
         // MARK: - CTA
         public static var ctaMessage: String {
-            String(
-                localized: "cta.message",
-                defaultValue: "Didn't find the feature you want?",
-                bundle: .module
-            )
+            text(\.ctaMessage, key: "cta.message", defaultValue: "Didn't find the feature you want?")
         }
 
         public static var requestFeature: String {
-            String(localized: "cta.requestFeature", defaultValue: "Request a Feature", bundle: .module)
+            text(\.requestFeature, key: "cta.requestFeature", defaultValue: "Request a Feature")
         }
 
         public static var ctaBannerMessage: String {
-            String(
-                localized: "cta.banner.message",
-                defaultValue: "Let us know what features you'd like to see",
-                bundle: .module
-            )
+            text(\.ctaBannerMessage, key: "cta.banner.message",
+                 defaultValue: "Let us know what features you'd like to see")
         }
 
         // MARK: - Section Headers
         public static var titleHeader: String {
-            String(localized: "section.title", defaultValue: "Title", bundle: .module)
+            text(\.titleHeader, key: "section.title", defaultValue: "Title")
         }
 
         public static var descriptionHeader: String {
-            String(localized: "section.description", defaultValue: "Description", bundle: .module)
+            text(\.descriptionHeader, key: "section.description", defaultValue: "Description")
         }
 
         public static var contactHeader: String {
-            String(localized: "section.contact", defaultValue: "Contact", bundle: .module)
+            text(\.contactHeader, key: "section.contact", defaultValue: "Contact")
         }
 
         public static var optional: String {
-            String(localized: "optional", defaultValue: "Optional", bundle: .module)
+            text(\.optional, key: "optional", defaultValue: "Optional")
         }
 
         // MARK: - Empty State
         public static var emptyStateTitle: String {
-            String(localized: "empty.state.title", defaultValue: "No Feature Requests Yet", bundle: .module)
+            text(\.emptyStateTitle, key: "empty.state.title", defaultValue: "No Feature Requests Yet")
         }
 
         public static var emptyStateMessage: String {
-            String(
-                localized: "empty.state.message",
-                defaultValue: "Be the first to share your ideas!\nLet us know what features you'd like to see.",
-                bundle: .module
+            text(
+                \.emptyStateMessage,
+                key: "empty.state.message",
+                defaultValue: "Be the first to share your ideas!\nLet us know what features you'd like to see."
             )
         }
 
         public static var emptyStateCompletedTitle: String {
-            String(localized: "empty.state.completed.title", defaultValue: "No Completed Features Yet", bundle: .module)
+            text(\.emptyStateCompletedTitle, key: "empty.state.completed.title",
+                 defaultValue: "No Completed Features Yet")
         }
 
         public static var emptyStateCompletedMessage: String {
-            String(
-                localized: "empty.state.completed.message",
-                defaultValue: "Completed features will appear here.",
-                bundle: .module
-            )
+            text(\.emptyStateCompletedMessage, key: "empty.state.completed.message",
+                 defaultValue: "Completed features will appear here.")
         }
 
         // MARK: - Restrictions
         public static var restrictionAlertTitle: String {
-            String(localized: "restriction.alert.title", defaultValue: "Subscription Required", bundle: .module)
+            text(\.restrictionAlertTitle, key: "restriction.alert.title", defaultValue: "Subscription Required")
         }
 
         public static func restrictionMessage(subscriptionName: String = "Pro") -> String {
-            // swiftlint:disable:next line_length
-            String(localized: "restriction.message", defaultValue: "Only \(subscriptionName) users can add new feature requests, but you can vote for already added requests.", bundle: .module)
+            text(
+                \.restrictionMessage,
+                key: "restriction.message",
+                // swiftlint:disable:next line_length
+                defaultValue: "Only {subscriptionName} users can add new feature requests, but you can vote for already added requests."
+            )
+            .replacingOccurrences(of: "{subscriptionName}", with: subscriptionName)
         }
 
         // MARK: - Translation
+        public static var translating: String {
+            text(\.translating, key: "translating", defaultValue: "Translating...")
+        }
+
         public static var translateAll: String {
-            String(localized: "Translate All", defaultValue: "Translate All", bundle: .module)
+            text(\.translateAll, key: "Translate All", defaultValue: "Translate All")
         }
 
         public static var showOriginal: String {
-            String(localized: "Show Original", defaultValue: "Show Original", bundle: .module)
+            text(\.showOriginal, key: "Show Original", defaultValue: "Show Original")
         }
 
         // MARK: - Branding
         public static var poweredBy: String {
-            String(localized: "powered.by", defaultValue: "Powered by", bundle: .module)
+            text(\.poweredBy, key: "powered.by", defaultValue: "Powered by")
         }
 
         // MARK: - Tabs
         public static var tabRequests: String {
-            String(localized: "tab.requests", defaultValue: "Requests", bundle: .module)
+            text(\.tabRequests, key: "tab.requests", defaultValue: "Requests")
         }
 
         public static var tabCompleted: String {
-            String(localized: "tab.completed", defaultValue: "Completed", bundle: .module)
+            text(\.tabCompleted, key: "tab.completed", defaultValue: "Completed")
         }
 
         // MARK: - Sort
         public static var sortTop: String {
-            String(localized: "sort.top", defaultValue: "Top", bundle: .module)
+            text(\.sortTop, key: "sort.top", defaultValue: "Top")
         }
 
         public static var sortNewest: String {
-            String(localized: "sort.newest", defaultValue: "Newest", bundle: .module)
+            text(\.sortNewest, key: "sort.newest", defaultValue: "Newest")
         }
 
         public static var sort: String {
-            String(localized: "sort", defaultValue: "Sort", bundle: .module)
+            text(\.sort, key: "sort", defaultValue: "Sort")
         }
 
         public static var sortReset: String {
-            String(localized: "sort.reset", defaultValue: "Reset sorting", bundle: .module)
+            text(\.sortReset, key: "sort.reset", defaultValue: "Reset sorting")
         }
     }
 }

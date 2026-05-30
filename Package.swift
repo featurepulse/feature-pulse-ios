@@ -14,15 +14,11 @@ let package = Package(
             targets: ["FeaturePulse"]
         )
     ],
-    dependencies: [
-        .package(url: "https://github.com/codykerns/StableID", from: "0.4.1")
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "FeaturePulse",
-            dependencies: [
-                .product(name: "StableID", package: "StableID")
-            ],
+            dependencies: [],
             resources: [
                 .process("Resources"),
                 .process("PrivacyInfo.xcprivacy")

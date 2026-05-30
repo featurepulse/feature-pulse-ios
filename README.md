@@ -22,6 +22,8 @@ Open `Demo/FeaturePulseDemo/FeaturePulseDemo.xcodeproj` in Xcode and run the `Fe
 
 The demo app uses the local SDK package and shows FeaturePulse as a tab, modal sheet, and CTA banner. Set `FEATUREPULSE_USE_MOCKS=0` and `FEATUREPULSE_API_KEY` in the scheme environment variables to connect it to a real project.
 
+To test localization in the demo, use the **App Language Settings** row. It opens the app's iOS Settings page, where iOS can apply an app-specific language.
+
 ## Tests and Coverage
 
 Run the Swift Testing suite with coverage:
@@ -250,6 +252,8 @@ This is useful for:
 - Linking feature requests to your internal user database
 - Tracking the same user across multiple devices
 - Associating feedback with specific user accounts
+
+FeaturePulse still keeps a local device ID for anonymous users. When `customID` is set, the SDK sends both identifiers and the backend merges matching users by `customID`, so votes and user metadata can follow the same signed-in user across devices.
 
 ### Payment Tracking
 
@@ -599,13 +603,14 @@ The SDK automatically uses the user's device language. No additional configurati
 
 ## API Reference
 
-### FeaturePulse (FeaturePulseConfiguration)
+### FeaturePulse
 
-Main configuration singleton. `FeaturePulse` is a typealias for `FeaturePulseConfiguration`.
+Main configuration singleton.
 
 ```swift
 // Required
 FeaturePulse.shared.apiKey: String
+FeaturePulse.shared.isConfigured: Bool
 
 // Optional Appearance
 FeaturePulse.shared.primaryColor: Color
@@ -618,6 +623,23 @@ FeaturePulse.shared.restrictionMode: FeaturePulse.RestrictionMode?
 FeaturePulse.shared.updateUser(customID: String?)
 FeaturePulse.shared.updateUser(payment: Payment)
 FeaturePulse.shared.view() -> FeaturePulseView
+```
+
+Override individual localized strings when the built-in wording does not match your app:
+
+```swift
+FeaturePulse.shared.localization.requestFeature = LocalizedStringResource("feedback.requestFeature")
+FeaturePulse.shared.localization.featureRequests = LocalizedStringResource("feedback.title")
+```
+
+These resources resolve through your app's localization files, so each language can provide its own value for the same key.
+You can also set multiple overrides at once:
+
+```swift
+FeaturePulse.shared.localization = .init(
+    featureRequests: LocalizedStringResource("feedback.title"),
+    requestFeature: LocalizedStringResource("feedback.requestFeature")
+)
 ```
 
 ### Views

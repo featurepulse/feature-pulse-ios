@@ -2,6 +2,7 @@ import Foundation
 
 struct SyncUserRequest: Encodable {
     let userIdentifier: String
+    let deviceID: String
     let customID: String?
     let paymentType: String?
     let monthlyValueCents: Int?
@@ -11,6 +12,7 @@ struct SyncUserRequest: Encodable {
     enum CodingKeys: String, CodingKey {
         case customID = "custom_id"
         case userIdentifier = "user_identifier"
+        case deviceID = "device_id"
         case paymentType = "payment_type"
         case monthlyValueCents = "monthly_value_cents"
         case originalAmountCents = "original_amount_cents"
