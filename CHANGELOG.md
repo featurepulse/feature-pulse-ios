@@ -5,12 +5,13 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.12.0] - 2026-05-30
+## [1.12.0] - 2026-05-31
 
 ### ✨ New Features
 
 - **Configuration readiness** — added `FeaturePulse.shared.isConfigured` for quick API key checks
 - **Localization overrides** — added typed `FeaturePulse.shared.localization` fields backed by `LocalizedStringResource`
+- **Cross-device identity** — when `customID` is set, votes and user metadata follow the same account across devices
 
 ### 📦 Installation
 

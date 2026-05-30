@@ -15,7 +15,7 @@ public final class FeaturePulseAPI: Sendable {
         let config = FeaturePulse.shared
 
         let request = ActivityRequest(
-            userIdentifier: config.user.deviceID,
+            userIdentifier: config.user.userIdentifier,
             activityType: type
         )
 
@@ -29,8 +29,10 @@ public final class FeaturePulseAPI: Sendable {
         let config = FeaturePulse.shared
 
         let queryItems = [
-            URLQueryItem(name: "device_id", value: config.user.deviceID)
-        ]
+            URLQueryItem(name: "user_identifier", value: config.user.userIdentifier),
+            URLQueryItem(name: "device_id", value: config.user.deviceID),
+            URLQueryItem(name: "custom_id", value: config.user.customID)
+        ].filter { $0.value != nil }
 
         let response: FeatureRequestsResponse = try await client.request(
             .featureRequests,
@@ -59,6 +61,7 @@ public final class FeaturePulseAPI: Sendable {
             title: title,
             description: description,
             deviceInfo: deviceInfo,
+            customID: config.user.customID,
             paymentType: config.user.payment?.paymentType.rawValue,
             monthlyValueCents: config.user.payment?.monthlyValueInCents,
             originalAmountCents: config.user.payment.map {
@@ -78,6 +81,7 @@ public final class FeaturePulseAPI: Sendable {
 
         let request = VoteRequest(
             deviceID: config.user.deviceID,
+            customID: config.user.customID,
             paymentType: config.user.payment?.paymentType.rawValue,
             monthlyValueCents: config.user.payment?.monthlyValueInCents
         )
@@ -90,7 +94,7 @@ public final class FeaturePulseAPI: Sendable {
     public func unvoteForFeatureRequest(id: String) async throws {
         let config = FeaturePulse.shared
 
-        let request = UnvoteRequest(deviceID: config.user.deviceID)
+        let request = UnvoteRequest(deviceID: config.user.deviceID, customID: config.user.customID)
 
         try await client.requestVoid(.unvote(featureRequestID: id), body: request)
     }
@@ -102,6 +106,7 @@ public final class FeaturePulseAPI: Sendable {
 
         let request = SyncUserRequest(
             userIdentifier: config.user.userIdentifier,
+            deviceID: config.user.deviceID,
             customID: config.user.customID,
             paymentType: config.user.payment?.paymentType.rawValue,
             monthlyValueCents: config.user.payment?.monthlyValueInCents,

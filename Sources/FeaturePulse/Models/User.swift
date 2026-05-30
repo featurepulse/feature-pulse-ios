@@ -17,11 +17,10 @@ final class User: @unchecked Sendable {
         deviceID = Self.getOrCreateDeviceID()
     }
 
-    /// Returns the user identifier to send with API requests
-    /// Always uses deviceID as the stable unique identifier
-    /// customID and email are sent as additional metadata to complement the device identity
+    /// Returns the canonical user identifier to send with API requests.
+    /// Signed-in apps use customID so the same account matches across devices.
     var userIdentifier: String {
-        deviceID
+        customID ?? deviceID
     }
 
     // MARK: - Private Helpers

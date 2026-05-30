@@ -253,6 +253,8 @@ This is useful for:
 - Tracking the same user across multiple devices
 - Associating feedback with specific user accounts
 
+FeaturePulse still keeps a local device ID for anonymous users. When `customID` is set, the SDK sends both identifiers and the backend merges matching users by `customID`, so votes and user metadata can follow the same signed-in user across devices.
+
 ### Payment Tracking
 
 Track user payment tiers to understand your customer base. **Currency is required** for all payment tiers (except `.free`).

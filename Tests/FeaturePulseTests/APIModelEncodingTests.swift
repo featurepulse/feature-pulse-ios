@@ -20,6 +20,7 @@ struct APIModelEncodingTests {
             title: "Calendar sync",
             description: "Sync events into the calendar.",
             deviceInfo: DeviceInfo(deviceID: "device-1", bundleID: "com.example.demo"),
+            customID: "user-1",
             paymentType: "monthly",
             monthlyValueCents: 999,
             originalAmountCents: 999,
@@ -35,20 +36,48 @@ struct APIModelEncodingTests {
         #expect(json["monthly_value_cents"] as? Int == 999)
         #expect(json["original_amount_cents"] as? Int == 999)
         #expect(json["currency"] as? String == "USD")
+        #expect(json["custom_id"] as? String == "user-1")
         #expect(deviceInfo["device_id"] as? String == "device-1")
         #expect(deviceInfo["bundle_id"] as? String == "com.example.demo")
     }
 
     @Test
-    func `vote and unvote requests use device ID key`() throws {
-        let voteRequest = VoteRequest(deviceID: "device-1", paymentType: "yearly", monthlyValueCents: 667)
+    func `vote and unvote requests include identity keys`() throws {
+        let voteRequest = VoteRequest(
+            deviceID: "device-1",
+            customID: "user-1",
+            paymentType: "yearly",
+            monthlyValueCents: 667
+        )
         let vote = try encodedJSONObject(voteRequest)
-        let unvote = try encodedJSONObject(UnvoteRequest(deviceID: "device-1"))
+        let unvote = try encodedJSONObject(UnvoteRequest(deviceID: "device-1", customID: "user-1"))
 
         #expect(vote["device_id"] as? String == "device-1")
+        #expect(vote["custom_id"] as? String == "user-1")
         #expect(vote["payment_type"] as? String == "yearly")
         #expect(vote["monthly_value_cents"] as? Int == 667)
         #expect(unvote["device_id"] as? String == "device-1")
+        #expect(unvote["custom_id"] as? String == "user-1")
+    }
+
+    @Test
+    func `sync user request includes canonical and device identifiers`() throws {
+        let request = SyncUserRequest(
+            userIdentifier: "user-1",
+            deviceID: "device-1",
+            customID: "user-1",
+            paymentType: "monthly",
+            monthlyValueCents: 999,
+            originalAmountCents: 999,
+            currency: "USD"
+        )
+
+        let json = try encodedJSONObject(request)
+
+        #expect(json["user_identifier"] as? String == "user-1")
+        #expect(json["device_id"] as? String == "device-1")
+        #expect(json["custom_id"] as? String == "user-1")
+        #expect(json["payment_type"] as? String == "monthly")
     }
 
     @Test

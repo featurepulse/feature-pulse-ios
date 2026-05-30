@@ -67,6 +67,20 @@ final class UserDefaultsManagerTests {
     }
 
     @Test
+    func `user identifier prefers custom ID`() throws {
+        resetFeaturePulseDefaults()
+
+        let user = User()
+        let deviceID = user.deviceID
+
+        #expect(user.userIdentifier == deviceID)
+
+        user.customID = "account-1"
+
+        #expect(user.userIdentifier == "account-1")
+    }
+
+    @Test
     func `user migrates legacy StableID device ID`() throws {
         resetFeaturePulseDefaults()
 
