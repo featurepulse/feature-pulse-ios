@@ -132,20 +132,21 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     /// Track app open for engagement metrics (with 30-minute timeout)
     /// Called automatically by the featurePulseSessionTracking() modifier
     func trackAppOpenIfNewSession() {
-        guard UserDefaultsManager.isUserActive else { return }
-
         let lastSessionTime = UserDefaultsManager.lastSessionTime
         let now = Date().timeIntervalSince1970
 
         guard lastSessionTime == 0 || (now - lastSessionTime) > 1800 else { return }
 
+        UserDefaultsManager.lastSessionTime = now
+        UserDefaultsManager.sessionCount += 1
+
+        guard UserDefaultsManager.isUserActive else { return }
+
         Task {
             do {
                 try await FeaturePulseAPI.shared.trackActivity(type: "app_open")
-                UserDefaultsManager.lastSessionTime = now
-                UserDefaultsManager.sessionCount += 1
             } catch {
-                // Don't update lastSessionTime — retry on next session
+                // Keep local session state even if network tracking fails.
             }
         }
     }
@@ -201,6 +202,8 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     }
 
     private func syncUserIfNeeded() {
+        guard UserDefaultsManager.isUserActive else { return }
+
         let cachedCustomID = UserDefaultsManager.lastSyncedCustomID
         let cachedPayment = UserDefaultsManager.lastSyncedPayment
 

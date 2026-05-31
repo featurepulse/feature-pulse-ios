@@ -67,6 +67,31 @@ final class UserDefaultsManagerTests {
     }
 
     @Test
+    func `user updates do not sync before user is active`() {
+        resetFeaturePulseDefaults()
+
+        FeaturePulse.shared.updateUser(customID: "user-1")
+        FeaturePulse.shared.updateUser(payment: .monthly(9.99, currency: "USD"))
+
+        #expect(UserDefaultsManager.lastSyncedCustomID == nil)
+        #expect(UserDefaultsManager.lastSyncedPayment == nil)
+        #expect(!UserDefaultsManager.isUserActive)
+    }
+
+    @Test
+    func `session tracking stores local session before user is active`() async {
+        resetFeaturePulseDefaults()
+
+        FeaturePulse.shared.trackAppOpenIfNewSession()
+
+        try? await Task.sleep(for: .milliseconds(100))
+
+        #expect(UserDefaultsManager.lastSessionTime > 0)
+        #expect(UserDefaultsManager.sessionCount == 1)
+        #expect(!UserDefaultsManager.isUserActive)
+    }
+
+    @Test
     func `user identifier prefers custom ID`() throws {
         resetFeaturePulseDefaults()
 
