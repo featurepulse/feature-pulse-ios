@@ -5,6 +5,26 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.1] - 2026-05-31
+
+### 🐛 Bug Fixes
+
+- **Session tracking** — session count and time now stored locally even before the user is active, so CTA banner triggers are accurate from the first session
+- **User sync guard** — `updateUser()` no longer fires API requests until the user has engaged with FeaturePulse
+
+### 📦 Installation
+
+```swift
+.package(url: "https://github.com/featurepulse/feature-pulse-ios.git", from: "1.12.1")
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.12.0] - 2026-05-31
 
 ### ✨ New Features
