@@ -17,6 +17,7 @@ struct FeatureRequestsResponse: Codable {
     let showStatus: Bool?
     let showTranslation: Bool?
     let showWatermark: Bool?
+    let featureRequestsDisabled: Bool?
     let statusConfig: StatusConfig?
     let permissions: Permissions?
 
@@ -25,6 +26,7 @@ struct FeatureRequestsResponse: Codable {
         case showStatus = "show_status"
         case showTranslation = "show_translation"
         case showWatermark = "show_watermark"
+        case featureRequestsDisabled = "feature_requests_disabled"
         case statusConfig = "status_config"
     }
 }

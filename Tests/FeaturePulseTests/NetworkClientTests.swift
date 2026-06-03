@@ -39,6 +39,7 @@ struct NetworkClientTests {
             #expect(request.httpMethod == "POST")
             #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
             #expect(request.value(forHTTPHeaderField: "X-API-Key") == "test-api-key")
+            #expect(request.value(forHTTPHeaderField: "X-FeaturePulse-SDK-Version") == FeaturePulseSDK.version)
 
             let body = try #require(request.httpBodyData)
             let json = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])

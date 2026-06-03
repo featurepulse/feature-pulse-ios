@@ -66,6 +66,10 @@ public struct FeaturePulseView: View {
         (enableTranslations && !translations.isEmpty) ? L10n.showOriginal : L10n.translateAll
     }
 
+    private var canShowRequestFeatureButton: Bool {
+        !config.featureRequestsDisabled
+    }
+
     @ViewBuilder
     private var translateButton: some View {
         if shouldShowTranslateButton, !viewModel.isLoading {
@@ -164,12 +168,14 @@ public struct FeaturePulseView: View {
             #endif
 
             ToolbarItem(placement: .confirmationAction) {
-                Button(L10n.requestFeature, systemImage: "plus") {
-                    handleFeatureRequestTap()
+                if canShowRequestFeatureButton {
+                    Button(L10n.requestFeature, systemImage: "plus") {
+                        handleFeatureRequestTap()
+                    }
+                    .foregroundStyle(Color.systemBackground)
+                    .tint(Color.label)
+                    .disabled(!configFetched)
                 }
-                .foregroundStyle(Color.systemBackground)
-                .tint(Color.label)
-                .disabled(!configFetched)
             }
         }
         .sheet(isPresented: $showingNewRequest) {
@@ -250,6 +256,8 @@ public struct FeaturePulseView: View {
     }
 
     private func handleFeatureRequestTap() {
+        guard canShowRequestFeatureButton else { return }
+
         if !config.permissions.canCreateFeatureRequest {
             handleRestriction()
         } else {
@@ -294,7 +302,10 @@ public struct FeaturePulseView: View {
     private var featureRequestsList: some View {
         Group {
             if displayedRequests.isEmpty, !viewModel.isLoading, configFetched {
-                FeaturePulseEmptyStateView(selectedTab: selectedTab) {
+                FeaturePulseEmptyStateView(
+                    selectedTab: selectedTab,
+                    canRequestFeature: canShowRequestFeatureButton
+                ) {
                     handleFeatureRequestTap()
                 }
             } else {
@@ -336,7 +347,10 @@ public struct FeaturePulseView: View {
                             .padding(.top, shouldShowTranslateButton ? 16 : 24)
 
                             if configFetched {
-                                FeaturePulseListFooter(showWatermark: config.showWatermark) {
+                                FeaturePulseListFooter(
+                                    showWatermark: config.showWatermark,
+                                    canRequestFeature: canShowRequestFeatureButton
+                                ) {
                                     handleFeatureRequestTap()
                                 }
                             }
