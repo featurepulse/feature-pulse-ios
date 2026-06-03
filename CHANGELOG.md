@@ -5,6 +5,30 @@ All notable changes to the FeaturePulse iOS SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.2] - 2026-06-03
+
+### 🎮 Demo App
+
+- Added **Developer Free Plan** toggle to simulate the watermark state without a real free-tier project
+
+### 🔧 Internals
+
+- SDK version is now sent with every API request
+- Feature request submission can now be disabled remotely from the dashboard
+
+### 📦 Installation
+
+```swift
+.package(url: "https://github.com/featurepulse/feature-pulse-ios.git", from: "1.12.2")
+```
+
+### 🔗 Links
+
+- [Full Changelog](https://github.com/featurepulse/feature-pulse-ios/blob/main/CHANGELOG.md)
+- [Documentation](https://featurepul.se)
+
+---
+
 ## [1.12.1] - 2026-05-31
 
 ### 🐛 Bug Fixes

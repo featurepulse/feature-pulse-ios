@@ -95,6 +95,7 @@ final class NetworkClient: Sendable {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        request.setValue(FeaturePulseSDK.version, forHTTPHeaderField: "X-FeaturePulse-SDK-Version")
         return request
     }
 

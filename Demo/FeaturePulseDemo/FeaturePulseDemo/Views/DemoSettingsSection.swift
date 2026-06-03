@@ -4,6 +4,7 @@ import UIKit
 struct DemoSettingsSection: View {
     @Binding var showStatusBadges: Bool
     @Binding var showTranslationButton: Bool
+    @Binding var isDeveloperFreePlan: Bool
     @Binding var tintColor: Color
     @Binding var textColor: Color
     let showsTranslationFallbackNote: Bool
@@ -39,14 +40,30 @@ struct DemoSettingsSection: View {
     }
 }
 
+struct DemoDeveloperStateSection: View {
+    @Binding var isDeveloperFreePlan: Bool
+
+    var body: some View {
+        Section {
+            Toggle("Developer Free Plan", isOn: $isDeveloperFreePlan)
+        } header: {
+            Text("Developer State")
+        } footer: {
+            Text("Free plan shows the FeaturePulse watermark, matching the developer's subscription state.")
+        }
+    }
+}
+
 #Preview {
     List {
         DemoSettingsSection(
             showStatusBadges: .constant(true),
             showTranslationButton: .constant(false),
+            isDeveloperFreePlan: .constant(false),
             tintColor: .constant(.pink),
             textColor: .constant(.white),
             showsTranslationFallbackNote: false
         )
+        DemoDeveloperStateSection(isDeveloperFreePlan: .constant(false))
     }
 }

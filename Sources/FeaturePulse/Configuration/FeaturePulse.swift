@@ -112,6 +112,9 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     /// Whether to show watermark branding (controlled from API based on subscription)
     @Published public internal(set) var showWatermark: Bool = true
 
+    /// Whether feature request submission is disabled for this project by the API
+    @Published public internal(set) var featureRequestsDisabled: Bool = false
+
     /// How to handle feature request restrictions (nil = default alert with "Pro")
     @Published public var restrictionMode: RestrictionMode?
 

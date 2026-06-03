@@ -89,6 +89,7 @@ struct APIModelEncodingTests {
           "show_status": true,
           "show_translation": false,
           "show_watermark": false,
+          "feature_requests_disabled": true,
           "permissions": {
             "can_create_feature_request": false
           },
@@ -108,6 +109,7 @@ struct APIModelEncodingTests {
         #expect(response.showStatus == true)
         #expect(response.showTranslation == false)
         #expect(response.showWatermark == false)
+        #expect(response.featureRequestsDisabled == true)
         #expect(response.permissions == Permissions(canCreateFeatureRequest: false))
         #expect(response.statusConfig?["planned"]?.color == "#FF00AA")
         #expect(response.statusConfig?["planned"]?.icon == "calendar.badge.clock")

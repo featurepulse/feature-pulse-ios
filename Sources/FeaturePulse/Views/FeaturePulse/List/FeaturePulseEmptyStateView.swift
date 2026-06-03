@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FeaturePulseEmptyStateView: View {
     let selectedTab: FeaturePulseView.FeatureTab
+    let canRequestFeature: Bool
     let onRequestFeature: () -> Void
 
     var body: some View {
@@ -22,7 +23,7 @@ struct FeaturePulseEmptyStateView: View {
             }
             .multilineTextAlignment(.center)
 
-            if selectedTab == .requests {
+            if selectedTab == .requests, canRequestFeature {
                 Button(action: onRequestFeature) {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")

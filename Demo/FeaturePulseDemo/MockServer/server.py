@@ -42,6 +42,9 @@ REQUESTS = [
 SETTINGS = {
     "show_status": True,
     "show_translation": False,
+    "show_watermark": False,
+    "feature_requests_disabled": False,
+    "can_create_feature_request": True,
 }
 
 
@@ -51,8 +54,9 @@ def feature_requests_payload(requests=None):
         "data": requests or list(REQUESTS),
         "show_status": SETTINGS["show_status"],
         "show_translation": SETTINGS["show_translation"],
-        "show_watermark": False,
-        "permissions": {"can_create_feature_request": True},
+        "show_watermark": SETTINGS["show_watermark"],
+        "feature_requests_disabled": SETTINGS["feature_requests_disabled"],
+        "permissions": {"can_create_feature_request": SETTINGS["can_create_feature_request"]},
         "status_config": {
             "pending": {"color": "#EAB308", "icon": "hourglass.bottomhalf.filled"},
             "approved": {"color": "#3B82F6", "icon": "checkmark.seal.fill"},
@@ -109,6 +113,12 @@ class Handler(BaseHTTPRequestHandler):
                 SETTINGS["show_status"] = bool(body["show_status"])
             if "show_translation" in body:
                 SETTINGS["show_translation"] = bool(body["show_translation"])
+            if "show_watermark" in body:
+                SETTINGS["show_watermark"] = bool(body["show_watermark"])
+            if "feature_requests_disabled" in body:
+                SETTINGS["feature_requests_disabled"] = bool(body["feature_requests_disabled"])
+            if "can_create_feature_request" in body:
+                SETTINGS["can_create_feature_request"] = bool(body["can_create_feature_request"])
             self.respond({"success": True, **SETTINGS})
         elif path == "/api/sdk/feature-requests":
             REQUESTS.insert(

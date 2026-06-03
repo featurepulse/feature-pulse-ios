@@ -5,6 +5,7 @@ struct DemoHomeView: View {
     let ctaBannerResetID: UUID
     @Binding var showStatusBadges: Bool
     @Binding var showTranslationButton: Bool
+    @Binding var isDeveloperFreePlan: Bool
     @Binding var tintColor: Color
     @Binding var textColor: Color
     let showsTranslationFallbackNote: Bool
@@ -31,6 +32,7 @@ struct DemoHomeView: View {
             DemoSettingsSection(
                 showStatusBadges: $showStatusBadges,
                 showTranslationButton: $showTranslationButton,
+                isDeveloperFreePlan: $isDeveloperFreePlan,
                 tintColor: $tintColor,
                 textColor: $textColor,
                 showsTranslationFallbackNote: showsTranslationFallbackNote
@@ -44,6 +46,8 @@ struct DemoHomeView: View {
                 }
             }
 
+            DemoDeveloperStateSection(isDeveloperFreePlan: $isDeveloperFreePlan)
+
             DemoUserSection()
         }
     }
@@ -54,6 +58,7 @@ struct DemoHomeView: View {
         ctaBannerResetID: UUID(),
         showStatusBadges: .constant(true),
         showTranslationButton: .constant(false),
+        isDeveloperFreePlan: .constant(false),
         tintColor: .constant(.pink),
         textColor: .constant(.white),
         showsTranslationFallbackNote: false,
