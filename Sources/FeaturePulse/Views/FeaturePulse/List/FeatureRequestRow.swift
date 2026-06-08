@@ -2,16 +2,49 @@ import SwiftUI
 
 /// Individual feature request row
 struct FeatureRequestRow: View {
+    enum BackgroundStyle {
+        case standard
+        case subtle
+    }
+
     // MARK: - Properties
     let request: FeatureRequest
     let hasVoted: Bool
     let translatedTitle: String?
     let translatedDescription: String?
+    let usesScrollTransition: Bool
+    let contentPadding: EdgeInsets
+    let backgroundStyle: BackgroundStyle
+    let voteTrigger: Int
+    let isVoteLoading: Bool
+    let onSelect: () -> Void
     let onVote: () async -> Bool
 
-    @State private var isVoting = false
-    @State private var justVoted = false
-    @State private var isPressing = false
+    init(
+        request: FeatureRequest,
+        hasVoted: Bool,
+        translatedTitle: String?,
+        translatedDescription: String?,
+        usesScrollTransition: Bool = true,
+        contentPadding: EdgeInsets = EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0),
+        backgroundStyle: BackgroundStyle = .standard,
+        voteTrigger: Int = 0,
+        isVoteLoading: Bool = false,
+        onSelect: @escaping () -> Void,
+        onVote: @escaping () async -> Bool
+    ) {
+        self.request = request
+        self.hasVoted = hasVoted
+        self.translatedTitle = translatedTitle
+        self.translatedDescription = translatedDescription
+        self.usesScrollTransition = usesScrollTransition
+        self.contentPadding = contentPadding
+        self.backgroundStyle = backgroundStyle
+        self.voteTrigger = voteTrigger
+        self.isVoteLoading = isVoteLoading
+        self.onSelect = onSelect
+        self.onVote = onVote
+    }
 
     private var displayTitle: String {
         translatedTitle ?? request.title
@@ -24,62 +57,7 @@ struct FeatureRequestRow: View {
     // MARK: - UI
     var body: some View {
         HStack(spacing: 12) {
-            // Vote Button
-            VStack(spacing: 4) {
-                ZStack {
-                    Image(systemName: "triangle.fill")
-                        .font(.caption2.weight(.semibold))
-                        .opacity(isVoting ? 0 : 1)
-                        .backport.symbolEffect(.bounce, value: justVoted)
-                        .scaleEffect(isPressing ? 1.2 : 1)
-
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(hasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
-                        .opacity(isVoting ? 1 : 0)
-                }
-                Text(verbatim: "\(request.voteCount)")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .backport.contentTransition(.numericText(value: Double(request.voteCount)))
-            }
-            .frame(width: 56, height: 60)
-            .background(hasVoted ? voteColor : voteColor.opacity(0.1))
-            .foregroundStyle(
-                hasVoted ? FeaturePulse.shared.foregroundColor : voteColor
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(hasVoted ? Color.clear : voteColor.opacity(0.2), lineWidth: 1)
-            )
-            .contentShape(Rectangle())
-            .scaleEffect(isPressing ? 0.9 : 1)
-            .opacity(isVoting ? 0.6 : 1.0)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isVoting else { return }
-                        withBackportAnimation(.smooth(duration: 0.2)) {
-                            isPressing = true
-                        }
-                    }
-                    .onEnded { _ in
-                        withBackportAnimation(.bouncy(duration: 0.5)) {
-                            isPressing = false
-                        }
-                        guard !isVoting else { return }
-                        Task {
-                            isVoting = true
-                            let success = await onVote()
-                            isVoting = false
-
-                            if success {
-                                justVoted.toggle()
-                            }
-                        }
-                    }
-            )
+            voteButton
 
             // Content
             VStack(alignment: .leading, spacing: 6) {
@@ -114,16 +92,47 @@ struct FeatureRequestRow: View {
                     )
                 }
             }
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onSelect)
         }
-        .padding(.vertical, 8)
-        .background(.background)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(contentPadding)
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(rowBackground)
+        }
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-        .backport.scrollTransition()
+        .modifier(FeatureRequestRowScrollTransition(enabled: usesScrollTransition))
     }
 
-    private var voteColor: Color {
-        FeaturePulse.shared.primaryColor
+    private var rowBackground: Color {
+        switch backgroundStyle {
+        case .standard:
+            Color.systemBackground
+        case .subtle:
+            Color.secondary.opacity(0.12)
+        }
+    }
+
+    private var voteButton: some View {
+        FeaturePulseVoteButton(
+            voteCount: request.voteCount,
+            hasVoted: hasVoted,
+            voteTrigger: voteTrigger,
+            isExternallyLoading: isVoteLoading,
+            onVote: onVote
+        )
+    }
+}
+
+private struct FeatureRequestRowScrollTransition: ViewModifier {
+    let enabled: Bool
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content.backport.scrollTransition()
+        } else {
+            content
+        }
     }
 }
 
@@ -141,6 +150,7 @@ struct FeatureRequestRow: View {
         hasVoted: false,
         translatedTitle: nil,
         translatedDescription: nil,
+        onSelect: {},
         onVote: { true }
     )
     .padding()
@@ -159,6 +169,7 @@ struct FeatureRequestRow: View {
         hasVoted: true,
         translatedTitle: nil,
         translatedDescription: nil,
+        onSelect: {},
         onVote: { true }
     )
     .padding()

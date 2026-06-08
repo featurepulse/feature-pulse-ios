@@ -42,6 +42,10 @@ public extension FeaturePulse {
             text(\.cancel, key: "cancel", defaultValue: "Cancel")
         }
 
+        public static var close: String {
+            text(\.close, key: "close", defaultValue: "Close")
+        }
+
         public static var retry: String {
             text(\.retry, key: "retry", defaultValue: "Retry")
         }
@@ -88,6 +92,25 @@ public extension FeaturePulse {
 
         public static var thankYou: String {
             text(\.thankYou, key: "thank.you", defaultValue: "Thanks for your feedback!")
+        }
+
+        public static var duplicateSuggestionTitle: String {
+            text(\.duplicateSuggestionTitle, key: "duplicate.suggestion.title",
+                 defaultValue: "Similar Request Found")
+        }
+
+        public static var duplicateSuggestionMessage: String {
+            text(\.duplicateSuggestionMessage, key: "duplicate.suggestion.message",
+                 defaultValue: "This looks similar to an existing request. You can vote for it instead.")
+        }
+
+        public static var voteForExisting: String {
+            text(\.voteForExisting, key: "duplicate.suggestion.voteForExisting",
+                 defaultValue: "Vote for Existing")
+        }
+
+        public static var submitAnyway: String {
+            text(\.submitAnyway, key: "duplicate.suggestion.submitAnyway", defaultValue: "Submit Anyway")
         }
 
         public static var invalidEmail: String {
@@ -224,6 +247,15 @@ public extension FeaturePulse {
 
         public static var sortReset: String {
             text(\.sortReset, key: "sort.reset", defaultValue: "Reset sorting")
+        }
+
+        // MARK: - Voting
+        public static var vote: String {
+            text(\.vote, key: "Vote", defaultValue: "Vote")
+        }
+
+        public static var removeVote: String {
+            text(\.removeVote, key: "Remove vote", defaultValue: "Remove vote")
         }
     }
 }

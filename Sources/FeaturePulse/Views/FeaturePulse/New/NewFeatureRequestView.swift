@@ -10,10 +10,13 @@ public struct NewFeatureRequestView: View {
     @State private var isSubmitting = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var duplicateSuggestion: DuplicateSuggestion?
+    @State private var skipDuplicateCheck = false
 
     @FocusState private var focusedField: Field?
 
     private var onSubmit: (() -> Void)?
+    private let existingRequests: [FeatureRequest]
 
     private enum Field: Hashable {
         case title, description
@@ -34,7 +37,8 @@ public struct NewFeatureRequestView: View {
             || isSubmitting
     }
 
-    public init(onSubmit: (() -> Void)? = nil) {
+    public init(existingRequests: [FeatureRequest] = [], onSubmit: (() -> Void)? = nil) {
+        self.existingRequests = existingRequests
         self.onSubmit = onSubmit
     }
 
@@ -115,6 +119,14 @@ public struct NewFeatureRequestView: View {
             .padding(24)
             .frame(minWidth: 420)
             .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
+            .duplicateSuggestionSheet(
+                suggestion: $duplicateSuggestion,
+                submitAnyway: {
+                    skipDuplicateCheck = true
+                    submitFeatureRequest()
+                },
+                voteForExisting: voteForSuggestedRequest
+            )
         }
     #endif
 
@@ -172,6 +184,14 @@ public struct NewFeatureRequestView: View {
                 ToolbarItem(placement: .confirmationAction) { submitButton }
             }
             .commonModifiers(showError: $showError, errorMessage: errorMessage, onAppear: { focusedField = .title })
+            .duplicateSuggestionSheet(
+                suggestion: $duplicateSuggestion,
+                submitAnyway: {
+                    skipDuplicateCheck = true
+                    submitFeatureRequest()
+                },
+                voteForExisting: voteForSuggestedRequest
+            )
     }
 
     // MARK: - Submit
@@ -190,9 +210,28 @@ public struct NewFeatureRequestView: View {
 
         Task {
             do {
+                let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+                let trimmedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                if !skipDuplicateCheck {
+                    let suggestion = await FeatureRequestDuplicateDetector.suggestion(
+                        title: trimmedTitle,
+                        description: trimmedDescription,
+                        existingRequests: existingRequests
+                    )
+
+                    if let suggestion {
+                        await MainActor.run {
+                            duplicateSuggestion = suggestion
+                            isSubmitting = false
+                        }
+                        return
+                    }
+                }
+
                 try await FeaturePulseAPI.shared.submitFeatureRequest(
-                    title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-                    description: description.trimmingCharacters(in: .whitespacesAndNewlines)
+                    title: trimmedTitle,
+                    description: trimmedDescription
                 )
                 await FeaturePulse.shared.markUserActiveIfNeeded()
                 await MainActor.run { onSubmit?(); dismiss() }
@@ -203,6 +242,34 @@ public struct NewFeatureRequestView: View {
                     isSubmitting = false
                 }
             }
+        }
+    }
+
+    private func voteForSuggestedRequest() async -> Bool {
+        guard let request = duplicateSuggestion?.request else { return false }
+
+        await MainActor.run {
+            focusedField = nil
+            withBackportAnimation(.smooth(duration: 0.3)) { isSubmitting = true }
+        }
+
+        do {
+            if !request.hasVoted {
+                try await FeaturePulseAPI.shared.voteForFeatureRequest(id: request.id)
+                await FeaturePulse.shared.markUserActiveIfNeeded()
+            }
+            await MainActor.run { onSubmit?(); dismiss() }
+            return true
+        } catch let error as FeaturePulseError where error == .alreadyVoted {
+            await MainActor.run { onSubmit?(); dismiss() }
+            return true
+        } catch {
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                showError = true
+                isSubmitting = false
+            }
+            return false
         }
     }
 }
@@ -247,6 +314,20 @@ private extension View {
             Text(errorMessage)
         }
         .onAppear(perform: onAppear)
+    }
+
+    func duplicateSuggestionSheet(
+        suggestion: Binding<DuplicateSuggestion?>,
+        submitAnyway: @escaping () -> Void,
+        voteForExisting: @escaping () async -> Bool
+    ) -> some View {
+        sheet(item: suggestion) { suggestion in
+            DuplicateSuggestionSheet(
+                suggestion: suggestion,
+                submitAnyway: submitAnyway,
+                voteForExisting: voteForExisting
+            )
+        }
     }
 }
 
