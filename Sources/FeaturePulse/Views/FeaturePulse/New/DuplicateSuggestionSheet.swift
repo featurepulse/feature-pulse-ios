@@ -6,6 +6,7 @@ struct DuplicateSuggestionSheet: View {
     let suggestion: DuplicateSuggestion
     let submitAnyway: () -> Void
     let voteForExisting: () async -> Bool
+    let onVoteAnimationCompleted: () -> Void
 
     @State private var isVoting = false
     @State private var voteTrigger = 0
@@ -49,7 +50,8 @@ struct DuplicateSuggestionSheet: View {
             voteTrigger: voteTrigger,
             isVoteLoading: isVoting,
             onSelect: {},
-            onVote: voteForSuggestedRequest
+            onVote: voteForSuggestedRequest,
+            onVoteAnimationCompleted: completeVoteFlow
         )
     }
 
@@ -125,5 +127,11 @@ struct DuplicateSuggestionSheet: View {
             isVoting = false
         }
         return success
+    }
+
+    @MainActor
+    private func completeVoteFlow() {
+        dismiss()
+        onVoteAnimationCompleted()
     }
 }

@@ -19,6 +19,7 @@ struct FeatureRequestRow: View {
     let isVoteLoading: Bool
     let onSelect: () -> Void
     let onVote: () async -> Bool
+    let onVoteAnimationCompleted: (() async -> Void)?
 
     init(
         request: FeatureRequest,
@@ -31,7 +32,8 @@ struct FeatureRequestRow: View {
         voteTrigger: Int = 0,
         isVoteLoading: Bool = false,
         onSelect: @escaping () -> Void,
-        onVote: @escaping () async -> Bool
+        onVote: @escaping () async -> Bool,
+        onVoteAnimationCompleted: (() async -> Void)? = nil
     ) {
         self.request = request
         self.hasVoted = hasVoted
@@ -44,6 +46,7 @@ struct FeatureRequestRow: View {
         self.isVoteLoading = isVoteLoading
         self.onSelect = onSelect
         self.onVote = onVote
+        self.onVoteAnimationCompleted = onVoteAnimationCompleted
     }
 
     private var displayTitle: String {
@@ -119,7 +122,8 @@ struct FeatureRequestRow: View {
             hasVoted: hasVoted,
             voteTrigger: voteTrigger,
             isExternallyLoading: isVoteLoading,
-            onVote: onVote
+            onVote: onVote,
+            onVoteAnimationCompleted: onVoteAnimationCompleted
         )
     }
 }

@@ -6,6 +6,7 @@ struct FeaturePulseVoteButton: View {
     let voteTrigger: Int
     let isExternallyLoading: Bool
     let onVote: () async -> Bool
+    let onVoteAnimationCompleted: (() async -> Void)?
 
     @State private var isVoting = false
     @State private var justVoted = false
@@ -16,13 +17,15 @@ struct FeaturePulseVoteButton: View {
         hasVoted: Bool,
         voteTrigger: Int = 0,
         isExternallyLoading: Bool = false,
-        onVote: @escaping () async -> Bool
+        onVote: @escaping () async -> Bool,
+        onVoteAnimationCompleted: (() async -> Void)? = nil
     ) {
         self.voteCount = voteCount
         self.hasVoted = hasVoted
         self.voteTrigger = voteTrigger
         self.isExternallyLoading = isExternallyLoading
         self.onVote = onVote
+        self.onVoteAnimationCompleted = onVoteAnimationCompleted
     }
 
     var body: some View {
@@ -87,6 +90,8 @@ struct FeaturePulseVoteButton: View {
 
         if success {
             justVoted.toggle()
+            try? await Task.sleep(for: .milliseconds(450))
+            await onVoteAnimationCompleted?()
         }
     }
 

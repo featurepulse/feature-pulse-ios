@@ -125,7 +125,8 @@ public struct NewFeatureRequestView: View {
                     skipDuplicateCheck = true
                     submitFeatureRequest()
                 },
-                voteForExisting: voteForSuggestedRequest
+                voteForExisting: voteForSuggestedRequest,
+                onVoteAnimationCompleted: completeDuplicateVoteFlow
             )
         }
     #endif
@@ -190,7 +191,8 @@ public struct NewFeatureRequestView: View {
                     skipDuplicateCheck = true
                     submitFeatureRequest()
                 },
-                voteForExisting: voteForSuggestedRequest
+                voteForExisting: voteForSuggestedRequest,
+                onVoteAnimationCompleted: completeDuplicateVoteFlow
             )
     }
 
@@ -258,10 +260,8 @@ public struct NewFeatureRequestView: View {
                 try await FeaturePulseAPI.shared.voteForFeatureRequest(id: request.id)
                 await FeaturePulse.shared.markUserActiveIfNeeded()
             }
-            await MainActor.run { onSubmit?(); dismiss() }
             return true
         } catch let error as FeaturePulseError where error == .alreadyVoted {
-            await MainActor.run { onSubmit?(); dismiss() }
             return true
         } catch {
             await MainActor.run {
@@ -271,6 +271,11 @@ public struct NewFeatureRequestView: View {
             }
             return false
         }
+    }
+
+    private func completeDuplicateVoteFlow() {
+        onSubmit?()
+        dismiss()
     }
 }
 
@@ -319,13 +324,15 @@ private extension View {
     func duplicateSuggestionSheet(
         suggestion: Binding<DuplicateSuggestion?>,
         submitAnyway: @escaping () -> Void,
-        voteForExisting: @escaping () async -> Bool
+        voteForExisting: @escaping () async -> Bool,
+        onVoteAnimationCompleted: @escaping () -> Void
     ) -> some View {
         sheet(item: suggestion) { suggestion in
             DuplicateSuggestionSheet(
                 suggestion: suggestion,
                 submitAnyway: submitAnyway,
-                voteForExisting: voteForExisting
+                voteForExisting: voteForExisting,
+                onVoteAnimationCompleted: onVoteAnimationCompleted
             )
         }
     }
