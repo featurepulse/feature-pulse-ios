@@ -258,6 +258,64 @@ struct FeatureRequestDuplicateDetectorTests {
     }
 
     @Test
+    func `suggests voice task creation duplicate without semantic reranker`() async {
+        FeaturePulse.shared.duplicateSuggestionsEnabled = true
+        defer { resetDetectorState() }
+
+        final class CallState: @unchecked Sendable {
+            var count = 0
+        }
+
+        let callState = CallState()
+        let existingRequest = FeatureRequest(
+            id: "speak-to-create-tasks",
+            title: "Speak to create tasks",
+            description: """
+            Speak te create tasks instead of writing as an input. It should than create x tasks depending and
+            determine the date. User can still update task after
+            """,
+            status: .inProgress,
+            voteCount: 6
+        )
+
+        let suggestion = await FeatureRequestDuplicateDetector.suggestion(
+            title: "Voice t create tasks",
+            description: "I want to speak to create tasks",
+            existingRequests: existingRequests(including: existingRequest),
+            semanticReranker: { _, _, _ in
+                callState.count += 1
+                return nil
+            }
+        )
+
+        #expect(suggestion?.request.id == "speak-to-create-tasks")
+        #expect(callState.count == 0)
+    }
+
+    @Test
+    func `does not suggest different short actions with shared object only`() async {
+        FeaturePulse.shared.duplicateSuggestionsEnabled = true
+        defer { resetDetectorState() }
+
+        let suggestion = await FeatureRequestDuplicateDetector.suggestion(
+            title: "Archive dashboard cards",
+            description: "Move dashboard cards into an archive so they are hidden from the active view.",
+            existingRequests: existingRequests(
+                including: FeatureRequest(
+                    id: "share-dashboard-cards",
+                    title: "Share dashboard cards",
+                    description: "Send dashboard cards to teammates with a public link.",
+                    status: .planned,
+                    voteCount: 22
+                )
+            ),
+            semanticReranker: { _, _, _ in nil }
+        )
+
+        #expect(suggestion == nil)
+    }
+
+    @Test
     func `finds duplicate in large request list`() async {
         FeaturePulse.shared.duplicateSuggestionsEnabled = true
         defer { resetDetectorState() }

@@ -78,7 +78,13 @@ enum FeatureRequestDuplicateDetector {
                     fuzzyJaccard(submittedTitleTokens, existingTitleTokens),
                     tokenContainmentScore(submittedTitleTokens, in: existingTitleTokens),
                     tokenContainmentScore(submittedTitleTokens, in: existingCombinedTokens),
-                    tokenContainmentScore(existingTitleTokens, in: submittedCombinedTokens)
+                    tokenContainmentScore(existingTitleTokens, in: submittedCombinedTokens),
+                    shortTitleOverlapScore(
+                        submittedTitleTokens,
+                        existingTitleTokens,
+                        submittedCombinedTokens,
+                        existingCombinedTokens
+                    )
                 )
                 let combinedScore = fuzzyJaccard(submittedCombinedTokens, existingCombinedTokens)
                 let containmentScore = containment(
@@ -135,6 +141,24 @@ enum FeatureRequestDuplicateDetector {
     ) -> Double {
         guard requiredTokens.count >= 2 else { return 0 }
         return fuzzyOverlap(requiredTokens, candidateTokens) == requiredTokens.count ? 0.92 : 0
+    }
+
+    private static func shortTitleOverlapScore(
+        _ lhsTitleTokens: Set<String>,
+        _ rhsTitleTokens: Set<String>,
+        _ lhsCombinedTokens: Set<String>,
+        _ rhsCombinedTokens: Set<String>
+    ) -> Double {
+        guard (2 ... 5).contains(lhsTitleTokens.count), (2 ... 5).contains(rhsTitleTokens.count) else { return 0 }
+
+        let titleOverlap = fuzzyOverlap(lhsTitleTokens, rhsTitleTokens)
+        let titleRatio = Double(titleOverlap) / Double(min(lhsTitleTokens.count, rhsTitleTokens.count))
+        guard titleOverlap >= 2, titleRatio >= 0.55 else { return 0 }
+
+        let combinedOverlap = fuzzyOverlap(lhsCombinedTokens, rhsCombinedTokens)
+        guard combinedOverlap >= max(3, titleOverlap + 1) else { return 0 }
+
+        return 1.0
     }
 
     private static func containment(_ lhs: String, _ rhs: String) -> Double {
