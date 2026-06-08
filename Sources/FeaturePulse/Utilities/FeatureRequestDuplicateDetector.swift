@@ -23,8 +23,7 @@ enum FeatureRequestDuplicateDetector {
 
     private enum Tuning {
         static let localDuplicateThreshold = 0.58
-        static let candidateThreshold = 0.10
-        static let semanticCandidateLimit = 12
+        static let semanticCandidateLimit = 20
     }
 
     static func suggestion(
@@ -70,9 +69,11 @@ enum FeatureRequestDuplicateDetector {
                     false
                 }
             }
-            .map { request in
+            .compactMap { request in
                 let existingTitleTokens = Set(tokens(from: request.title))
                 let existingCombinedTokens = Set(tokens(from: "\(request.title) \(request.description)"))
+                let titleOverlap = fuzzyOverlap(submittedTitleTokens, existingTitleTokens)
+                let combinedOverlap = fuzzyOverlap(submittedCombinedTokens, existingCombinedTokens)
 
                 let titleScore = max(
                     fuzzyJaccard(submittedTitleTokens, existingTitleTokens),
@@ -93,9 +94,11 @@ enum FeatureRequestDuplicateDetector {
                 )
 
                 let score = titleScore * 0.55 + combinedScore * 0.35 + containmentScore * 0.10
+                guard titleOverlap >= 1 || combinedOverlap >= 2 || containmentScore > 0 else {
+                    return nil
+                }
                 return DuplicateSuggestionCandidate(request: request, score: score)
             }
-            .filter { $0.score >= Tuning.candidateThreshold }
             .sorted { lhs, rhs in
                 if lhs.score == rhs.score {
                     return lhs.request.voteCount > rhs.request.voteCount

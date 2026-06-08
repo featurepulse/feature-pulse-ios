@@ -187,7 +187,7 @@ struct FeatureRequestDuplicateDetectorTests {
     }
 
     @Test
-    func `semantic reranker receives at most twelve candidates`() async {
+    func `semantic reranker receives at most twenty candidates`() async {
         FeaturePulse.shared.duplicateSuggestionsEnabled = true
         defer { resetDetectorState() }
 
@@ -218,7 +218,7 @@ struct FeatureRequestDuplicateDetectorTests {
         )
 
         #expect(suggestion == nil)
-        #expect(capture.candidateCount == 12)
+        #expect(capture.candidateCount == 20)
     }
 
     @Test
@@ -258,15 +258,15 @@ struct FeatureRequestDuplicateDetectorTests {
     }
 
     @Test
-    func `suggests voice task creation duplicate without semantic reranker`() async {
+    func `passes semantically similar voice task request to reranker`() async {
         FeaturePulse.shared.duplicateSuggestionsEnabled = true
         defer { resetDetectorState() }
 
-        final class CallState: @unchecked Sendable {
-            var count = 0
+        final class Capture: @unchecked Sendable {
+            var candidateIDs: [String] = []
         }
 
-        let callState = CallState()
+        let capture = Capture()
         let existingRequest = FeatureRequest(
             id: "speak-to-create-tasks",
             title: "Speak to create tasks",
@@ -279,17 +279,68 @@ struct FeatureRequestDuplicateDetectorTests {
         )
 
         let suggestion = await FeatureRequestDuplicateDetector.suggestion(
-            title: "Voice t create tasks",
-            description: "I want to speak to create tasks",
+            title: "Voice to create",
+            description: "Use voice to create tasks",
             existingRequests: existingRequests(including: existingRequest),
-            semanticReranker: { _, _, _ in
-                callState.count += 1
-                return nil
+            semanticReranker: { _, _, candidates in
+                capture.candidateIDs = candidates.map(\.request.id)
+                return candidates
+                    .first { $0.request.id == "speak-to-create-tasks" }
+                    .map { DuplicateSuggestion(request: $0.request) }
             }
         )
 
         #expect(suggestion?.request.id == "speak-to-create-tasks")
-        #expect(callState.count == 0)
+        #expect(capture.candidateIDs.contains("speak-to-create-tasks"))
+    }
+
+    @Test
+    func `suggests duplicate for voice to create screenshot wording`() async {
+        FeaturePulse.shared.duplicateSuggestionsEnabled = true
+        defer { resetDetectorState() }
+
+        let existingRequest = FeatureRequest(
+            id: "voice-t-create-tasks",
+            title: "Voice t create tasks",
+            description: "I want to speak to create tasks",
+            status: .pending,
+            voteCount: 1
+        )
+
+        let suggestion = await FeatureRequestDuplicateDetector.suggestion(
+            title: "Voice to create",
+            description: "Use voice to create tasks",
+            existingRequests: existingRequests(including: existingRequest),
+            semanticReranker: { _, _, _ in nil }
+        )
+
+        #expect(suggestion?.request.id == "voice-t-create-tasks")
+    }
+
+    @Test
+    func `does not locally suggest semantic-only voice request without reranker`() async {
+        FeaturePulse.shared.duplicateSuggestionsEnabled = true
+        defer { resetDetectorState() }
+
+        let existingRequest = FeatureRequest(
+            id: "speak-to-create-tasks",
+            title: "Speak to create tasks",
+            description: """
+            Speak te create tasks instead of writing as an input. It should than create x tasks depending and
+            determine the date. User can still update task after
+            """,
+            status: .inProgress,
+            voteCount: 6
+        )
+
+        let suggestion = await FeatureRequestDuplicateDetector.suggestion(
+            title: "Voice to create",
+            description: "Use voice to create tasks",
+            existingRequests: existingRequests(including: existingRequest),
+            semanticReranker: { _, _, _ in nil }
+        )
+
+        #expect(suggestion == nil)
     }
 
     @Test
