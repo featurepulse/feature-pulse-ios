@@ -43,7 +43,7 @@ public extension FeaturePulse {
         }
 
         public static var close: String {
-            text(\.close, key: "close", defaultValue: "Close")
+            text(\.close, key: "Close", defaultValue: "Close")
         }
 
         public static var retry: String {

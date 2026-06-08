@@ -41,7 +41,7 @@ final class FeaturePulseConfigurationTests {
     func `duplicate suggestion strings are localized for supported languages`() throws {
         let supportedLanguages = ["de", "en", "es", "fr", "it", "pt-PT", "zh-Hans"]
         let requiredKeys = [
-            "close",
+            "Close",
             "duplicate.suggestion.title",
             "duplicate.suggestion.message",
             "duplicate.suggestion.voteForExisting",
