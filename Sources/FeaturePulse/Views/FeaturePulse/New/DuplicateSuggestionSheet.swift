@@ -9,7 +9,23 @@ struct DuplicateSuggestionSheet: View {
     let onVoteAnimationCompleted: () -> Void
 
     @State private var isVoting = false
+    @State private var isCompletingVote = false
+    @State private var displayedHasVoted = false
+    @State private var displayedVoteCount: Int
     @State private var voteTrigger = 0
+
+    init(
+        suggestion: DuplicateSuggestion,
+        submitAnyway: @escaping () -> Void,
+        voteForExisting: @escaping () async -> Bool,
+        onVoteAnimationCompleted: @escaping () -> Void
+    ) {
+        self.suggestion = suggestion
+        self.submitAnyway = submitAnyway
+        self.voteForExisting = voteForExisting
+        self.onVoteAnimationCompleted = onVoteAnimationCompleted
+        _displayedVoteCount = State(initialValue: suggestion.request.voteCount)
+    }
 
     var body: some View {
         NavigationStack {
@@ -40,8 +56,8 @@ struct DuplicateSuggestionSheet: View {
 
     private var suggestedRequestRow: some View {
         FeatureRequestRow(
-            request: suggestion.request,
-            hasVoted: false,
+            request: displayedRequest,
+            hasVoted: displayedHasVoted,
             translatedTitle: nil,
             translatedDescription: nil,
             usesScrollTransition: false,
@@ -62,9 +78,22 @@ struct DuplicateSuggestionSheet: View {
         }
     }
 
+    private var displayedRequest: FeatureRequest {
+        FeatureRequest(
+            id: suggestion.request.id,
+            title: suggestion.request.title,
+            description: suggestion.request.description,
+            status: suggestion.request.status,
+            voteCount: displayedVoteCount,
+            hasVoted: displayedHasVoted,
+            isOwner: suggestion.request.isOwner,
+            createdAt: suggestion.request.createdAt
+        )
+    }
+
     private var voteButton: some View {
         Button {
-            guard !isVoting else { return }
+            guard !isVoting, !isCompletingVote else { return }
             withBackportAnimation(.smooth(duration: 0.2)) {
                 voteTrigger += 1
             }
@@ -88,7 +117,7 @@ struct DuplicateSuggestionSheet: View {
         .tint(FeaturePulse.shared.primaryColor)
         .foregroundStyle(FeaturePulse.shared.foregroundColor)
         .opacity(isVoting ? 0.75 : 1)
-        .disabled(isVoting)
+        .disabled(isVoting || isCompletingVote)
     }
 
     private var submitAnywayButton: some View {
@@ -105,7 +134,7 @@ struct DuplicateSuggestionSheet: View {
         .tint(Color.label)
         .foregroundStyle(Color.systemBackground)
         .opacity(isVoting ? 0.45 : 1)
-        .disabled(isVoting)
+        .disabled(isVoting || isCompletingVote)
     }
 
     private var closeButton: some View {
@@ -116,14 +145,25 @@ struct DuplicateSuggestionSheet: View {
                 .font(.body.weight(.semibold))
         }
         .accessibilityLabel(L10n.close)
-        .disabled(isVoting)
+        .disabled(isVoting || isCompletingVote)
     }
 
     private func voteForSuggestedRequest() async -> Bool {
-        guard !isVoting else { return false }
+        guard !isVoting, !isCompletingVote else { return false }
         isVoting = true
         let success = await voteForExisting()
-        if !success {
+        if success {
+            withBackportAnimation(.bouncy(duration: 0.35)) {
+                isVoting = false
+                isCompletingVote = true
+                if !displayedHasVoted {
+                    displayedHasVoted = true
+                    if !suggestion.request.hasVoted {
+                        displayedVoteCount += 1
+                    }
+                }
+            }
+        } else {
             isVoting = false
         }
         return success
