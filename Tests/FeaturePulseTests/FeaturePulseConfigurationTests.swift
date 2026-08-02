@@ -31,6 +31,13 @@ final class FeaturePulseConfigurationTests {
     }
 
     @Test
+    func `restriction message supports printf placeholder`() {
+        FeaturePulse.shared.localization.restrictionMessage = "Only %@ users can add new requests."
+
+        #expect(L10n.restrictionMessage(subscriptionName: "Premium") == "Only Premium users can add new requests.")
+    }
+
+    @Test
     func `localization supports direct typed mutation`() {
         FeaturePulse.shared.localization.requestFeature = "Idee senden"
 

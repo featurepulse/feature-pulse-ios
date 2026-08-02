@@ -203,6 +203,7 @@ public extension FeaturePulse {
                 defaultValue: "Only {subscriptionName} users can add new feature requests, but you can vote for already added requests."
             )
             .replacingOccurrences(of: "{subscriptionName}", with: subscriptionName)
+            .replacingOccurrences(of: "%@", with: subscriptionName)
         }
 
         // MARK: - Translation
