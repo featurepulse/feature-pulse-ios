@@ -112,6 +112,10 @@ public final class FeaturePulse: ObservableObject, @unchecked Sendable {
     /// Whether to show watermark branding (controlled from API based on subscription)
     @Published public internal(set) var showWatermark: Bool = true
 
+    /// Whether to suggest existing requests before submitting likely duplicates.
+    /// This is controlled by the API based on the project owner's plan.
+    @Published public internal(set) var duplicateSuggestionsEnabled: Bool = false
+
     /// Whether feature request submission is disabled for this project by the API
     @Published public internal(set) var featureRequestsDisabled: Bool = false
 

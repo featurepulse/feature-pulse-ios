@@ -37,12 +37,103 @@ REQUESTS = [
         "is_owner": True,
         "created_at": "2026-05-26T12:00:00Z",
     },
+    {
+        "id": "mock-request-4",
+        "title": "Push notifications for updates",
+        "description": "Notify users when a feature they voted for changes status or gets shipped.",
+        "status": "pending",
+        "vote_count": 71,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-05-27T09:15:00Z",
+    },
+    {
+        "id": "mock-request-5",
+        "title": "In-app screenshot attachments",
+        "description": "Allow users to include screenshots when they submit feature requests.",
+        "status": "planned",
+        "vote_count": 59,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-05-28T14:45:00Z",
+    },
+    {
+        "id": "mock-request-6",
+        "title": "Duplicate request detection",
+        "description": "Suggest similar existing requests before a user submits a new one.",
+        "status": "in_progress",
+        "vote_count": 52,
+        "has_voted": True,
+        "is_owner": False,
+        "created_at": "2026-05-29T08:20:00Z",
+    },
+    {
+        "id": "mock-request-7",
+        "title": "Roadmap tab for shipped features",
+        "description": "Show completed requests separately so users can see recent progress.",
+        "status": "completed",
+        "vote_count": 44,
+        "has_voted": False,
+        "is_owner": True,
+        "created_at": "2026-05-30T16:10:00Z",
+    },
+    {
+        "id": "mock-request-8",
+        "title": "Sort by newest",
+        "description": "Let users switch between top-voted requests and the newest ideas.",
+        "status": "completed",
+        "vote_count": 31,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-05-31T10:40:00Z",
+    },
+    {
+        "id": "mock-request-9",
+        "title": "Anonymous voting option",
+        "description": "Let teams collect votes without showing user names in exported reports.",
+        "status": "pending",
+        "vote_count": 28,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-06-01T13:05:00Z",
+    },
+    {
+        "id": "mock-request-10",
+        "title": "Admin reply on requests",
+        "description": "Let product teams add a short response or status note to a request.",
+        "status": "planned",
+        "vote_count": 23,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-06-02T11:25:00Z",
+    },
+    {
+        "id": "mock-request-11",
+        "title": "Filter by my votes",
+        "description": "Add a quick way for users to see the requests they already supported.",
+        "status": "pending",
+        "vote_count": 18,
+        "has_voted": True,
+        "is_owner": False,
+        "created_at": "2026-06-03T15:55:00Z",
+    },
+    {
+        "id": "mock-request-12",
+        "title": "Localized request list",
+        "description": "Translate request titles and descriptions into the user's device language.",
+        "status": "pending",
+        "vote_count": 12,
+        "has_voted": False,
+        "is_owner": False,
+        "created_at": "2026-06-04T09:35:00Z",
+    },
 ]
 
 SETTINGS = {
     "show_status": True,
     "show_translation": False,
     "show_watermark": False,
+    "duplicate_suggestions_enabled": True,
     "feature_requests_disabled": False,
     "can_create_feature_request": True,
 }
@@ -55,6 +146,7 @@ def feature_requests_payload(requests=None):
         "show_status": SETTINGS["show_status"],
         "show_translation": SETTINGS["show_translation"],
         "show_watermark": SETTINGS["show_watermark"],
+        "duplicate_suggestions_enabled": SETTINGS["duplicate_suggestions_enabled"],
         "feature_requests_disabled": SETTINGS["feature_requests_disabled"],
         "permissions": {"can_create_feature_request": SETTINGS["can_create_feature_request"]},
         "status_config": {
@@ -115,6 +207,8 @@ class Handler(BaseHTTPRequestHandler):
                 SETTINGS["show_translation"] = bool(body["show_translation"])
             if "show_watermark" in body:
                 SETTINGS["show_watermark"] = bool(body["show_watermark"])
+            if "duplicate_suggestions_enabled" in body:
+                SETTINGS["duplicate_suggestions_enabled"] = bool(body["duplicate_suggestions_enabled"])
             if "feature_requests_disabled" in body:
                 SETTINGS["feature_requests_disabled"] = bool(body["feature_requests_disabled"])
             if "can_create_feature_request" in body:

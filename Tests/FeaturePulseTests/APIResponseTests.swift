@@ -32,6 +32,21 @@ struct APIResponseTests {
         #expect(response.success)
         #expect(response.message == "tracked")
     }
+
+    @Test
+    func `feature requests response decodes duplicate suggestions setting`() throws {
+        let data = """
+        {
+          "success": true,
+          "data": [],
+          "duplicate_suggestions_enabled": true
+        }
+        """.data(using: .utf8)!
+
+        let response = try JSONDecoder().decode(FeatureRequestsResponse.self, from: data)
+
+        #expect(response.duplicateSuggestionsEnabled == true)
+    }
 }
 
 // swiftlint:enable identifier_name

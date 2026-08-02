@@ -11,6 +11,7 @@ public extension FeaturePulse {
         public var emailOptional: LocalizedStringResource?
         public var submit: LocalizedStringResource?
         public var cancel: LocalizedStringResource?
+        public var close: LocalizedStringResource?
         public var retry: LocalizedStringResource?
         public var statusPending: LocalizedStringResource?
         public var statusApproved: LocalizedStringResource?
@@ -22,6 +23,10 @@ public extension FeaturePulse {
         public var error: LocalizedStringResource?
         public var ok: LocalizedStringResource?
         public var thankYou: LocalizedStringResource?
+        public var duplicateSuggestionTitle: LocalizedStringResource?
+        public var duplicateSuggestionMessage: LocalizedStringResource?
+        public var voteForExisting: LocalizedStringResource?
+        public var submitAnyway: LocalizedStringResource?
         public var invalidEmail: LocalizedStringResource?
         public var titleTooShort: LocalizedStringResource?
         public var titleTooLong: LocalizedStringResource?
@@ -50,7 +55,10 @@ public extension FeaturePulse {
         public var sortNewest: LocalizedStringResource?
         public var sort: LocalizedStringResource?
         public var sortReset: LocalizedStringResource?
+        public var vote: LocalizedStringResource?
+        public var removeVote: LocalizedStringResource?
 
+        // swiftlint:disable:next function_body_length
         public init(
             featureRequests: LocalizedStringResource? = nil,
             newFeatureRequest: LocalizedStringResource? = nil,
@@ -61,6 +69,7 @@ public extension FeaturePulse {
             emailOptional: LocalizedStringResource? = nil,
             submit: LocalizedStringResource? = nil,
             cancel: LocalizedStringResource? = nil,
+            close: LocalizedStringResource? = nil,
             retry: LocalizedStringResource? = nil,
             statusPending: LocalizedStringResource? = nil,
             statusApproved: LocalizedStringResource? = nil,
@@ -72,6 +81,10 @@ public extension FeaturePulse {
             error: LocalizedStringResource? = nil,
             ok: LocalizedStringResource? = nil,
             thankYou: LocalizedStringResource? = nil,
+            duplicateSuggestionTitle: LocalizedStringResource? = nil,
+            duplicateSuggestionMessage: LocalizedStringResource? = nil,
+            voteForExisting: LocalizedStringResource? = nil,
+            submitAnyway: LocalizedStringResource? = nil,
             invalidEmail: LocalizedStringResource? = nil,
             titleTooShort: LocalizedStringResource? = nil,
             titleTooLong: LocalizedStringResource? = nil,
@@ -99,7 +112,9 @@ public extension FeaturePulse {
             sortTop: LocalizedStringResource? = nil,
             sortNewest: LocalizedStringResource? = nil,
             sort: LocalizedStringResource? = nil,
-            sortReset: LocalizedStringResource? = nil
+            sortReset: LocalizedStringResource? = nil,
+            vote: LocalizedStringResource? = nil,
+            removeVote: LocalizedStringResource? = nil
         ) {
             self.featureRequests = featureRequests
             self.newFeatureRequest = newFeatureRequest
@@ -110,6 +125,7 @@ public extension FeaturePulse {
             self.emailOptional = emailOptional
             self.submit = submit
             self.cancel = cancel
+            self.close = close
             self.retry = retry
             self.statusPending = statusPending
             self.statusApproved = statusApproved
@@ -121,6 +137,10 @@ public extension FeaturePulse {
             self.error = error
             self.ok = ok
             self.thankYou = thankYou
+            self.duplicateSuggestionTitle = duplicateSuggestionTitle
+            self.duplicateSuggestionMessage = duplicateSuggestionMessage
+            self.voteForExisting = voteForExisting
+            self.submitAnyway = submitAnyway
             self.invalidEmail = invalidEmail
             self.titleTooShort = titleTooShort
             self.titleTooLong = titleTooLong
@@ -149,6 +169,8 @@ public extension FeaturePulse {
             self.sortNewest = sortNewest
             self.sort = sort
             self.sortReset = sortReset
+            self.vote = vote
+            self.removeVote = removeVote
         }
     }
 }

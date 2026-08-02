@@ -135,6 +135,10 @@ public final class FeaturePulseAPI: Sendable {
             config.showWatermark = showWatermark
         }
 
+        if let duplicateSuggestionsEnabled = response.duplicateSuggestionsEnabled {
+            config.duplicateSuggestionsEnabled = duplicateSuggestionsEnabled
+        }
+
         if let featureRequestsDisabled = response.featureRequestsDisabled {
             config.featureRequestsDisabled = featureRequestsDisabled
         }

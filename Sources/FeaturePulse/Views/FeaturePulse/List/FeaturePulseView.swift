@@ -179,7 +179,7 @@ public struct FeaturePulseView: View {
             }
         }
         .sheet(isPresented: $showingNewRequest) {
-            NewFeatureRequestView {
+            NewFeatureRequestView(existingRequests: viewModel.featureRequests) {
                 Task {
                     await viewModel.loadFeatureRequests()
                     await MainActor.run {
@@ -316,21 +316,20 @@ public struct FeaturePulseView: View {
 
                             VStack {
                                 ForEach(displayedRequests) { request in
-                                    Button {
-                                        selectedRequest = request
-                                    } label: {
-                                        FeatureRequestRow(
-                                            request: request,
-                                            hasVoted: viewModel.hasVoted(for: request.id),
-                                            translatedTitle: enableTranslations ? translations[request.id]?.title : nil,
-                                            translatedDescription: enableTranslations
-                                                ? translations[request.id]?.description
-                                                : nil
-                                        ) {
+                                    FeatureRequestRow(
+                                        request: request,
+                                        hasVoted: viewModel.hasVoted(for: request.id),
+                                        translatedTitle: enableTranslations ? translations[request.id]?.title : nil,
+                                        translatedDescription: enableTranslations
+                                            ? translations[request.id]?.description
+                                            : nil,
+                                        onSelect: {
+                                            selectedRequest = request
+                                        },
+                                        onVote: {
                                             await viewModel.toggleVote(for: request.id)
                                         }
-                                    }
-                                    .buttonStyle(.plain)
+                                    )
                                     .padding(.horizontal, 16)
                                     .id(request.id)
                                     .overlay(
@@ -475,6 +474,30 @@ private let mockRequests: [FeatureRequest] = [
     FeatureRequest(
         id: "4", title: "Push Notifications", description: "Get notified on updates",
         status: .pending, voteCount: 37, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "5", title: "Screenshot Attachments", description: "Attach screenshots to requests",
+        status: .planned, voteCount: 31, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "6", title: "Duplicate Detection", description: "Suggest similar ideas before submit",
+        status: .inProgress, voteCount: 28, hasVoted: true
+    ),
+    FeatureRequest(
+        id: "7", title: "Completed Roadmap", description: "See what shipped recently",
+        status: .completed, voteCount: 22, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "8", title: "My Votes Filter", description: "Quickly revisit supported ideas",
+        status: .pending, voteCount: 18, hasVoted: true
+    ),
+    FeatureRequest(
+        id: "9", title: "Admin Replies", description: "Show product team responses",
+        status: .planned, voteCount: 14, hasVoted: false
+    ),
+    FeatureRequest(
+        id: "10", title: "Localized Requests", description: "Translate ideas into device language",
+        status: .pending, voteCount: 9, hasVoted: false
     )
 ]
 

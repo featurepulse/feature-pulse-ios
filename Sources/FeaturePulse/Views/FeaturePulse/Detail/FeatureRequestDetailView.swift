@@ -120,21 +120,23 @@ struct FeatureRequestDetailView: View {
                     isVoting = false
                 }
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     if isVoting {
                         ProgressView()
                             .controlSize(.small)
+                            .tint(localHasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
                     } else {
                         Image(systemName: "triangle.fill")
                             .font(.caption2.weight(.semibold))
                             .backport.symbolEffect(.bounce, value: request.hasVoted)
                     }
-                    Text(verbatim: "\(request.voteCount)")
-                        .font(.subheadline.weight(.semibold))
-                        .backport.contentTransition(.numericText(value: Double(request.voteCount)))
+
+                    voteCountLabel
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
+                .frame(minWidth: 68)
+                .fixedSize(horizontal: true, vertical: false)
                 .background(localHasVoted ? voteColor : voteColor.opacity(0.1))
                 .foregroundStyle(localHasVoted ? FeaturePulse.shared.foregroundColor : voteColor)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -146,5 +148,14 @@ struct FeatureRequestDetailView: View {
 
     private var voteColor: Color {
         FeaturePulse.shared.primaryColor
+    }
+
+    private var voteCountLabel: some View {
+        Text(verbatim: "\(request.voteCount)")
+            .font(.subheadline.weight(.semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .fixedSize(horizontal: true, vertical: false)
+            .backport.contentTransition(.numericText(value: Double(request.voteCount)))
     }
 }

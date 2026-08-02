@@ -1,3 +1,3 @@
 enum FeaturePulseSDK {
-    static let version = "1.12.2"
+    static let version = "1.13.0"
 }
